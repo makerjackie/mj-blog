@@ -60,25 +60,23 @@ function AboutPage() {
                   <ArrowRightIcon />
                 </Button>
                 <Button
-                  render={
-                    <a href="https://makerjackie.com/projects" aria-label={copy.secondaryAction} />
-                  }
+                  render={<a href="/projects" aria-label={copy.secondaryAction} />}
                   variant="outline"
                   nativeButton={false}
                 >
                   {copy.secondaryAction}
-                  <ExternalLinkIcon />
+                  <ArrowRightIcon />
                 </Button>
               </div>
             </div>
 
-            <aside className="border border-border bg-muted/35 p-5">
+            <aside className="flex items-start gap-5 border-t border-border pt-6 lg:block lg:border-t lg:bg-muted/20 lg:p-5">
               <img
                 src="/jackie-avatar.jpg"
                 alt="MakerJackie"
-                className="aspect-square w-full object-cover"
+                className="size-24 shrink-0 border-2 border-border object-cover shadow-[5px_5px_0_0_var(--border)] sm:size-32 lg:size-36"
               />
-              <div className="mt-5">
+              <div className="lg:mt-5">
                 <p className="text-sm font-semibold text-link uppercase">MakerJackie</p>
                 <p className="mt-2 text-2xl font-semibold">{copy.profileTitle}</p>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.profileBody}</p>
@@ -190,7 +188,7 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
           eyebrow: "Work",
           title: "看公开项目",
           description: "查看 Jackie 做过的产品、公开实验和长期项目。",
-          href: "https://makerjackie.com/projects",
+          href: "/projects",
         },
         {
           eyebrow: "Template",
@@ -243,7 +241,7 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
         title: "View public projects",
         description:
           "Browse products, public experiments, and long-running projects Jackie has built.",
-        href: "https://makerjackie.com/projects",
+        href: "/projects",
       },
       {
         eyebrow: "Template",

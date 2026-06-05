@@ -1,12 +1,9 @@
 import type { Post, SupportedLocale } from "@repo/core";
 import { formatDate } from "@repo/core";
-import { cn } from "@repo/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { CalendarDaysIcon, LibraryIcon } from "lucide-react";
-import { useState } from "react";
 
 import { getCurrentLocale } from "#/lib/i18n";
-import { resolvePostCoverImage } from "#/lib/post-cover-image";
 import { m } from "#/paraglide/messages.js";
 
 type PostCardProps = {
@@ -15,74 +12,56 @@ type PostCardProps = {
   readonly locale?: SupportedLocale;
 };
 
-export function PostCard({ post, priority = false, locale = getCurrentLocale() }: PostCardProps) {
-  const resolvedCoverImage = resolvePostCoverImage(post.coverImage);
-  const [failedCoverImage, setFailedCoverImage] = useState("");
-  const coverImage = failedCoverImage === resolvedCoverImage ? "" : resolvedCoverImage;
-
+export function PostCard({ post, locale = getCurrentLocale() }: PostCardProps) {
   return (
-    <article
-      className={cn(
-        "grid overflow-hidden rounded-lg border border-border/80 bg-card shadow-xs transition hover:border-ring/45 hover:shadow-sm",
-        coverImage && "md:grid-cols-[0.42fr_0.58fr]",
-      )}
-    >
-      {coverImage ? (
-        <Link to="/blog/$slug" params={{ slug: post.slug }} className="block min-h-56 bg-muted">
-          <img
-            src={coverImage}
-            alt=""
-            loading={priority ? "eager" : "lazy"}
-            onError={() => setFailedCoverImage(resolvedCoverImage)}
-            className="h-full min-h-56 w-full object-cover"
-          />
-        </Link>
-      ) : null}
-      <div className={cn("flex min-w-0 flex-col p-5", !coverImage && "sm:p-6")}>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
+    <article className="border-b border-border/70 py-6 last:border-b-0 sm:py-7">
+      <Link
+        to="/blog/$slug"
+        params={{ slug: post.slug }}
+        className="group grid gap-3 no-underline transition hover:no-underline sm:grid-cols-[9rem_minmax(0,1fr)]"
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-muted-foreground sm:block sm:pt-1">
+          <span className="inline-flex items-center gap-1.5 sm:flex">
             <CalendarDaysIcon className="size-3.5" />
-            {formatDate(post.publishedAt, locale)}
+            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt, locale)}</time>
           </span>
-          {post.pinned ? (
-            <span className="rounded-sm bg-accent px-2 py-0.5 text-accent-foreground">
-              {m.pinned()}
-            </span>
-          ) : null}
-          {post.featured ? (
-            <span className="rounded-sm bg-accent px-2 py-0.5 text-accent-foreground">
-              {m.featured()}
-            </span>
-          ) : null}
-          {post.series ? (
-            <Link
-              to="/series/$slug"
-              params={{ slug: post.series.slug }}
-              className="inline-flex items-center gap-1 rounded-sm bg-accent px-2 py-0.5 text-accent-foreground transition hover:bg-accent/80"
-            >
-              <LibraryIcon className="size-3.5" />
-              {post.series.name}
-            </Link>
-          ) : null}
+          <span className="sm:mt-2 sm:block">
+            {[post.pinned ? m.pinned() : "", post.featured ? m.featured() : ""]
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
         </div>
-        <Link to="/blog/$slug" params={{ slug: post.slug }} className="group mt-3">
-          <h2 className="text-2xl font-semibold text-balance group-hover:text-link">
+
+        <div className="min-w-0">
+          <h2 className="text-2xl leading-snug font-semibold text-balance group-hover:text-link">
             {post.title}
           </h2>
-        </Link>
-        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
+        </div>
+      </Link>
+
+      <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 sm:ml-36">
+        {post.series ? (
+          <Link
+            to="/series/$slug"
+            params={{ slug: post.series.slug }}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground underline-offset-4 transition hover:text-link hover:underline"
+          >
+            <LibraryIcon className="size-3.5" />
+            {post.series.name}
+          </Link>
+        ) : null}
+        {post.tags.map((tag) => (
+          <span key={tag.slug} className="inline-flex items-center gap-3">
             <Link
-              key={tag.slug}
               to="/tags/$slug"
               params={{ slug: tag.slug }}
-              className="rounded-sm border border-border bg-muted/45 px-2 py-1 text-xs text-muted-foreground transition hover:border-ring/50 hover:text-foreground"
+              className="text-xs font-medium text-muted-foreground underline-offset-4 transition hover:text-link hover:underline"
             >
-              {tag.name}
+              #{tag.name}
             </Link>
-          ))}
-        </div>
+          </span>
+        ))}
       </div>
     </article>
   );

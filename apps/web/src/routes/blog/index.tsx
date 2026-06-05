@@ -1,6 +1,7 @@
 import { localizePost, localizeSeries, localizeSiteSettings, localizeTag } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
+import { cn } from "@repo/ui/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { SearchIcon } from "lucide-react";
 
@@ -57,7 +58,7 @@ function BlogIndexPage() {
           <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">{m.blog_title()}</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">{m.blog_description()}</p>
         </div>
-        <form className="mt-8 grid gap-4 rounded-lg border border-border/80 bg-card p-4 shadow-xs md:grid-cols-[minmax(0,1fr)_auto]">
+        <form className="mt-8 grid gap-4 border-y border-border py-4 md:grid-cols-[minmax(0,1fr)_auto]">
           {search.tag ? <input type="hidden" name="tag" value={search.tag} /> : null}
           {search.series ? <input type="hidden" name="series" value={search.series} /> : null}
           <label className="relative block">
@@ -71,7 +72,7 @@ function BlogIndexPage() {
             />
           </label>
           <Button type="submit">{m.blog_search_submit()}</Button>
-          <details className="rounded-md border border-border bg-muted/30 p-3 md:col-span-2 md:hidden">
+          <details className="border-t border-border pt-3 md:col-span-2 md:hidden">
             <summary className="cursor-pointer text-sm font-semibold">
               {locale === "zh" ? "筛选文章" : "Filter articles"}
             </summary>
@@ -83,13 +84,13 @@ function BlogIndexPage() {
             <FilterGroups search={search} tags={tags} series={series} />
           </div>
         </form>
-        <div className="mt-8 grid gap-5">
+        <div className="mt-8">
           {posts.length ? (
             posts.map((post, index) => (
               <PostCard key={post.id} post={post} priority={index === 0} locale={locale} />
             ))
           ) : (
-            <p className="rounded-lg border border-border/80 bg-card p-6 text-sm text-muted-foreground">
+            <p className="border-y border-border py-6 text-sm text-muted-foreground">
               {m.blog_no_results()}
             </p>
           )}
@@ -153,61 +154,56 @@ function FilterGroups({
 }) {
   return (
     <>
-      <div className="flex flex-wrap gap-2" aria-label={m.blog_filter_label()}>
-        <Button
-          render={<a href={blogHref({ q: search.q })} aria-label={m.blog_filter_all()} />}
-          nativeButton={false}
-          variant={search.tag ? "outline" : "default"}
-          size="sm"
+      <div className="flex flex-wrap gap-x-4 gap-y-2" aria-label={m.blog_filter_label()}>
+        <a
+          href={blogHref({ q: search.q })}
+          aria-label={m.blog_filter_all()}
+          aria-current={search.tag ? undefined : "true"}
+          className={filterLinkClassName(!search.tag)}
         >
           {m.blog_filter_all()}
-        </Button>
+        </a>
         {tags.slice(0, 8).map((tag) => (
-          <Button
+          <a
             key={tag.slug}
-            render={
-              <a
-                href={blogHref({ q: search.q, tag: tag.slug, series: search.series })}
-                aria-label={tag.name}
-              />
-            }
-            nativeButton={false}
-            variant={search.tag === tag.slug ? "default" : "outline"}
-            size="sm"
+            href={blogHref({ q: search.q, tag: tag.slug, series: search.series })}
+            aria-label={tag.name}
+            aria-current={search.tag === tag.slug ? "true" : undefined}
+            className={filterLinkClassName(search.tag === tag.slug)}
           >
             {tag.name}
-          </Button>
+          </a>
         ))}
       </div>
-      <div className="flex flex-wrap gap-2" aria-label={m.blog_series_filter_label()}>
-        <Button
-          render={
-            <a href={blogHref({ q: search.q, tag: search.tag })} aria-label={m.blog_series_all()} />
-          }
-          nativeButton={false}
-          variant={search.series ? "outline" : "default"}
-          size="sm"
+      <div className="flex flex-wrap gap-x-4 gap-y-2" aria-label={m.blog_series_filter_label()}>
+        <a
+          href={blogHref({ q: search.q, tag: search.tag })}
+          aria-label={m.blog_series_all()}
+          aria-current={search.series ? undefined : "true"}
+          className={filterLinkClassName(!search.series)}
         >
           {m.blog_series_all()}
-        </Button>
+        </a>
         {series.slice(0, 6).map((item) => (
-          <Button
+          <a
             key={item.slug}
-            render={
-              <a
-                href={blogHref({ q: search.q, tag: search.tag, series: item.slug })}
-                aria-label={item.name}
-              />
-            }
-            nativeButton={false}
-            variant={search.series === item.slug ? "default" : "outline"}
-            size="sm"
+            href={blogHref({ q: search.q, tag: search.tag, series: item.slug })}
+            aria-label={item.name}
+            aria-current={search.series === item.slug ? "true" : undefined}
+            className={filterLinkClassName(search.series === item.slug)}
           >
             {item.name}
-          </Button>
+          </a>
         ))}
       </div>
     </>
+  );
+}
+
+function filterLinkClassName(active: boolean) {
+  return cn(
+    "inline-flex min-h-8 items-center border-b-2 px-0.5 text-sm font-semibold underline-offset-4 transition hover:text-link",
+    active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground",
   );
 }
 

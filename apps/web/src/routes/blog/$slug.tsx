@@ -135,68 +135,75 @@ function BlogPostPage() {
   return (
     <SiteShell siteSettings={localizedSiteSettings}>
       <article>
-        <header className="relative isolate flex min-h-[calc(100svh-3.5rem)] items-end overflow-hidden bg-foreground text-white">
-          {coverImage ? (
-            <>
-              <img
-                src={coverImage}
-                alt=""
-                className="absolute inset-0 -z-20 size-full object-cover"
-              />
-              <div className="absolute inset-0 -z-10 bg-linear-to-t from-black/85 via-black/40 to-black/20" />
-            </>
-          ) : null}
+        <header className="border-b border-border bg-background">
+          <div className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+            {user?.role === "admin" ? (
+              <Link
+                to="/admin/posts/$postId"
+                params={{ postId: localizedPost.id }}
+                className="absolute top-5 right-4 z-10 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground underline-offset-4 hover:text-link hover:underline sm:right-6 lg:right-8"
+                aria-label={editLabel}
+              >
+                <PencilLineIcon className="size-4" />
+                {editLabel}
+              </Link>
+            ) : null}
 
-          {user?.role === "admin" ? (
-            <Link
-              to="/admin/posts/$postId"
-              params={{ postId: localizedPost.id }}
-              className="absolute top-5 right-4 z-10 inline-flex items-center gap-2 text-sm font-semibold text-white underline-offset-4 drop-shadow-md hover:underline sm:right-6 lg:right-8"
-              aria-label={editLabel}
+            <div
+              className={cn(
+                "grid gap-6",
+                coverImage && "lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end",
+              )}
             >
-              <PencilLineIcon className="size-4" />
-              {editLabel}
-            </Link>
-          ) : null}
-
-          <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-14 sm:px-6 sm:pb-20 lg:px-8">
-            <div className="max-w-4xl">
-              <div className="flex flex-wrap gap-x-4 gap-y-2">
-                {localizedPost.series ? (
-                  <Link
-                    to="/series/$slug"
-                    params={{ slug: localizedPost.series.slug }}
-                    className="text-xs font-semibold tracking-[0.18em] text-white uppercase underline-offset-4 drop-shadow-md hover:underline"
-                  >
-                    {localizedPost.series.name}
-                  </Link>
-                ) : null}
-                {localizedPost.tags.map((tag) => (
-                  <Link
-                    key={tag.slug}
-                    to="/tags/$slug"
-                    params={{ slug: tag.slug }}
-                    className="text-xs font-semibold tracking-[0.18em] text-white/80 uppercase underline-offset-4 drop-shadow-md hover:text-white hover:underline"
-                  >
-                    {tag.name}
-                  </Link>
-                ))}
+              <div className="min-w-0">
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                  {localizedPost.series ? (
+                    <Link
+                      to="/series/$slug"
+                      params={{ slug: localizedPost.series.slug }}
+                      className="text-xs font-semibold tracking-[0.18em] text-link uppercase underline-offset-4 hover:underline"
+                    >
+                      {localizedPost.series.name}
+                    </Link>
+                  ) : null}
+                  {localizedPost.tags.map((tag) => (
+                    <Link
+                      key={tag.slug}
+                      to="/tags/$slug"
+                      params={{ slug: tag.slug }}
+                      className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase underline-offset-4 hover:text-link hover:underline"
+                    >
+                      {tag.name}
+                    </Link>
+                  ))}
+                </div>
+                <h1 className="mt-5 max-w-4xl text-4xl leading-tight font-semibold text-balance sm:text-5xl">
+                  {localizedPost.title}
+                </h1>
+                <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
+                  {localizedPost.excerpt}
+                </p>
+                <p className="mt-5 text-sm font-medium tracking-wide text-muted-foreground">
+                  {formatDate(localizedPost.publishedAt, locale)} · {m.updated()}{" "}
+                  {formatDate(localizedPost.updatedAt, locale)} · {localizedPost.authorName}
+                </p>
               </div>
-              <h1 className="mt-6 max-w-4xl text-4xl leading-tight font-semibold text-balance drop-shadow-lg sm:text-6xl">
-                {localizedPost.title}
-              </h1>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-white/85 drop-shadow-md sm:text-xl">
-                {localizedPost.excerpt}
-              </p>
-              <p className="mt-7 text-sm font-medium tracking-wide text-white/75 drop-shadow-md">
-                {formatDate(localizedPost.publishedAt, locale)} · {m.updated()}{" "}
-                {formatDate(localizedPost.updatedAt, locale)} · {localizedPost.authorName}
-              </p>
+
+              {coverImage ? (
+                <div className="overflow-hidden border border-border bg-muted">
+                  <img
+                    src={coverImage}
+                    alt=""
+                    loading="eager"
+                    className="aspect-[16/7] w-full object-cover lg:aspect-[4/3]"
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </header>
 
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[12rem_minmax(0,48rem)] lg:px-8 xl:grid-cols-[12rem_minmax(0,48rem)_12rem]">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[12rem_minmax(0,48rem)] lg:px-8 xl:grid-cols-[12rem_minmax(0,48rem)_12rem]">
           <aside className="hidden lg:block">
             <nav aria-label={m.contents()} className="sticky top-24 text-sm">
               <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">

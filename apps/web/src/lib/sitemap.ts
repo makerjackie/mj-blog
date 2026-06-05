@@ -11,7 +11,7 @@ export async function getSitemapPaths() {
       listD1Series().catch(() => []),
     ]);
     const docsPaths = source.getPages().map((page) => page.url);
-    const pagePaths = ["", "/demo", "/blog", "/docs", "/series", "/tags", "/about"];
+    const pagePaths = ["", "/demo", "/blog", "/docs", "/series", "/tags", "/projects", "/about"];
     const postPaths = posts.map((post) => `/blog/${post.slug}`);
     const taxonomyPaths = [
       ...series.map((item) => `/series/${item.slug}`),

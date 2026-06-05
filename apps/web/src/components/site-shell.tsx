@@ -8,8 +8,8 @@ import {
   HomeIcon,
   InfoIcon,
   Loader2Icon,
+  FolderKanbanIcon,
   SearchIcon,
-  TagsIcon,
   UserCircleIcon,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -131,7 +131,7 @@ type ShellNavigationItem = SiteSettings["navigation"][number];
 const defaultMarketingNavigation: ShellNavigationItem[] = [
   { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
   { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
-  { label: "Projects", href: "https://makerjackie.com/projects", i18n: { label: { zh: "项目" } } },
+  { label: "Projects", href: "/projects", i18n: { label: { zh: "项目" } } },
   { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
 ];
 
@@ -146,8 +146,20 @@ function getMarketingNavigation(
 
   return navigation.map((item) => ({
     ...item,
+    href: normalizeMarketingNavigationHref(item.href),
     label: item.i18n?.label?.[locale] ?? item.label,
   }));
+}
+
+function normalizeMarketingNavigationHref(href: string) {
+  if (
+    href === "https://makerjackie.com/projects" ||
+    href === "https://www.makerjackie.com/projects"
+  ) {
+    return "/projects";
+  }
+
+  return href;
 }
 
 function isLegacyStarterNavigation(navigation: ShellNavigationItem[]) {
@@ -174,9 +186,9 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
       icon: SearchIcon,
     },
     {
-      href: "/tags",
-      label: locale === "zh" ? "标签" : "Tags",
-      icon: TagsIcon,
+      href: "/projects",
+      label: locale === "zh" ? "项目" : "Projects",
+      icon: FolderKanbanIcon,
     },
     {
       href: "/about",

@@ -18,7 +18,7 @@ export const siteSettings: SiteSettings = {
     { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
     {
       label: "Projects",
-      href: "https://makerjackie.com/projects",
+      href: "/projects",
       i18n: { label: { zh: "项目" } },
     },
     { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },

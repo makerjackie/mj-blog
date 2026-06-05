@@ -13,7 +13,6 @@ import {
   ArrowRightIcon,
   BookOpenIcon,
   Code2Icon,
-  ExternalLinkIcon,
   LightbulbIcon,
   RssIcon,
   SparklesIcon,
@@ -71,26 +70,24 @@ function HomePage() {
                   <ArrowRightIcon />
                 </Button>
                 <Button
-                  render={
-                    <a href="https://makerjackie.com/projects" aria-label={copy.secondaryAction} />
-                  }
+                  render={<Link to="/projects" aria-label={copy.secondaryAction} />}
                   nativeButton={false}
                   size="lg"
                   variant="outline"
                 >
                   {copy.secondaryAction}
-                  <ExternalLinkIcon />
+                  <ArrowRightIcon />
                 </Button>
               </div>
             </div>
 
-            <aside className="border border-border bg-muted/35 p-5">
+            <aside className="flex items-start gap-5 border-t border-border pt-6 lg:block lg:border-t-0 lg:pt-0">
               <img
                 src="/jackie-avatar.jpg"
                 alt="MakerJackie"
-                className="aspect-square w-full object-cover"
+                className="size-24 shrink-0 border-2 border-border object-cover shadow-[5px_5px_0_0_var(--border)] sm:size-32 lg:size-36"
               />
-              <div className="mt-5 grid gap-3">
+              <div className="grid gap-3 lg:mt-5">
                 {copy.profileItems.map((item) => {
                   const Icon = item.icon;
 
@@ -112,13 +109,13 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="border-b border-border bg-muted/35">
+        <section className="border-b border-border bg-muted/20">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.28fr_minmax(0,1fr)] lg:px-8 lg:py-14">
             <div>
               <p className="text-sm font-semibold text-link uppercase">{copy.latestEyebrow}</p>
               <h2 className="mt-3 text-3xl font-semibold">{copy.latestTitle}</h2>
             </div>
-            <div className="grid gap-5">
+            <div>
               {posts.slice(0, 4).map((post, index) => (
                 <PostCard key={post.id} post={post} priority={index === 0} locale={locale} />
               ))}
@@ -137,7 +134,7 @@ function HomePage() {
                   <h2 className="mt-3 text-3xl font-semibold">{copy.featuredTitle}</h2>
                 </div>
               </div>
-              <div className="mt-6 grid gap-px border border-border bg-border sm:grid-cols-2">
+              <div className="mt-6 border-t border-border">
                 {(featuredPosts.length ? featuredPosts : posts.slice(0, 2))
                   .slice(0, 2)
                   .map((post) => (
@@ -146,18 +143,18 @@ function HomePage() {
               </div>
             </div>
 
-            <aside className="border border-border bg-muted/35 p-5">
+            <aside className="border-t border-border pt-6 lg:border-t-0 lg:pt-0">
               <p className="text-sm font-semibold text-link uppercase">{copy.tagsEyebrow}</p>
               <h2 className="mt-3 text-2xl font-semibold">{copy.tagsTitle}</h2>
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
                 {tags.slice(0, 18).map((tag) => (
                   <Link
                     key={tag.slug}
                     to="/tags/$slug"
                     params={{ slug: tag.slug }}
-                    className="rounded-sm border border-border bg-background px-2.5 py-1.5 text-sm font-medium transition hover:border-ring hover:text-link"
+                    className="text-sm font-medium text-muted-foreground underline-offset-4 transition hover:text-link hover:underline"
                   >
-                    {tag.name}
+                    #{tag.name}
                   </Link>
                 ))}
               </div>
@@ -196,7 +193,7 @@ function FeaturedPostLink({
     <Link
       to="/blog/$slug"
       params={{ slug: post.slug }}
-      className="group block bg-background p-5 transition hover:bg-muted/35"
+      className="group block border-b border-border py-5 transition hover:bg-muted/35 sm:px-5"
     >
       <time dateTime={post.publishedAt} className="text-xs font-medium text-muted-foreground">
         {formatDate(post.publishedAt, locale)}
