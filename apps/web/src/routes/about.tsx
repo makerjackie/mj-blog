@@ -5,7 +5,6 @@ import { ArrowRightIcon, ExternalLinkIcon, MailIcon, SparklesIcon } from "lucide
 
 import { SiteShell } from "#/components/site-shell";
 import { $getAboutPageData } from "#/lib/cms-server";
-import { getDocsUrl } from "#/lib/docs-i18n";
 import { getCurrentLocale } from "#/lib/i18n";
 
 export const Route = createFileRoute("/about")({
@@ -16,14 +15,14 @@ export const Route = createFileRoute("/about")({
     return {
       meta: [
         {
-          title: locale === "zh" ? "关于 01MVP 和 Jackie" : "About 01MVP and Jackie",
+          title: locale === "zh" ? "关于 MakerJackie" : "About MakerJackie",
         },
         {
           name: "description",
           content:
             locale === "zh"
-              ? "了解 01MVP 的 AI 产品实战方法，以及 MakerJackie 的项目背景。"
-              : "Learn about the 01MVP practical AI product method and MakerJackie's background.",
+              ? "了解 MakerJackie 的 AI 产品实践、独立开发项目和长期写作。"
+              : "Learn about MakerJackie's AI product practice, indie projects, and writing.",
         },
       ],
     };
@@ -36,7 +35,6 @@ function AboutPage() {
   const locale = getCurrentLocale();
   const siteSettings = localizeSiteSettings(data.siteSettings, locale);
   const copy = getAboutCopy(locale);
-  const docsHref = getDocsUrl([], locale);
 
   return (
     <SiteShell siteSettings={siteSettings}>
@@ -55,14 +53,16 @@ function AboutPage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button
-                  render={<a href={docsHref} aria-label={copy.primaryAction} />}
+                  render={<a href="/blog" aria-label={copy.primaryAction} />}
                   nativeButton={false}
                 >
                   {copy.primaryAction}
                   <ArrowRightIcon />
                 </Button>
                 <Button
-                  render={<a href="https://makerjackie.com" aria-label={copy.secondaryAction} />}
+                  render={
+                    <a href="https://makerjackie.com/projects" aria-label={copy.secondaryAction} />
+                  }
                   variant="outline"
                   nativeButton={false}
                 >
@@ -131,11 +131,11 @@ function AboutPage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-border pt-6">
               <a
-                href="mailto:hi@01mvp.com"
+                href="mailto:hi@makerjackie.com"
                 className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-link hover:underline"
               >
                 <MailIcon className="size-4" />
-                hi@01mvp.com
+                hi@makerjackie.com
               </a>
               <a
                 href="https://x.com/makerjackie"
@@ -155,101 +155,102 @@ function AboutPage() {
 function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
   if (locale === "zh") {
     return {
-      eyebrow: "关于 01MVP",
-      title: "把模糊想法，做成能上线的小产品。",
+      eyebrow: "关于 MakerJackie",
+      title: "用 AI 做产品，也记录一路上的弯路。",
       description:
-        "01MVP 是 Jackie 持续整理的 AI 产品实战手册。它关注从选择问题、搭建第一版、上线验证，到根据反馈继续迭代的完整路径。",
-      primaryAction: "开始阅读手册",
-      secondaryAction: "查看作品集",
+        "这里会记录我的 AI 产品实践、独立开发项目、自媒体复盘和一些长期思考。很多文章不追求完美，但会尽量留下真实的路径、判断和踩坑。",
+      primaryAction: "阅读文章",
+      secondaryAction: "查看项目",
       profileTitle: "独立开发者，前 AI 算法工程师",
       profileBody: "Jackie 是周周黑客松社区发起人，也长期记录 AI 创作、产品实验和可复用模板。",
-      whyEyebrow: "方法",
-      whyTitle: "这套手册强调什么",
+      whyEyebrow: "写作边界",
+      whyTitle: "这里主要写什么",
       principles: [
         {
-          title: "先做出来",
-          description: "先用一个小项目建立手感，再通过上线后的反馈判断下一步。",
+          title: "AI 产品实战",
+          description: "从一个想法开始，记录选型、实现、上线、反馈和继续迭代的过程。",
         },
         {
-          title: "少踩坑",
-          description: "优先讲值得先学、能直接上手、能被真实项目验证的工具和方法。",
+          title: "工具和教程",
+          description: "分享我自己真正在用的 AI 工具、开发工具和部署方案，尽量写到新手能照着做。",
         },
         {
-          title: "面向交付",
-          description: "把 Demo 作为阶段检查点，继续推进到发布、反馈和下一轮迭代。",
+          title: "个人复盘",
+          description: "记录自媒体、社区、产品和生活里的思考，保留当时真实的判断。",
         },
       ],
       paths: [
         {
-          eyebrow: "Start",
-          title: "读 01MVP 手册",
-          description: "按从想法到上线的路径建立完整工作流。",
-          href: getDocsUrl([], "zh"),
+          eyebrow: "Blog",
+          title: "读最新文章",
+          description: "AI、产品、工具、生活和长期思考都会沉淀在这里。",
+          href: "/blog",
         },
         {
           eyebrow: "Work",
-          title: "看 MakerJackie 作品",
+          title: "看公开项目",
           description: "查看 Jackie 做过的产品、公开实验和长期项目。",
-          href: "https://makerjackie.com",
+          href: "https://makerjackie.com/projects",
         },
         {
           eyebrow: "Template",
-          title: "回到博客模板",
-          description: "了解这个 Cloudflare 原生博客模板如何部署和维护。",
-          href: "/",
+          title: "博客模板",
+          description: "这个站由 01mvp-blog-starter 生成，也会继续作为第一个真实用户使用。",
+          href: "https://github.com/01mvp/blog-starter",
         },
       ],
     };
   }
 
   return {
-    eyebrow: "About 01MVP",
-    title: "Turning rough ideas into small products that can ship.",
+    eyebrow: "About MakerJackie",
+    title: "Building AI products and documenting the path.",
     description:
-      "01MVP is Jackie’s practical AI product handbook. It focuses on choosing a real problem, building the first version, launching, collecting feedback, and deciding what to do next.",
-    primaryAction: "Start reading",
-    secondaryAction: "View portfolio",
+      "This site collects my AI product practice, indie projects, creator notes, and long-term thinking. The writing is practical, direct, and grounded in actual work.",
+    primaryAction: "Read articles",
+    secondaryAction: "View projects",
     profileTitle: "Independent developer and former AI algorithm engineer",
     profileBody:
       "Jackie founded Hackathon Weekly and keeps publishing AI creation notes, product experiments, and reusable templates.",
-    whyEyebrow: "Method",
-    whyTitle: "What this handbook emphasizes",
+    whyEyebrow: "Writing",
+    whyTitle: "What I write about",
     principles: [
       {
-        title: "Ship the first version",
+        title: "AI product practice",
         description:
-          "Use a small project to build product muscle, then let real feedback guide the next step.",
+          "Idea selection, stack choices, implementation, launch, feedback, and iteration.",
       },
       {
-        title: "Avoid the expensive detours",
+        title: "Tools and guides",
         description:
-          "Prioritize tools and methods that are worth learning early and can be used in real projects.",
+          "AI tools, developer tools, and deployment paths written clearly enough for new builders.",
       },
       {
-        title: "Stay close to delivery",
+        title: "Personal notes",
         description:
-          "Treat the demo as a checkpoint, then move the work toward launch, feedback, and iteration.",
+          "Creator work, community building, product reflections, and life notes kept in one place.",
       },
     ],
     paths: [
       {
-        eyebrow: "Start",
-        title: "Read the 01MVP handbook",
-        description: "Follow the path from idea to launch and build a complete working loop.",
-        href: getDocsUrl([], "en"),
+        eyebrow: "Blog",
+        title: "Read the latest posts",
+        description: "AI, products, tools, life, and long-term notes live here.",
+        href: "/blog",
       },
       {
         eyebrow: "Work",
-        title: "View MakerJackie projects",
+        title: "View public projects",
         description:
           "Browse products, public experiments, and long-running projects Jackie has built.",
-        href: "https://makerjackie.com",
+        href: "https://makerjackie.com/projects",
       },
       {
         eyebrow: "Template",
-        title: "Return to the blog template",
-        description: "See how this Cloudflare-native blog template is deployed and maintained.",
-        href: "/",
+        title: "Blog starter",
+        description:
+          "This site is powered by 01mvp-blog-starter and will keep dogfooding the template.",
+        href: "https://github.com/01mvp/blog-starter",
       },
     ],
   };

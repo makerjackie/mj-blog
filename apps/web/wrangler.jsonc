@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "blog-starter",
+  "name": "makerjackie-blog",
   "main": "./src/server.ts",
   "compatibility_date": "2026-05-24",
   "compatibility_flags": ["nodejs_compat"],
@@ -12,13 +12,13 @@
   },
   "routes": [
     {
-      "pattern": "blog.01mvp.com",
+      "pattern": "new.makerjackie.com",
       "custom_domain": true,
     },
   ],
   "vars": {
-    "VITE_BASE_URL": "https://blog.01mvp.com",
-    "CMS_PUBLIC_SITE_URL": "https://blog.01mvp.com",
+    "VITE_BASE_URL": "https://new.makerjackie.com",
+    "CMS_PUBLIC_SITE_URL": "https://new.makerjackie.com",
     "CMS_BACKUP_RETENTION_DAYS": "30",
     "CMS_EMAIL_SENDING_ENABLED": "false",
     "CMS_EMAIL_FROM": "",
@@ -29,21 +29,21 @@
   "d1_databases": [
     {
       "binding": "CMS_DB",
-      "database_name": "blog-starter-cms",
-      "database_id": "b267c97c-72a5-45a1-9f5a-cfd0b8e8067c",
+      "database_name": "makerjackie-blog-cms",
+      "database_id": "96cc91a6-6b58-4fca-983c-ac362a6410bd",
       "migrations_dir": "../../packages/db/migrations",
     },
   ],
   "r2_buckets": [
     {
       "binding": "CMS_STORAGE",
-      "bucket_name": "blog-starter-assets",
+      "bucket_name": "makerjackie-blog-assets",
     },
   ],
   "kv_namespaces": [
     {
       "binding": "CMS_CACHE",
-      "id": "c1150cc286374ba9919f48f48a985f36",
+      "id": "1c07f15c64f2482c93edba68fc71b995",
     },
   ],
 }

@@ -1,23 +1,26 @@
 import type { Asset, Comment, Post, Series, SiteSettings, Tag } from "./types";
 
 export const siteSettings: SiteSettings = {
-  name: "01MVP Blog Starter",
-  description:
-    "A Cloudflare-native personal site for articles, videos, durable notes, and API-assisted publishing.",
-  url: "https://your-domain.example",
-  authorName: "01MVP",
-  authorBio:
-    "Builder notes, product essays, and durable personal knowledge on an edge-native publishing stack.",
-  avatarUrl: "/og-default.svg",
+  name: "MakerJackie",
+  description: "AI product notes, indie hacking logs, and practical guides from MakerJackie.",
+  url: "https://new.makerjackie.com",
+  authorName: "Jackie",
+  authorBio: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
+  avatarUrl: "/jackie-avatar.jpg",
   defaultOgImage: "/og-default.svg",
   socialLinks: [
-    { label: "GitHub", href: "https://github.com/01mvp/blog-starter" },
+    { label: "GitHub", href: "https://github.com/makerjackie" },
+    { label: "X", href: "https://x.com/makerjackie" },
     { label: "RSS", href: "/rss.xml" },
   ],
   navigation: [
-    { label: "Demo", href: "/demo", i18n: { label: { zh: "博客 Demo" } } },
-    { label: "Docs", href: "/docs", i18n: { label: { zh: "文档" } } },
     { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
+    { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
+    {
+      label: "Projects",
+      href: "https://makerjackie.com/projects",
+      i18n: { label: { zh: "项目" } },
+    },
     { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
   ],
   rssEnabled: true,
@@ -35,13 +38,16 @@ export const siteSettings: SiteSettings = {
   themePreset: "maker",
   layoutPreset: "shelf",
   locales: ["en", "zh"],
-  primaryLanguage: "en",
+  primaryLanguage: "zh",
   i18n: {
+    name: {
+      zh: "MakerJackie",
+    },
     description: {
-      zh: "基于 Cloudflare 的个人站点，用来沉淀文章、视频、长期笔记和 API 辅助发布工作流。",
+      zh: "记录 AI 产品、独立开发、自媒体和长期思考。",
     },
     authorBio: {
-      zh: "基于边缘原生发布栈记录构建笔记、产品文章和长期可沉淀的个人知识。",
+      zh: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
     },
   },
 };

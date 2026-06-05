@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 860" role="img" aria-labelledby="title desc">
+  <title id="title">方案 1：AxisNow + Cloudflare for SaaS</title>
+  <desc id="desc">展示 www.01mvp.com 通过 AxisNow DNS 调度，再回到 Cloudflare Custom Hostname 与 Worker 的访问链路。</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7fafc; }
+      .title { font: 700 34px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #475569; }
+      .box-title { font: 700 20px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .box-text { font: 500 16px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #334155; }
+      .box { stroke: #cbd5e1; stroke-width: 2; rx: 22; ry: 22; }
+      .blue { fill: #e0f2fe; }
+      .green { fill: #dcfce7; }
+      .amber { fill: #fef3c7; }
+      .orange { fill: #ffedd5; }
+      .slate { fill: #e2e8f0; }
+      .note { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 8 8; rx: 18; ry: 18; }
+      .note-text { font: 500 15px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #475569; }
+      .arrow { stroke: #0f172a; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .soft-arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrowhead-soft); }
+      .tag { font: 700 15px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .chip { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 999; ry: 999; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#0f172a"/>
+    </marker>
+    <marker id="arrowhead-soft" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="860"/>
+
+  <text class="title" x="70" y="70">方案 1 · AxisNow + Cloudflare for SaaS</text>
+  <text class="subtitle" x="70" y="108">核心意思：先让 AxisNow 在 DNS 层选路，再把流量交给 Cloudflare 的 Custom Hostname 和 Worker。</text>
+  <text class="subtitle" x="70" y="136">注意：这不是浏览器 301 跳转，地址栏仍然是 www.01mvp.com。</text>
+
+  <rect class="box blue" x="70" y="220" width="250" height="130"/>
+  <text class="box-title" x="100" y="262">1. 用户访问</text>
+  <text class="box-text" x="100" y="296">https://www.01mvp.com</text>
+  <text class="box-text" x="100" y="324">目标：打开 01MVP 网站</text>
+
+  <rect class="box amber" x="390" y="190" width="320" height="160"/>
+  <text class="box-title" x="420" y="232">2. DNS 先交给 AxisNow</text>
+  <text class="box-text" x="420" y="268">www.01mvp.com</text>
+  <text class="box-text" x="420" y="294">CNAME gtm.axisnowdns.com</text>
+  <text class="box-text" x="420" y="322">AxisNow 按线路和健康检查选路</text>
+
+  <rect class="box green" x="800" y="120" width="320" height="150"/>
+  <text class="box-title" x="830" y="162">3A. 中国线路优先</text>
+  <text class="box-text" x="830" y="198">cn.axisnowdns.com</text>
+  <text class="box-text" x="830" y="224">命中 AxisNow 中国优化边缘</text>
+  <text class="box-text" x="830" y="250">适合大陆访问</text>
+
+  <rect class="box slate" x="800" y="350" width="320" height="150"/>
+  <text class="box-title" x="830" y="392">3B. 默认 / 故障回落</text>
+  <text class="box-text" x="830" y="428">cf-origin.01mvp.com</text>
+  <text class="box-text" x="830" y="454">直接回到 Cloudflare 入口</text>
+  <text class="box-text" x="830" y="480">作为兜底线路</text>
+
+  <rect class="box orange" x="1200" y="210" width="310" height="160"/>
+  <text class="box-title" x="1230" y="252">4. Cloudflare 接管请求</text>
+  <text class="box-text" x="1230" y="288">Custom Hostname:</text>
+  <text class="box-text" x="1230" y="314">www.01mvp.com</text>
+  <text class="box-text" x="1230" y="342">Host 头不变，所以规则能命中</text>
+
+  <rect class="box orange" x="1200" y="450" width="310" height="170"/>
+  <text class="box-title" x="1230" y="492">5. 回到你的站点</text>
+  <text class="box-text" x="1230" y="528">Fallback Origin:</text>
+  <text class="box-text" x="1230" y="554">cf-origin.01mvp.com</text>
+  <text class="box-text" x="1230" y="580">Worker Route -&gt; 01mvp 站点</text>
+  <text class="box-text" x="1230" y="606">把页面返回给用户</text>
+
+  <path class="arrow" d="M320 285 L390 285"/>
+  <path class="arrow" d="M710 255 L800 195"/>
+  <path class="soft-arrow" d="M710 285 L770 285 L770 425 L800 425"/>
+  <path class="arrow" d="M1120 195 L1200 255"/>
+  <path class="soft-arrow" d="M1120 425 L1160 425 L1160 290 L1200 290"/>
+  <path class="arrow" d="M1355 370 L1355 450"/>
+  <path class="soft-arrow" d="M1200 590 L890 590 L890 690 L320 690 L320 350"/>
+
+  <rect class="note" x="80" y="560" width="560" height="180"/>
+  <text class="box-title" x="110" y="605">你要在 Cloudflare 里做的事</text>
+  <text class="note-text" x="110" y="640">1. 开启 Cloudflare for SaaS</text>
+  <text class="note-text" x="110" y="668">2. 创建 fallback origin：cf-origin.01mvp.com</text>
+  <text class="note-text" x="110" y="696">3. 添加 custom hostname：www.01mvp.com</text>
+  <text class="note-text" x="110" y="724">4. 给 Worker 配 www.01mvp.com/* 或 */* 路由</text>
+
+  <rect class="note" x="690" y="560" width="450" height="180"/>
+  <text class="box-title" x="720" y="605">你要在 AxisNow 里做的事</text>
+  <text class="note-text" x="720" y="640">1. 建 cn.axisnowdns.com 中国优化入口</text>
+  <text class="note-text" x="720" y="668">2. 建 gtm.axisnowdns.com 一级调度域</text>
+  <text class="note-text" x="720" y="696">3. 地址池放：cn.axisnowdns.com + cf-origin.01mvp.com</text>
+  <text class="note-text" x="720" y="724">4. 开健康检查和最小延迟策略</text>
+
+  <rect class="chip" x="1215" y="120" width="280" height="44"/>
+  <text class="tag" x="1240" y="148">推荐理由：现在最稳，最适合先落地</text>
+</svg>

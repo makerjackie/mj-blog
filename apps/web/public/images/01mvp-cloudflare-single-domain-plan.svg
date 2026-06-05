@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 860" role="img" aria-labelledby="title desc">
+  <title id="title">方案 2：单域名优选</title>
+  <desc id="desc">展示 www.01mvp.com 先 CNAME 到 cf-edge.01mvp.com，再命中优选 Cloudflare 入口并回源到 Worker 的链路。</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #475569; }
+      .box-title { font: 700 20px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .box-text { font: 500 16px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #334155; }
+      .box { stroke: #cbd5e1; stroke-width: 2; rx: 22; ry: 22; }
+      .blue { fill: #e0f2fe; }
+      .amber { fill: #fef3c7; }
+      .green { fill: #dcfce7; }
+      .orange { fill: #ffedd5; }
+      .rose { fill: #ffe4e6; }
+      .note { fill: #ffffff; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 8 8; rx: 18; ry: 18; }
+      .note-text { font: 500 15px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #475569; }
+      .arrow { stroke: #0f172a; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .soft-arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrowhead-soft); }
+      .tag { font: 700 15px -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif; fill: #0f172a; }
+      .chip { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 999; ry: 999; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#0f172a"/>
+    </marker>
+    <marker id="arrowhead-soft" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="860"/>
+
+  <text class="title" x="70" y="70">方案 2 · 单域名优选</text>
+  <text class="subtitle" x="70" y="108">核心意思：公开入口还是 www.01mvp.com，但先让它 CNAME 到你自己的“优选承载子域”。</text>
+  <text class="subtitle" x="70" y="136">你只用一套主域名 01mvp.com，但会多一个中间子域 cf-edge.01mvp.com。</text>
+
+  <rect class="box blue" x="70" y="220" width="240" height="130"/>
+  <text class="box-title" x="100" y="262">1. 用户访问</text>
+  <text class="box-text" x="100" y="296">https://www.01mvp.com</text>
+  <text class="box-text" x="100" y="324">地址栏里只看到这个域名</text>
+
+  <rect class="box amber" x="370" y="185" width="310" height="165"/>
+  <text class="box-title" x="400" y="227">2. 第一次 CNAME</text>
+  <text class="box-text" x="400" y="263">www.01mvp.com</text>
+  <text class="box-text" x="400" y="289">-&gt; cf-edge.01mvp.com</text>
+  <text class="box-text" x="400" y="317">先把公开入口交给你自己的承载子域</text>
+
+  <rect class="box amber" x="740" y="185" width="320" height="165"/>
+  <text class="box-title" x="770" y="227">3. 自己维护优选入口</text>
+  <text class="box-text" x="770" y="263">cf-edge.01mvp.com</text>
+  <text class="box-text" x="770" y="289">-&gt; 你自己筛选的优选 IP 池</text>
+  <text class="box-text" x="770" y="317">或你自己维护的 ByoIP 列表</text>
+
+  <rect class="box green" x="1120" y="170" width="340" height="185"/>
+  <text class="box-title" x="1150" y="212">4. 命中更快的 Cloudflare 入口</text>
+  <text class="box-text" x="1150" y="248">请求实际从这个入口进入 Cloudflare</text>
+  <text class="box-text" x="1150" y="276">但 Host 头仍然是：</text>
+  <text class="box-text" x="1150" y="304">www.01mvp.com</text>
+  <text class="box-text" x="1150" y="332">所以后面的规则还能继续匹配</text>
+
+  <rect class="box orange" x="1120" y="430" width="340" height="185"/>
+  <text class="box-title" x="1150" y="472">5. 回到 Cloudflare 配置</text>
+  <text class="box-text" x="1150" y="508">Custom Hostname:</text>
+  <text class="box-text" x="1150" y="534">www.01mvp.com</text>
+  <text class="box-text" x="1150" y="562">Fallback Origin:</text>
+  <text class="box-text" x="1150" y="588">origin.01mvp.com</text>
+
+  <rect class="box rose" x="730" y="450" width="280" height="165"/>
+  <text class="box-title" x="760" y="492">6. Worker 返回页面</text>
+  <text class="box-text" x="760" y="528">origin.01mvp.com</text>
+  <text class="box-text" x="760" y="554">-&gt; Worker Route</text>
+  <text class="box-text" x="760" y="580">-&gt; 01mvp 站点内容</text>
+
+  <path class="arrow" d="M310 285 L370 285"/>
+  <path class="arrow" d="M680 285 L740 285"/>
+  <path class="arrow" d="M1060 285 L1120 285"/>
+  <path class="arrow" d="M1290 355 L1290 430"/>
+  <path class="arrow" d="M1120 540 L1010 540"/>
+  <path class="soft-arrow" d="M730 540 L520 540 L520 690 L310 690 L310 350"/>
+
+  <rect class="note" x="80" y="500" width="560" height="200"/>
+  <text class="box-title" x="110" y="545">你要记住的关键点</text>
+  <text class="note-text" x="110" y="580">1. 这套还是 Cloudflare SaaS / Host 识别逻辑，不是跳网页。</text>
+  <text class="note-text" x="110" y="608">2. “单域名”的意思是：公开域名和承载子域都在 01mvp.com 下面。</text>
+  <text class="note-text" x="110" y="636">3. 真正需要你维护的是最右上那个“优选 IP 池”，不是你的 Worker。</text>
+  <text class="note-text" x="110" y="664">4. 所以一定要自己做健康检查和替换，不要把它当成一次性配置。</text>
+
+  <rect class="chip" x="1115" y="90" width="345" height="46"/>
+  <text class="tag" x="1140" y="120">单域名优选方案示意图</text>
+</svg>

@@ -19,6 +19,7 @@ coverage
 out/
 build
 dist
+output/makerjackie-blog-import/
 .nitro
 .vercel
 .wrangler
@@ -32,6 +33,7 @@ yarn-error.log*
 .DS_Store
 *.pem
 .cache
+.tmp
 .tanstack
 worker-configuration.d.ts
 .wrangler-dry-run

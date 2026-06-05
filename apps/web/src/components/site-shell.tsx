@@ -5,11 +5,11 @@ import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  BookOpenIcon,
-  FileTextIcon,
   HomeIcon,
+  InfoIcon,
   Loader2Icon,
   SearchIcon,
+  TagsIcon,
   UserCircleIcon,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -129,9 +129,9 @@ export function SiteShell({
 type ShellNavigationItem = SiteSettings["navigation"][number];
 
 const defaultMarketingNavigation: ShellNavigationItem[] = [
-  { label: "Demo", href: "/demo", i18n: { label: { zh: "博客 Demo" } } },
-  { label: "Docs", href: "/docs", i18n: { label: { zh: "文档" } } },
   { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
+  { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
+  { label: "Projects", href: "https://makerjackie.com/projects", i18n: { label: { zh: "项目" } } },
   { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
 ];
 
@@ -162,7 +162,6 @@ function isLegacyStarterNavigation(navigation: ShellNavigationItem[]) {
 function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurrentLocale> }) {
   const { user } = useAuth();
   const location = useLocation();
-  const docsHref = getLocalizedDocsHref("/docs", locale);
   const items = [
     {
       href: "/",
@@ -170,19 +169,19 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
       icon: HomeIcon,
     },
     {
-      href: "/demo",
-      label: locale === "zh" ? "Demo" : "Demo",
-      icon: BookOpenIcon,
-    },
-    {
-      href: docsHref,
-      label: locale === "zh" ? "文档" : "Docs",
-      icon: FileTextIcon,
-    },
-    {
       href: "/blog",
       label: locale === "zh" ? "文章" : "Articles",
       icon: SearchIcon,
+    },
+    {
+      href: "/tags",
+      label: locale === "zh" ? "标签" : "Tags",
+      icon: TagsIcon,
+    },
+    {
+      href: "/about",
+      label: locale === "zh" ? "关于" : "About",
+      icon: InfoIcon,
     },
     {
       href: user ? "/app" : "/login",
