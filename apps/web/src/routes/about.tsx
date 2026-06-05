@@ -180,7 +180,7 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
       paths: [
         {
           eyebrow: "Blog",
-          title: "读最新文章",
+          title: "读文章",
           description: "AI、产品、工具、生活和长期思考都会沉淀在这里。",
           href: "/blog",
         },
@@ -232,7 +232,7 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
     paths: [
       {
         eyebrow: "Blog",
-        title: "Read the latest posts",
+        title: "Read articles",
         description: "AI, products, tools, life, and long-term notes live here.",
         href: "/blog",
       },

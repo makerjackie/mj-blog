@@ -1,10 +1,8 @@
 import type { Post, SupportedLocale } from "@repo/core";
 import { formatDate } from "@repo/core";
 import { Link } from "@tanstack/react-router";
-import { CalendarDaysIcon, LibraryIcon } from "lucide-react";
 
 import { getCurrentLocale } from "#/lib/i18n";
-import { m } from "#/paraglide/messages.js";
 
 type PostCardProps = {
   readonly post: Post;
@@ -14,40 +12,36 @@ type PostCardProps = {
 
 export function PostCard({ post, locale = getCurrentLocale() }: PostCardProps) {
   return (
-    <article className="border-b border-border/70 py-6 last:border-b-0 sm:py-7">
+    <article className="border-b border-border/50 py-6 last:border-b-0 sm:py-7">
       <Link
         to="/blog/$slug"
         params={{ slug: post.slug }}
-        className="group grid gap-3 no-underline transition hover:no-underline sm:grid-cols-[9rem_minmax(0,1fr)]"
+        className="group block space-y-2 no-underline transition hover:no-underline"
       >
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-muted-foreground sm:block sm:pt-1">
-          <span className="inline-flex items-center gap-1.5 sm:flex">
-            <CalendarDaysIcon className="size-3.5" />
-            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt, locale)}</time>
-          </span>
-          <span className="sm:mt-2 sm:block">
-            {[post.pinned ? m.pinned() : "", post.featured ? m.featured() : ""]
-              .filter(Boolean)
-              .join(" · ")}
-          </span>
-        </div>
-
-        <div className="min-w-0">
-          <h2 className="text-2xl leading-snug font-semibold text-balance group-hover:text-link">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <h2 className="text-xl leading-snug font-semibold text-balance transition-colors group-hover:text-foreground/80 sm:text-2xl">
             {post.title}
           </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
+          <time
+            dateTime={post.publishedAt}
+            className="shrink-0 text-sm whitespace-nowrap text-muted-foreground sm:mt-1"
+          >
+            {formatDate(post.publishedAt, locale)}
+          </time>
         </div>
+
+        <p className="line-clamp-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          {post.excerpt}
+        </p>
       </Link>
 
-      <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 sm:ml-36">
+      <div className="mt-3 flex flex-wrap gap-2">
         {post.series ? (
           <Link
             to="/series/$slug"
             params={{ slug: post.series.slug }}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground underline-offset-4 transition hover:text-link hover:underline"
+            className="rounded bg-secondary px-2 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
           >
-            <LibraryIcon className="size-3.5" />
             {post.series.name}
           </Link>
         ) : null}
@@ -56,9 +50,9 @@ export function PostCard({ post, locale = getCurrentLocale() }: PostCardProps) {
             <Link
               to="/tags/$slug"
               params={{ slug: tag.slug }}
-              className="text-xs font-medium text-muted-foreground underline-offset-4 transition hover:text-link hover:underline"
+              className="rounded bg-secondary px-2 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
             >
-              #{tag.name}
+              {tag.name}
             </Link>
           </span>
         ))}
