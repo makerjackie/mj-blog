@@ -24,6 +24,7 @@ Opinionated full-stack TypeScript monorepo: TanStack Start + Drizzle + Better Au
 
 - Stack: TypeScript + React (TanStack Start) in a pnpm + Vite+ monorepo, with Drizzle ORM, shadcn/ui, and Better Auth.
 - Product: Cloudflare-native Personal Blog CMS + AI Init Skill for `github.com/01mvp/blog-starter`.
+- MakerJackie blog content uses `content/posts/*.mdx` as the long-term source and the CMS/D1 database as the production runtime layer. Formal article edits should happen in MDX first, then sync to CMS with `pnpm publish:mdx`; use the CMS admin for comments, settings, image management, and temporary small fixes.
 - Prefer shared `@repo/ui` components; add primitives via shadcn CLI (`pnpm -F @repo/web ui add <component>`).
 - Use `lucide-react` for UI icons (use `Icon` suffix, e.g. `import { Loader2Icon } from "lucide-react"`); for brand icons use `@icons-pack/react-simple-icons` (e.g. `SiGithub`).
 - Use shared pnpm catalog versions (`pnpm-workspace.yaml`) via `catalog:`.
@@ -45,6 +46,7 @@ Opinionated full-stack TypeScript monorepo: TanStack Start + Drizzle + Better Au
 
 ### Shared Packages And Platform
 
+- [Content publishing](.agents/content-publishing.md) for MakerJackie MDX-as-source and CMS-as-runtime rules.
 - [UI guidelines](.agents/ui.md) for app-level UI composition, shadcn usage, icons, images, and extraction decisions.
 - [TypeScript conventions](.agents/typescript.md) for schema placement, import boundaries, and `lib/` vs `utils/`.
 - [Toolchain](.agents/toolchain.md) for Vite Plus, `vp`/`vpx`, and repo command equivalents.
@@ -55,6 +57,7 @@ Opinionated full-stack TypeScript monorepo: TanStack Start + Drizzle + Better Au
 
 - UI fix: Start with [UI guidelines](.agents/ui.md). Add [TanStack patterns](.agents/tanstack-patterns.md) when the fix touches routes, loaders, or page composition.
 - Bugfix: Start with the owning domain doc from the index above, then use [Workflow](.agents/workflow.md) for narrow validation. Add [Testing](.agents/testing.md) only when the task explicitly calls for tests.
+- Blog content or CMS sync: Start with [Content publishing](.agents/content-publishing.md), then use [Toolchain](.agents/toolchain.md) for command syntax.
 - Test work: Start with [Testing](.agents/testing.md), then load the owning domain doc so the tests match the real feature boundaries.
 - End-to-end feature: Start with [TanStack patterns](.agents/tanstack-patterns.md), then load [Auth patterns](.agents/auth.md) or [UI guidelines](.agents/ui.md) as needed.
 

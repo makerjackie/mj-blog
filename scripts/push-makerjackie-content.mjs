@@ -4,11 +4,10 @@ import { join } from "node:path";
 const outputDir = join(process.cwd(), "output/makerjackie-blog-import");
 const postsPath = join(outputDir, "api-posts.json");
 const tokenPath = join(process.cwd(), ".tmp/makerjackie-blog-api-token.txt");
-const siteUrl = (process.env.CMS_PUBLIC_SITE_URL || "https://new.makerjackie.com").replace(
-  /\/$/,
-  "",
-);
+const siteUrl = (process.env.CMS_PUBLIC_SITE_URL || "https://makerjackie.com").replace(/\/$/, "");
 const maxAttempts = Number(process.env.CMS_IMPORT_MAX_ATTEMPTS || 4);
+const readLang = process.env.CMS_IMPORT_READ_LANG || "zh";
+const writeLang = process.env.CMS_IMPORT_WRITE_LANG || "en";
 
 if (!existsSync(postsPath)) {
   throw new Error(`Missing generated posts file: ${postsPath}`);
@@ -25,12 +24,7 @@ if (!Array.isArray(posts)) {
   throw new Error("api-posts.json must contain an array.");
 }
 
-const existingPosts = await fetchJson(`${siteUrl}/api/posts?status=all&lang=zh`);
-const postsBySlug = new Map(
-  (existingPosts.data ?? [])
-    .filter((post) => post?.slug && post?.id)
-    .map((post) => [post.slug, post]),
-);
+const { postsBySlug, canReadPosts } = await fetchExistingPostsBySlug();
 
 let created = 0;
 let updated = 0;
@@ -39,18 +33,16 @@ for (const post of posts) {
   const existing = postsBySlug.get(post.slug);
   const payload = { ...post };
   delete payload.sourcePath;
-  const url = existing
-    ? `${siteUrl}/api/posts/${encodeURIComponent(existing.id)}?lang=zh`
-    : `${siteUrl}/api/posts?lang=zh`;
-  const method = existing ? "PATCH" : "POST";
-  const response = await fetchWithRetry(url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  delete payload.locale;
+  const { method, response } =
+    existing || canReadPosts
+      ? await writePost({
+          method: existing ? "PATCH" : "POST",
+          payload,
+          slug: post.slug,
+          target: existing?.id,
+        })
+      : await upsertPostWithoutReadScope(post.slug, payload);
 
   if (!response.ok) {
     const text = await response.text();
@@ -66,18 +58,19 @@ for (const post of posts) {
 
   postsBySlug.set(importedPost.slug, importedPost);
 
-  if (existing) {
+  if (method === "PATCH") {
     updated += 1;
   } else {
     created += 1;
   }
 
-  console.log(`${existing ? "updated" : "created"} ${importedPost.slug}`);
+  console.log(`${method === "PATCH" ? "updated" : "created"} ${importedPost.slug}`);
 }
 
 console.log(`Imported ${posts.length} posts: ${created} created, ${updated} updated.`);
 
-async function fetchJson(url) {
+async function fetchExistingPostsBySlug() {
+  const url = `${siteUrl}/api/posts?status=all&lang=${encodeURIComponent(readLang)}`;
   const response = await fetchWithRetry(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -86,10 +79,61 @@ async function fetchJson(url) {
 
   if (!response.ok) {
     const text = await response.text();
+
+    if (response.status === 403 && text.includes("posts:read")) {
+      console.warn("Token lacks posts:read; falling back to PATCH-by-slug upsert.");
+      return { postsBySlug: new Map(), canReadPosts: false };
+    }
+
     throw new Error(`GET ${url} failed: ${response.status} ${text}`);
   }
 
-  return response.json();
+  const existingPosts = await response.json();
+
+  return {
+    postsBySlug: new Map(
+      (existingPosts.data ?? [])
+        .filter((post) => post?.slug && post?.id)
+        .map((post) => [post.slug, post]),
+    ),
+    canReadPosts: true,
+  };
+}
+
+async function upsertPostWithoutReadScope(slug, payload) {
+  const patchResult = await writePost({
+    method: "PATCH",
+    payload,
+    slug,
+    target: slug,
+  });
+
+  if (patchResult.response.status !== 404) {
+    return patchResult;
+  }
+
+  return writePost({
+    method: "POST",
+    payload,
+    slug,
+  });
+}
+
+async function writePost({ method, payload, slug, target }) {
+  const url =
+    method === "PATCH" && target
+      ? `${siteUrl}/api/posts/${encodeURIComponent(target)}?lang=${encodeURIComponent(writeLang)}`
+      : `${siteUrl}/api/posts?lang=${encodeURIComponent(writeLang)}`;
+  const response = await fetchWithRetry(url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return { method, response, slug };
 }
 
 async function fetchWithRetry(url, init = {}) {

@@ -10,7 +10,11 @@ export const Route = createFileRoute("/api/account/login")({
     handlers: {
       POST: async ({ request }: { request: Request }) => {
         const formPost = isFormPost(request);
-        const body = await readJsonOrFormBody<{ email: string; password: string }>(request);
+        const body = await readJsonOrFormBody<{
+          email: string;
+          password: string;
+          redirectTo?: unknown;
+        }>(request);
         const result = await loginAccount(body, request).catch((error: unknown) => ({
           error: error instanceof Error ? error.message : "Login failed",
         }));
@@ -24,7 +28,9 @@ export const Route = createFileRoute("/api/account/login")({
         }
 
         if (formPost) {
-          return formRedirect(redirectForRole(result.data), { headers: result.headers });
+          return formRedirect(redirectForRole(result.data, body.redirectTo), {
+            headers: result.headers,
+          });
         }
 
         return jsonResponse({ data: result.data }, { headers: result.headers });

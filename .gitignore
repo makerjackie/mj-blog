@@ -17,9 +17,9 @@ coverage
 
 # Build Outputs
 out/
+output/
 build
 dist
-output/makerjackie-blog-import/
 .nitro
 .vercel
 .wrangler

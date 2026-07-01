@@ -1,6 +1,6 @@
 # MakerJackie Blog Dogfood Rollout
 
-Updated: 2026-06-05
+Updated: 2026-06-30
 
 ## Goal
 
@@ -11,8 +11,9 @@ The rollout should prove the public docs and `01mvp-blog` Skill can guide an AI 
 
 - Keep the old `makerjackie.com` repository intact.
 - Prefer `makerjackie/blog` for the new blog repository. If GitHub keeps redirecting that name to `makerjackie/old-blog`, use `makerjackie/mj-blog`.
-- Deploy the new blog to `new.makerjackie.com` first.
-- Move the existing site to `old.makerjackie.com` before any apex cutover.
+- Deploy the new blog to `makerjackie.com`.
+- Move the existing site to `old.makerjackie.com`.
+- Delete `new.makerjackie.com` after apex cutover succeeds.
 - Do not delete the old site or old repository during this rollout.
 - `blog.01mvp.com` production content should be updated through the site's API or admin surface.
 
@@ -74,27 +75,29 @@ The public docs and landing page should say:
   - D1
   - KV
   - R2 if enabled
-  - custom domain binding for `new.makerjackie.com`
-- Import existing articles from `/Users/jackiexiao/code/makerjackie/makerjackie.com/content/blog`.
-- Preserve existing dirty work in `makerjackie.com`, especially `content/blog/2026-06-05-ai-era-10x-leverage.mdx`.
+  - custom domain binding for `makerjackie.com` and `www.makerjackie.com`
+- Import existing articles from `/Users/jackiexiao/code/makerjackie/old-mj-blog/content/blog`.
+- Preserve existing dirty work in `old-mj-blog`, especially `content/blog/2026-06-05-ai-era-10x-leverage.mdx`.
 - Verify public pages, admin, RSS, sitemap, robots, OpenAPI, imported posts, and backups.
 
 ### Phase 6 - Domain Transition
 
 - Bind old site to `old.makerjackie.com` and verify it serves the current Next/Fumadocs site.
-- Keep `makerjackie.com` unchanged until `new.makerjackie.com` is proven.
-- Prepare apex cutover plan for `makerjackie.com` to point to the new blog-starter Worker.
-- Execute apex cutover only after explicit verification of the new site.
+- Point `makerjackie.com` to the new blog-starter Worker after the old site has moved to `old.makerjackie.com`.
+- Delete `new.makerjackie.com`; do not keep a third public entry point.
+- Verify the new site after apex cutover.
 
 ## Current Evidence
 
 - `blog-starter` current branch: `main`.
 - `blog-starter` remote: `https://github.com/01MVP/blog-starter.git`.
-- `makerjackie.com` current branch: `main`.
-- `makerjackie.com` remote: `git@github.com:makerjackie/makerjackie.com.git`.
-- `makerjackie.com` currently has uncommitted changes in `content/blog/2026-06-05-ai-era-10x-leverage.mdx`.
-- `makerjackie.com` currently returns HTTP 200.
-- `old.makerjackie.com` currently does not resolve.
+- `old-mj-blog` current branch: `main`.
+- `old-mj-blog` remote: `git@github.com:makerjackie/makerjackie.com.git`.
+- `old-mj-blog` currently has uncommitted changes in `content/blog/2026-06-05-ai-era-10x-leverage.mdx`.
+- `makerjackie.com` currently returns HTTP 200 from the new `makerjackie-blog` Worker.
+- `www.makerjackie.com` currently returns HTTP 200 from the new `makerjackie-blog` Worker.
+- `old.makerjackie.com` currently returns HTTP 200 from the old `makerjackie-com-middleware` Worker.
+- `new.makerjackie.com` should not be bound after the final cleanup.
 - `blog.01mvp.com/openapi.json` currently returns OpenAPI 3.1.0.
 - `blog.01mvp.com/api/posts` currently exposes the historical post `why-i-built-an-ai-maintained-personal-blog`.
 - `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are present in the environment.
@@ -115,8 +118,8 @@ The public docs and landing page should say:
 - [ ] X/Twitter copy is generated.
 - [ ] Video script and demo flow are generated.
 - [ ] New GitHub repo exists.
-- [ ] New MakerJackie blog is deployed to `new.makerjackie.com`.
-- [ ] Old site is reachable at `old.makerjackie.com`.
+- [x] New MakerJackie blog is deployed to `makerjackie.com`.
+- [x] Old site is reachable at `old.makerjackie.com`.
 - [ ] Old articles are migrated and verified on the new blog.
 - [ ] Skill fixes found during dogfooding are committed back.
 - [ ] Final report lists files, commits, URLs, validation commands, and remaining manual publishing steps.

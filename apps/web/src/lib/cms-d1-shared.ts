@@ -5,6 +5,8 @@ import {
   type ApiTokenScope,
   type Asset,
   type Comment,
+  type CommentAiModerationDecision,
+  type CommentAiModerationStatus,
   type CommentStatus,
   type ContentStatus,
   type Post,
@@ -195,9 +197,26 @@ export function drizzleRowToComment(row: typeof schema.comments.$inferSelect): C
     authorWebsite: row.authorWebsite,
     body: row.body,
     status: row.status as CommentStatus,
+    aiModeration: {
+      status: normalizeAiModerationStatus(row.aiModerationStatus),
+      decision: normalizeAiModerationDecision(row.aiModerationDecision),
+      reason: row.aiModerationReason,
+      error: row.aiModerationError,
+      reviewedAt: row.aiModerationReviewedAt,
+    },
     createdAt: row.createdAt,
     i18n: row.i18n as Comment["i18n"],
   };
+}
+
+function normalizeAiModerationStatus(value: unknown): CommentAiModerationStatus {
+  return value === "pending" || value === "completed" || value === "failed"
+    ? value
+    : "not_requested";
+}
+
+function normalizeAiModerationDecision(value: unknown): CommentAiModerationDecision | null {
+  return value === "approve" || value === "review" || value === "spam" ? value : null;
 }
 
 export function drizzleRowToAsset(row: typeof schema.assets.$inferSelect): Asset {

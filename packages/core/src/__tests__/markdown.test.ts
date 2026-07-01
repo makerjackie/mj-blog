@@ -56,6 +56,17 @@ describe("renderMarkdownToHtml", () => {
     expect(html).not.toContain("<a ");
   });
 
+  it("renders standalone MDX image tags safely", () => {
+    const md =
+      '<img src="https://assets.example.com/post/image.jpg?v=1" alt="Example image" width={1600} height={1036} />';
+    const html = renderMarkdownToHtml(md);
+
+    expect(html).toContain(
+      '<img src="https://assets.example.com/post/image.jpg?v=1" alt="Example image" width="1600" height="1036" />',
+    );
+    expect(html).not.toContain("&lt;img");
+  });
+
   it("renders blockquotes", () => {
     const html = renderMarkdownToHtml("> A quote");
     expect(html).toContain("<blockquote>");
@@ -85,6 +96,14 @@ describe("markdownToText", () => {
     const result = markdownToText("![alt](https://example.com/img.png)");
     expect(result).not.toContain("![");
     expect(result).not.toContain("](");
+  });
+
+  it("removes standalone MDX image tags", () => {
+    const result = markdownToText(
+      'Before <img src="https://example.com/img.png" alt="alt" width={1600} /> After',
+    );
+
+    expect(result).toBe("Before After");
   });
 
   it("removes code blocks", () => {

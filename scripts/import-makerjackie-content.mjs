@@ -2,11 +2,15 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 
-const defaultSourceRoot = "/Users/jackiexiao/code/makerjackie/makerjackie.com";
+const defaultSourceRoot = "/Users/jackiexiao/code/makerjackie/old-mj-blog";
 const sourceRoot = process.argv[2] || defaultSourceRoot;
 const sourceBlogDir = join(sourceRoot, "content/blog");
 const outputDir = join(process.cwd(), "output/makerjackie-blog-import");
 const tmpDir = join(process.cwd(), ".tmp");
+const apiPostsPath = join(outputDir, "api-posts.json");
+const manifestPath = join(outputDir, "manifest.json");
+const siteSettingsPath = join(outputDir, "site-settings.sql");
+const tokenPath = join(tmpDir, "makerjackie-blog-api-token.txt");
 const generatedAt = new Date().toISOString();
 
 if (!existsSync(sourceBlogDir)) {
@@ -15,6 +19,8 @@ if (!existsSync(sourceBlogDir)) {
 
 mkdirSync(outputDir, { recursive: true });
 mkdirSync(tmpDir, { recursive: true });
+
+const existingApiPosts = readExistingApiPosts(apiPostsPath);
 
 const files = readdirSync(sourceBlogDir)
   .filter((file) => file.endsWith(".mdx") && file !== "index.mdx")
@@ -74,7 +80,7 @@ for (const post of posts) {
 const siteSettings = {
   name: "MakerJackie",
   description: "记录 AI 产品、独立开发、自媒体和长期思考。",
-  url: "https://new.makerjackie.com",
+  url: "https://makerjackie.com",
   authorName: "Jackie",
   authorBio: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
   avatarUrl: "/jackie-avatar.jpg",
@@ -117,7 +123,8 @@ const siteSettings = {
   },
 };
 
-const apiTokenSecret = `blogcms_${randomUUID().replaceAll("-", "")}`;
+const existingApiTokenSecret = existsSync(tokenPath) ? readFileSync(tokenPath, "utf8").trim() : "";
+const apiTokenSecret = existingApiTokenSecret || `blogcms_${randomUUID().replaceAll("-", "")}`;
 const apiTokenHash = hash(apiTokenSecret);
 const apiTokenId = "token_makerjackie_import";
 const apiTokenScopes = ["posts:read", "posts:write", "posts:publish", "site:read", "site:write"];
@@ -142,7 +149,7 @@ const setupSql = [
   "",
 ].join("\n");
 
-const apiPosts = posts.map((post) => ({
+const currentApiPosts = posts.map((post) => ({
   title: post.title,
   slug: post.slug,
   excerpt: post.excerpt,
@@ -159,13 +166,15 @@ const apiPosts = posts.map((post) => ({
   locale: "zh",
   sourcePath: post.sourcePath,
 }));
+const apiPosts = mergeApiPosts(existingApiPosts, currentApiPosts);
 
 const manifest = {
   generatedAt,
   sourceRoot,
-  postCount: posts.length,
+  postCount: apiPosts.length,
+  sourcePostCount: posts.length,
   tagCount: tagMap.size,
-  posts: posts.map((post) => ({
+  posts: apiPosts.map((post) => ({
     title: post.title,
     slug: post.slug,
     publishedAt: post.publishedAt,
@@ -174,17 +183,59 @@ const manifest = {
   })),
 };
 
-writeFileSync(join(outputDir, "site-settings.sql"), setupSql);
-writeFileSync(join(outputDir, "api-posts.json"), `${JSON.stringify(apiPosts, null, 2)}\n`);
-writeFileSync(join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-writeFileSync(join(tmpDir, "makerjackie-blog-api-token.txt"), `${apiTokenSecret}\n`, {
+writeFileSync(siteSettingsPath, setupSql);
+writeFileSync(apiPostsPath, `${JSON.stringify(apiPosts, null, 2)}\n`);
+writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+writeFileSync(tokenPath, `${apiTokenSecret}\n`, {
   mode: 0o600,
 });
 
-console.log(`Generated ${posts.length} posts and ${tagMap.size} tags.`);
-console.log(join(outputDir, "site-settings.sql"));
-console.log(join(outputDir, "api-posts.json"));
-console.log(join(tmpDir, "makerjackie-blog-api-token.txt"));
+console.log(
+  `Generated ${apiPosts.length} posts (${posts.length} from source) and ${tagMap.size} tags.`,
+);
+console.log(siteSettingsPath);
+console.log(apiPostsPath);
+console.log(tokenPath);
+
+function readExistingApiPosts(filePath) {
+  if (!existsSync(filePath)) {
+    return [];
+  }
+
+  const parsed = JSON.parse(readFileSync(filePath, "utf8"));
+
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Existing api-posts.json must contain an array: ${filePath}`);
+  }
+
+  return parsed;
+}
+
+function mergeApiPosts(existingPosts, currentPosts) {
+  const postsBySlug = new Map();
+
+  for (const post of existingPosts) {
+    if (post?.slug) {
+      postsBySlug.set(post.slug, post);
+    }
+  }
+
+  for (const post of currentPosts) {
+    if (post?.slug) {
+      postsBySlug.set(post.slug, post);
+    }
+  }
+
+  return [...postsBySlug.values()].sort((left, right) => {
+    const dateOrder = String(left.publishedAt ?? "").localeCompare(String(right.publishedAt ?? ""));
+
+    if (dateOrder !== 0) {
+      return dateOrder;
+    }
+
+    return String(left.slug).localeCompare(String(right.slug), "zh-Hans-CN");
+  });
+}
 
 function parseFrontmatter(markdown) {
   const normalized = markdown.replace(/\r\n/g, "\n");
@@ -350,6 +401,14 @@ function renderMarkdownToHtml(markdown) {
       continue;
     }
 
+    const imageHtml = standaloneImageTagToHtml(trimmed);
+
+    if (imageHtml) {
+      flushList();
+      html.push(imageHtml);
+      continue;
+    }
+
     if (trimmed.startsWith("### ")) {
       flushList();
       html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
@@ -406,9 +465,47 @@ function inlineMarkdown(value) {
     );
 }
 
+function standaloneImageTagToHtml(value) {
+  if (!/^<img\b[\s\S]*\/?>$/i.test(value)) {
+    return "";
+  }
+
+  const src = readAttribute(value, "src");
+
+  if (!src || !/^(https?:\/\/|\/)/i.test(src)) {
+    return "";
+  }
+
+  const alt = readAttribute(value, "alt") ?? "";
+  const width = readNumericAttribute(value, "width");
+  const height = readNumericAttribute(value, "height");
+
+  return [
+    "<p><img",
+    ` src="${escapeHtml(src)}"`,
+    ` alt="${escapeHtml(alt)}"`,
+    width ? ` width="${width}"` : "",
+    height ? ` height="${height}"` : "",
+    " /></p>",
+  ].join("");
+}
+
+function readAttribute(value, name) {
+  const match = new RegExp(`\\s${name}=(["'])([\\s\\S]*?)\\1`, "i").exec(value);
+
+  return match?.[2];
+}
+
+function readNumericAttribute(value, name) {
+  const match = new RegExp(`\\s${name}=(?:\\{(\\d+)\\}|["'](\\d+)["']|(\\d+))`, "i").exec(value);
+
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? "";
+}
+
 function markdownToText(markdown) {
   return stripInlineMarkdown(markdown)
     .replace(/```[\s\S]*?```/g, " ")
+    .replace(/<img\b[^>]*>/gi, " ")
     .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
     .replace(/\[([^\]]+)]\([^)]+\)/g, "$1")
     .replace(/<[^>]+>/g, " ")
@@ -421,9 +518,11 @@ function stripInlineMarkdown(value) {
 }
 
 function firstMarkdownImage(markdown) {
-  const match = /!\[[^\]]*]\((https?:\/\/[^)\s]+|\/[^)\s]+)(?:\s+"[^"]*")?\)/.exec(markdown);
+  const match =
+    /!\[[^\]]*]\((https?:\/\/[^)\s]+|\/[^)\s]+)(?:\s+"[^"]*")?\)/.exec(markdown) ??
+    /<img\b[^>]*\ssrc=(["'])(https?:\/\/[^"']+|\/[^"']+)\1/i.exec(markdown);
 
-  return match?.[1] ?? "";
+  return match?.[2] ?? match?.[1] ?? "";
 }
 
 function dateFromFilename(file) {

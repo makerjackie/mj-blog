@@ -2,22 +2,27 @@ import { authQueryOptions } from "@repo/auth/tanstack/queries";
 import { getSiteSettingsForLocale } from "@repo/core";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { redirectForRole } from "#/lib/account-routing";
+import { redirectForRole, safeAccountRedirectPath } from "#/lib/account-routing";
 import { getCurrentLocale } from "#/lib/i18n";
 import { getServerAuthUser } from "#/lib/route-auth";
 
 export const Route = createFileRoute("/_guest")({
+  validateSearch: (search): { redirectTo?: string } => {
+    const redirectTo = safeAccountRedirectPath(search.redirectTo);
+
+    return redirectTo === "/app" ? {} : { redirectTo };
+  },
   component: RouteComponent,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, search }) => {
     // Redirect path when user is already present,
     // or after successful login/signup
-    const REDIRECT_URL = "/app";
+    const REDIRECT_URL = safeAccountRedirectPath(search.redirectTo);
     const serverUser = await getServerAuthUser();
 
     if (serverUser !== undefined) {
       if (serverUser) {
         throw redirect({
-          to: redirectForRole(serverUser),
+          to: redirectForRole(serverUser, REDIRECT_URL),
         });
       }
 
@@ -32,7 +37,7 @@ export const Route = createFileRoute("/_guest")({
     });
     if (user) {
       throw redirect({
-        to: redirectForRole(user),
+        to: redirectForRole(user, REDIRECT_URL),
       });
     }
 

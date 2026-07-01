@@ -134,6 +134,7 @@ export async function updateCmsUser(
     readonly commentReplyNotificationsEnabled?: boolean;
     readonly emailPreference?: EmailPreference;
     readonly marketingOptOut?: boolean;
+    readonly name?: string;
     readonly role?: UserRole;
   },
 ): Promise<CmsUser | null> {
@@ -176,6 +177,14 @@ export async function updateCmsUser(
 
     if (input.marketingOptOut) {
       nextValues.emailPreference = "none";
+    }
+  }
+
+  if (input.name !== undefined) {
+    const name = input.name.replace(/\s+/g, " ").trim();
+
+    if (name && name !== existing.name) {
+      nextValues.name = name;
     }
   }
 

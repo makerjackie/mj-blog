@@ -170,6 +170,7 @@ function AdminSettingsPage() {
   const [aiActionState, setAiActionState] = useState<AiActionState>("idle");
   const [tokens, setTokens] = useState<ApiToken[]>([]);
   const [secret, setSecret] = useState<string | null>(null);
+  const [tokenExpiryMode, setTokenExpiryMode] = useState("90d");
   const [settingsStatus, setSettingsStatus] = useState<"idle" | "saved" | "error">("idle");
   const [broadcastAudienceCount, setBroadcastAudienceCount] = useState(0);
   const [broadcastSubject, setBroadcastSubject] = useState("");
@@ -334,10 +335,15 @@ function AdminSettingsPage() {
   const createToken: FormSubmitHandler = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const expiresAt = resolveTokenExpiry(
+      formData.get("tokenExpiryMode"),
+      formData.get("tokenCustomExpiry"),
+    );
     const response = await fetch("/api/tokens", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
+        expiresAt,
         name: formData.get("tokenName"),
         scopes: formData.getAll("scopes") as ApiTokenScope[],
       }),
@@ -356,6 +362,7 @@ function AdminSettingsPage() {
     setTokens((current) => [payload.data, ...current]);
     setSecret(payload.secret);
     event.currentTarget.reset();
+    setTokenExpiryMode("90d");
     toast.success(actionCopy.tokenCreated);
   };
 
@@ -1327,6 +1334,33 @@ function AdminSettingsPage() {
             <Label htmlFor="token-name">{m.admin_token_name()}</Label>
             <Input id="token-name" name="tokenName" defaultValue="AI publisher" required />
           </div>
+          <div className="grid gap-3 md:grid-cols-[minmax(0,0.75fr)_minmax(0,1fr)]">
+            <div className="grid gap-2">
+              <Label htmlFor="token-expiry-mode">{actionCopy.tokenExpiry}</Label>
+              <select
+                id="token-expiry-mode"
+                name="tokenExpiryMode"
+                value={tokenExpiryMode}
+                onChange={(event) => setTokenExpiryMode(event.currentTarget.value)}
+                className={adminSelectClassName}
+              >
+                <option value="90d">{actionCopy.tokenExpiry90Days}</option>
+                <option value="365d">{actionCopy.tokenExpiry1Year}</option>
+                <option value="custom">{actionCopy.tokenExpiryCustom}</option>
+                <option value="never">{actionCopy.tokenExpiryNever}</option>
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="token-custom-expiry">{actionCopy.tokenCustomExpiry}</Label>
+              <Input
+                id="token-custom-expiry"
+                name="tokenCustomExpiry"
+                type="datetime-local"
+                disabled={tokenExpiryMode !== "custom"}
+                required={tokenExpiryMode === "custom"}
+              />
+            </div>
+          </div>
           <fieldset className="grid gap-3">
             <legend className="text-sm font-medium">{m.admin_token_scopes()}</legend>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -1363,6 +1397,9 @@ function AdminSettingsPage() {
                   <p className="font-medium">{token.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {token.tokenPrefix}... · {token.scopes.join(", ")}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {tokenExpiryLabel(token, locale, actionCopy)}
                   </p>
                 </div>
                 <Button
@@ -1456,8 +1493,17 @@ function getSettingsActionCopy(locale: "en" | "zh") {
       networkError: "网络异常，请稍后再试。",
       settingsError: "设置保存失败",
       settingsSaved: "设置已保存",
+      tokenCustomExpiry: "自定义过期时间",
       tokenCreateError: "Token 创建失败",
       tokenCreated: "Token 已创建，请立即保存密钥。",
+      tokenExpired: (date: string) => `已于 ${date} 过期`,
+      tokenExpires: (date: string) => `过期时间：${date}`,
+      tokenExpiry: "Token 有效期",
+      tokenExpiry1Year: "1 年",
+      tokenExpiry90Days: "90 天",
+      tokenExpiryCustom: "自定义",
+      tokenExpiryNever: "不过期",
+      tokenNeverExpires: "不过期",
       tokenRevokeError: "Token 撤销失败",
       tokenRevoked: "Token 已撤销",
     };
@@ -1476,11 +1522,61 @@ function getSettingsActionCopy(locale: "en" | "zh") {
     networkError: "Network error. Try again in a moment.",
     settingsError: "Settings could not be saved",
     settingsSaved: "Settings saved",
+    tokenCustomExpiry: "Custom expiry",
     tokenCreateError: "Token could not be created",
     tokenCreated: "Token created. Save the secret now.",
+    tokenExpired: (date: string) => `Expired ${date}`,
+    tokenExpires: (date: string) => `Expires ${date}`,
+    tokenExpiry: "Token expiry",
+    tokenExpiry1Year: "1 year",
+    tokenExpiry90Days: "90 days",
+    tokenExpiryCustom: "Custom",
+    tokenExpiryNever: "Never expires",
+    tokenNeverExpires: "Never expires",
     tokenRevokeError: "Token could not be revoked",
     tokenRevoked: "Token revoked",
   };
+}
+
+function resolveTokenExpiry(
+  modeValue: FormDataEntryValue | null,
+  customValue: FormDataEntryValue | null,
+) {
+  const mode = typeof modeValue === "string" ? modeValue : "90d";
+
+  if (mode === "never") {
+    return null;
+  }
+
+  if (mode === "custom") {
+    const custom = typeof customValue === "string" ? customValue.trim() : "";
+
+    return custom ? new Date(custom).toISOString() : null;
+  }
+
+  const days = mode === "365d" ? 365 : 90;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + days);
+
+  return expiresAt.toISOString();
+}
+
+function tokenExpiryLabel(
+  token: ApiToken,
+  locale: ReturnType<typeof getCurrentLocale>,
+  copy: ReturnType<typeof getSettingsActionCopy>,
+) {
+  if (!token.expiresAt) {
+    return copy.tokenNeverExpires;
+  }
+
+  const date = new Date(token.expiresAt);
+  const label = new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+
+  return date.getTime() <= Date.now() ? copy.tokenExpired(label) : copy.tokenExpires(label);
 }
 
 function getAiProviderCopy(locale: ReturnType<typeof getCurrentLocale>) {

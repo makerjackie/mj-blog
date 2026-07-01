@@ -1,6 +1,7 @@
 import { type CommentUserStatus, type EmailPreference, type UserRole } from "@repo/core";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { revokeAccountSessions } from "#/lib/account-security";
 import { countAdminUsers, getAdminUserFromRequest } from "#/lib/admin-auth";
 import { jsonResponse, readJsonBody } from "#/lib/cms-api";
 import {
@@ -98,6 +99,10 @@ export const Route = createFileRoute("/api/admin/users/$id")({
 
         if (!user) {
           return jsonResponse({ error: "User not found" }, { status: 404 });
+        }
+
+        if (updates.role && existingUser && updates.role !== existingUser.role) {
+          await revokeAccountSessions(params.id);
         }
 
         return jsonResponse({ data: user });

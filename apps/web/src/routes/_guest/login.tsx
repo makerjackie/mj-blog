@@ -7,6 +7,7 @@ import { Label } from "@repo/ui/components/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BookOpenIcon, LoaderCircleIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { $getAccountLoginOptions, type AccountLoginOptions } from "#/lib/account-login-options";
@@ -27,9 +28,13 @@ function LoginForm() {
   const { redirectUrl } = Route.useRouteContext();
   const { socialProviders } = Route.useLoaderData();
   const search = Route.useSearch();
-  const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
+  const locale = getCurrentLocale();
+  const siteSettings = getSiteSettingsForLocale(locale);
+  const copy = getLoginRecoveryCopy(locale);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState<"idle" | "sending" | "sent">("idle");
   const availableSocialLogins = socialLoginOptions.filter((option) =>
     socialProviders.includes(option.provider),
   );
@@ -50,8 +55,14 @@ function LoginForm() {
 
       return payload.data;
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : m.login_error());
+    onError: (error, variables) => {
+      const message = error instanceof Error ? error.message : m.login_error();
+      toast.error(message);
+
+      if (/verification/i.test(message)) {
+        setVerificationEmail(variables.email);
+        setVerificationStatus("idle");
+      }
     },
     onSuccess: async (user) => {
       queryClient.setQueryData(authQueryOptions().queryKey, user);
@@ -72,9 +83,32 @@ function LoginForm() {
     emailLoginMutate({ email, password });
   };
 
+  const resendVerification = async () => {
+    if (!verificationEmail || verificationStatus === "sending") {
+      return;
+    }
+
+    setVerificationStatus("sending");
+    const response = await fetch("/api/account/verification-email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: verificationEmail }),
+    }).catch(() => null);
+
+    if (!response?.ok) {
+      setVerificationStatus("idle");
+      toast.error(copy.verificationResendError);
+      return;
+    }
+
+    setVerificationStatus("sent");
+    toast.success(copy.verificationResent);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <form action="/api/account/login" method="post" onSubmit={handleSubmit}>
+        <input type="hidden" name="redirectTo" value={redirectUrl} />
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <Link to="/" className="flex flex-col items-center gap-2 font-medium">
@@ -151,13 +185,35 @@ function LoginForm() {
               {isPending && <LoaderCircleIcon className="animate-spin" />}
               {isPending ? m.login_pending() : m.login()}
             </Button>
+            {verificationEmail ? (
+              <div className="rounded-md border border-border bg-muted/35 p-3 text-sm">
+                <p className="text-muted-foreground">{copy.verificationPrompt}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 w-full"
+                  disabled={verificationStatus === "sending"}
+                  onClick={() => void resendVerification()}
+                >
+                  {verificationStatus === "sending" ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : null}
+                  {verificationStatus === "sent" ? copy.verificationSent : copy.verificationResend}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </form>
 
       <div className="text-center text-sm">
         {m.login_no_account()}{" "}
-        <Link to="/signup" className="underline underline-offset-4">
+        <Link
+          to="/signup"
+          search={accountRedirectSearch(redirectUrl)}
+          className="underline underline-offset-4"
+        >
           {m.signup()}
         </Link>
       </div>
@@ -176,4 +232,28 @@ const socialLoginOptions = [
 
 function accountSocialLoginHref(provider: "github" | "google", redirectTo: string) {
   return `/api/account/login/${provider}/start?redirectTo=${encodeURIComponent(redirectTo)}`;
+}
+
+function accountRedirectSearch(redirectTo: string): { redirectTo?: string } {
+  return redirectTo === "/app" ? {} : { redirectTo };
+}
+
+function getLoginRecoveryCopy(locale: ReturnType<typeof getCurrentLocale>) {
+  if (locale === "zh") {
+    return {
+      verificationPrompt: "没有收到验证邮件？可以重新发送一次。",
+      verificationResend: "重新发送验证邮件",
+      verificationResendError: "验证邮件发送失败。",
+      verificationResent: "验证邮件已发送。",
+      verificationSent: "已发送",
+    };
+  }
+
+  return {
+    verificationPrompt: "Did not receive the verification email? Send it again.",
+    verificationResend: "Resend verification email",
+    verificationResendError: "Verification email could not be sent.",
+    verificationResent: "Verification email sent.",
+    verificationSent: "Sent",
+  };
 }

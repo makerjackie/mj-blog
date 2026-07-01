@@ -8,6 +8,7 @@ import { Button } from "@repo/ui/components/button";
 import { Label } from "@repo/ui/components/label";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
+  BotIcon,
   CheckIcon,
   SaveIcon,
   SearchIcon,
@@ -518,6 +519,7 @@ function AdminCommentsPage() {
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{comment.body}</p>
+                <AiModerationSummary moderation={comment.aiModeration} locale={locale} />
                 <div className="mt-4 flex flex-wrap gap-2">
                   {localizedPost ? (
                     <Button
@@ -571,6 +573,39 @@ function AdminCommentsPage() {
   );
 }
 
+function AiModerationSummary({
+  locale,
+  moderation,
+}: {
+  readonly locale: "en" | "zh";
+  readonly moderation: Comment["aiModeration"];
+}) {
+  if (!moderation || moderation.status === "not_requested") {
+    return null;
+  }
+
+  const copy = getAiModerationSummaryCopy(moderation, locale);
+  const reviewedAt = moderation.reviewedAt
+    ? formatAiModerationDate(moderation.reviewedAt, locale)
+    : null;
+
+  return (
+    <div className="mt-3 flex items-start gap-2 border-l-2 border-border bg-background/55 py-2 pr-3 pl-3">
+      <BotIcon className="mt-0.5 size-4 shrink-0 text-link" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-foreground">{copy.heading}</span>
+          <span className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-xs text-muted-foreground">
+            {copy.label}
+          </span>
+          {reviewedAt ? <span className="text-xs text-muted-foreground">{reviewedAt}</span> : null}
+        </div>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">{copy.detail}</p>
+      </div>
+    </div>
+  );
+}
+
 function pickCommentSettings(settings: SiteSettings): CommentSettings {
   return {
     commentsEnabled: settings.commentsEnabled,
@@ -593,6 +628,89 @@ function parseCommentBlockedKeywords(value: FormDataEntryValue | null) {
 
 function formValueString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value : "";
+}
+
+function getAiModerationSummaryCopy(
+  moderation: NonNullable<Comment["aiModeration"]>,
+  locale: "en" | "zh",
+) {
+  if (moderation.status === "pending") {
+    return locale === "zh"
+      ? {
+          heading: "AI 审核记录",
+          label: "审核中",
+          detail: "模型正在处理，结果写入后会更新评论状态。",
+        }
+      : {
+          heading: "AI review record",
+          label: "Reviewing",
+          detail:
+            "The model is reviewing this comment and will update the status when it finishes.",
+        };
+  }
+
+  if (moderation.status === "failed") {
+    const fallback =
+      locale === "zh" ? "已按原有审核逻辑处理。" : "Handled with the existing moderation rules.";
+    const detail = moderation.error ? `${fallback} ${moderation.error}` : fallback;
+
+    return locale === "zh"
+      ? {
+          heading: "AI 审核记录",
+          label: "审核失败",
+          detail,
+        }
+      : {
+          heading: "AI review record",
+          label: "Failed",
+          detail,
+        };
+  }
+
+  const label = aiModerationDecisionLabel(moderation.decision, locale);
+  const detail =
+    moderation.reason ||
+    (locale === "zh" ? "模型未返回具体理由。" : "The model did not return a specific reason.");
+
+  return locale === "zh"
+    ? {
+        heading: "AI 审核记录",
+        label,
+        detail,
+      }
+    : {
+        heading: "AI review record",
+        label,
+        detail,
+      };
+}
+
+function aiModerationDecisionLabel(
+  decision: NonNullable<Comment["aiModeration"]>["decision"],
+  locale: "en" | "zh",
+) {
+  if (locale === "zh") {
+    if (decision === "approve") return "建议通过";
+    if (decision === "spam") return "判为垃圾";
+    return "建议复核";
+  }
+
+  if (decision === "approve") return "Approve";
+  if (decision === "spam") return "Spam";
+  return "Review";
+}
+
+function formatAiModerationDate(value: string, locale: "en" | "zh") {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 }
 
 function commentStatusLabel(status: Comment["status"]) {

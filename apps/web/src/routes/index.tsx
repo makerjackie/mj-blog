@@ -1,7 +1,7 @@
 import { localizePost, localizeSiteSettings, localizeTag } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRightIcon, BookOpenIcon, Code2Icon, LightbulbIcon, SparklesIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 
 import { PostCard } from "#/components/post-card";
 import { SiteShell } from "#/components/site-shell";
@@ -63,30 +63,14 @@ function HomePage() {
               </div>
             </div>
 
-            <aside className="flex items-start gap-5 border-t border-border pt-6 lg:block lg:border-t-0 lg:pt-0">
+            <aside className="flex justify-center border-t border-border pt-6 lg:border-t-0 lg:pt-0">
               <img
-                src="/jackie-avatar.jpg"
-                alt="MakerJackie"
-                className="size-24 shrink-0 border-2 border-border object-cover shadow-[5px_5px_0_0_var(--border)] sm:size-32 lg:size-36"
+                src="/images/makerjackie-wind.jpg"
+                alt={copy.imageAlt}
+                width={1086}
+                height={1448}
+                className="aspect-[3/4] w-full max-w-[320px] border-2 border-border object-cover shadow-[6px_6px_0_0_var(--border)] lg:max-w-[380px] xl:max-w-[400px]"
               />
-              <div className="grid gap-3 lg:mt-5">
-                {copy.profileItems.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <div
-                      key={item.label}
-                      className="flex items-start gap-3 border-t border-border pt-3"
-                    >
-                      <Icon className="mt-0.5 size-4 shrink-0 text-link" />
-                      <div>
-                        <p className="text-sm font-semibold">{item.label}</p>
-                        <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.body}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </aside>
           </div>
         </section>
@@ -155,55 +139,23 @@ function isReaderFacingPost(post: { title: string; slug: string }) {
 function getHomeCopy(locale: ReturnType<typeof getCurrentLocale>) {
   if (locale === "zh") {
     return {
-      eyebrow: "AI 产品 · 独立开发 · 长期写作",
+      eyebrow: "创造 / 行动 / 自由",
       heroBody:
-        "我是 Jackie。这里记录 AI 产品实践、独立开发项目、自媒体复盘和一些生活思考。新的博客由 01mvp-blog-starter 生成，也会作为这个模板的第一个真实用户持续迭代。",
+        "你好，我是 MakerJackie。喜欢探索世界和旅行，也用 AI 开发一些有趣的小产品。现在是一名独立开发者 / OPC / 数字游民，也是周周黑客松社区发起人；之前做过几年 AI 算法工程师，96 年生，中山大学计算机。",
+      imageAlt: "MakerJackie 在风机前的旅行照片",
       primaryAction: "阅读文章",
       secondaryAction: "查看项目",
       allArticles: "查看全部文章",
-      profileItems: [
-        {
-          label: "独立开发者",
-          body: "做 AI 产品、工具模板和内容系统，也记录真实的交付过程。",
-          icon: Code2Icon,
-        },
-        {
-          label: "周周黑客松",
-          body: "发起并运营一个用 AI 做东西的创作者社区。",
-          icon: SparklesIcon,
-        },
-        {
-          label: "01MVP",
-          body: "把想法做成能上线的小产品，再从真实反馈里继续迭代。",
-          icon: LightbulbIcon,
-        },
-      ],
     };
   }
 
   return {
-    eyebrow: "AI products · Indie hacking · Long-form writing",
+    eyebrow: "Create / Move / Freedom",
     heroBody:
-      "I am Jackie. This site collects my AI product practice, indie projects, creator notes, and life reflections. It is powered by 01mvp-blog-starter and will keep dogfooding the template in public.",
+      "Hi, I am MakerJackie. I love exploring the world and building small AI products. I am an independent developer, OPC builder, and digital nomad; I founded Hackathon Weekly, worked as an AI algorithm engineer, and studied computer science at Sun Yat-sen University.",
+    imageAlt: "MakerJackie traveling in front of a wind turbine",
     primaryAction: "Read articles",
     secondaryAction: "View projects",
     allArticles: "View all articles",
-    profileItems: [
-      {
-        label: "Independent developer",
-        body: "Building AI products, tooling templates, and publishing systems.",
-        icon: Code2Icon,
-      },
-      {
-        label: "Hackathon Weekly",
-        body: "Running a creator community around building with AI.",
-        icon: SparklesIcon,
-      },
-      {
-        label: "01MVP",
-        body: "Turning ideas into small products, then iterating from real feedback.",
-        icon: BookOpenIcon,
-      },
-    ],
   };
 }

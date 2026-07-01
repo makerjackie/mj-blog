@@ -353,6 +353,7 @@ export async function notifyBackupCompleted(input: {
 
 export async function sendPasswordResetEmail(input: {
   email: string;
+  siteName?: string;
   token: string;
   siteUrl: string;
   ttlMinutes: number;
@@ -363,7 +364,7 @@ export async function sendPasswordResetEmail(input: {
 
   return sendCmsEmail({
     to: input.email,
-    subject: "Reset your 01mvp-blog-starter password",
+    subject: `Reset your ${input.siteName ?? "01mvp-blog-starter"} password`,
     text: [
       `Open this link to reset your password: ${resetUrl}`,
       `This link expires in ${input.ttlMinutes} minutes.`,

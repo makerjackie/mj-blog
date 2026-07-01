@@ -62,6 +62,14 @@ export function renderMarkdownToHtml(markdown: string) {
       continue;
     }
 
+    const imageHtml = standaloneImageTagToHtml(trimmed);
+
+    if (imageHtml) {
+      flushList();
+      html.push(imageHtml);
+      continue;
+    }
+
     if (trimmed.startsWith("### ")) {
       flushList();
       html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
@@ -109,6 +117,7 @@ export function renderMarkdownToHtml(markdown: string) {
 export function markdownToText(markdown: string) {
   return markdown
     .replace(/```[\s\S]*?```/g, " ")
+    .replace(/<img\b[^>]*>/gi, " ")
     .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
     .replace(/\[([^\]]+)]\([^)]+\)/g, "$1")
     .replace(/[#>*_`~-]+/g, " ")
@@ -140,6 +149,43 @@ function inlineMarkdown(value: string) {
       /(?<!!)\[([^\]]+)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g,
       '<a href="$2" rel="noreferrer">$1</a>',
     );
+}
+
+function standaloneImageTagToHtml(value: string) {
+  if (!/^<img\b[\s\S]*\/?>$/i.test(value)) {
+    return "";
+  }
+
+  const src = readAttribute(value, "src");
+
+  if (!src || !/^(https?:\/\/|\/)/i.test(src)) {
+    return "";
+  }
+
+  const alt = readAttribute(value, "alt") ?? "";
+  const width = readNumericAttribute(value, "width");
+  const height = readNumericAttribute(value, "height");
+
+  return [
+    "<p><img",
+    ` src="${escapeHtml(src)}"`,
+    ` alt="${escapeHtml(alt)}"`,
+    width ? ` width="${width}"` : "",
+    height ? ` height="${height}"` : "",
+    " /></p>",
+  ].join("");
+}
+
+function readAttribute(value: string, name: string) {
+  const match = new RegExp(`\\s${name}=(["'])([\\s\\S]*?)\\1`, "i").exec(value);
+
+  return match?.[2];
+}
+
+function readNumericAttribute(value: string, name: string) {
+  const match = new RegExp(`\\s${name}=(?:\\{(\\d+)\\}|["'](\\d+)["']|(\\d+))`, "i").exec(value);
+
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? "";
 }
 
 export function htmlToText(html: string) {

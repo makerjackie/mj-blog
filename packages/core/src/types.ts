@@ -78,6 +78,18 @@ export type Tag = {
 
 export type CommentStatus = "pending" | "approved" | "spam" | "deleted";
 
+export type CommentAiModerationStatus = "not_requested" | "pending" | "completed" | "failed";
+
+export type CommentAiModerationDecision = "approve" | "review" | "spam";
+
+export type CommentAiModeration = {
+  status: CommentAiModerationStatus;
+  decision: CommentAiModerationDecision | null;
+  reason: string | null;
+  error: string | null;
+  reviewedAt: string | null;
+};
+
 export type UserRole = "admin" | "reader";
 
 export type CommentUserStatus = "active" | "muted";
@@ -114,6 +126,7 @@ export type Comment = {
   authorWebsite: string | null;
   body: string;
   status: CommentStatus;
+  aiModeration?: CommentAiModeration;
   createdAt: string;
   i18n?: LocalizedFields<"body">;
 };

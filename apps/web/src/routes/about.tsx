@@ -51,6 +51,10 @@ function AboutPage() {
               <p className="mt-6 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
                 {copy.description}
               </p>
+              <div className="mt-6 max-w-3xl border-t border-border pt-4">
+                <p className="text-base font-semibold">{copy.profileTitle}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{copy.profileBody}</p>
+              </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button
                   render={<a href="/blog" aria-label={copy.primaryAction} />}
@@ -70,17 +74,14 @@ function AboutPage() {
               </div>
             </div>
 
-            <aside className="flex items-start gap-5 border-t border-border pt-6 lg:block lg:border-t lg:bg-muted/20 lg:p-5">
+            <aside className="flex justify-center border-t border-border pt-6 lg:border-t-0 lg:pt-0">
               <img
-                src="/jackie-avatar.jpg"
-                alt="MakerJackie"
-                className="size-24 shrink-0 border-2 border-border object-cover shadow-[5px_5px_0_0_var(--border)] sm:size-32 lg:size-36"
+                src="/images/makerjackie-wind.jpg"
+                alt={copy.imageAlt}
+                width={1086}
+                height={1448}
+                className="aspect-[3/4] w-full max-w-[320px] border-2 border-border object-cover shadow-[6px_6px_0_0_var(--border)] lg:max-w-[360px] xl:max-w-[380px]"
               />
-              <div className="lg:mt-5">
-                <p className="text-sm font-semibold text-link uppercase">MakerJackie</p>
-                <p className="mt-2 text-2xl font-semibold">{copy.profileTitle}</p>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy.profileBody}</p>
-              </div>
             </aside>
           </div>
         </section>
@@ -154,13 +155,15 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
   if (locale === "zh") {
     return {
       eyebrow: "关于 MakerJackie",
-      title: "用 AI 做产品，也记录一路上的弯路。",
+      title: "探索世界，也把想法做成看得见的作品。",
       description:
-        "这里会记录我的 AI 产品实践、独立开发项目、自媒体复盘和一些长期思考。很多文章不追求完美，但会尽量留下真实的路径、判断和踩坑。",
+        "你好，我是 MakerJackie。喜欢探索世界和旅行，用 AI 开发一些有趣的小产品。这里会记录我的 AI 产品实践、独立开发项目、自媒体复盘和一些长期思考。",
+      imageAlt: "MakerJackie 在风机前的旅行照片",
       primaryAction: "阅读文章",
       secondaryAction: "查看项目",
-      profileTitle: "独立开发者，前 AI 算法工程师",
-      profileBody: "Jackie 是周周黑客松社区发起人，也长期记录 AI 创作、产品实验和可复用模板。",
+      profileTitle: "独立开发者 / OPC / 数字游民",
+      profileBody:
+        "周周黑客松社区发起人，前 AI 算法工程师，96 年生，中山大学计算机。博客和作品集在 makerjackie.com，AI 产品创作教程在 01mvp.com，社交媒体全网同名 MakerJackie。",
       whyEyebrow: "写作边界",
       whyTitle: "这里主要写什么",
       principles: [
@@ -191,10 +194,10 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
           href: "/projects",
         },
         {
-          eyebrow: "Template",
-          title: "博客模板",
-          description: "这个站由 01mvp-blog-starter 生成，也会继续作为第一个真实用户使用。",
-          href: "https://github.com/01mvp/blog-starter",
+          eyebrow: "01MVP",
+          title: "系统化教程",
+          description: "AI 产品实战教程、工具工作流和案例手册会沉淀在 01MVP。",
+          href: "https://01mvp.com",
         },
       ],
     };
@@ -202,14 +205,15 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
 
   return {
     eyebrow: "About MakerJackie",
-    title: "Building AI products and documenting the path.",
+    title: "Exploring the world and turning ideas into visible products.",
     description:
-      "This site collects my AI product practice, indie projects, creator notes, and long-term thinking. The writing is practical, direct, and grounded in actual work.",
+      "Hi, I am MakerJackie. I love exploring the world, traveling, and building small AI products. This site collects my AI product practice, indie projects, creator notes, and long-term thinking.",
+    imageAlt: "MakerJackie traveling in front of a wind turbine",
     primaryAction: "Read articles",
     secondaryAction: "View projects",
-    profileTitle: "Independent developer and former AI algorithm engineer",
+    profileTitle: "Independent developer / OPC builder / digital nomad",
     profileBody:
-      "Jackie founded Hackathon Weekly and keeps publishing AI creation notes, product experiments, and reusable templates.",
+      "Founder of Hackathon Weekly, former AI algorithm engineer, and computer science graduate from Sun Yat-sen University. My blog and portfolio are at makerjackie.com, AI product tutorials live at 01mvp.com, and I use MakerJackie across social platforms.",
     whyEyebrow: "Writing",
     whyTitle: "What I write about",
     principles: [
@@ -244,11 +248,10 @@ function getAboutCopy(locale: ReturnType<typeof getCurrentLocale>) {
         href: "/projects",
       },
       {
-        eyebrow: "Template",
-        title: "Blog starter",
-        description:
-          "This site is powered by 01mvp-blog-starter and will keep dogfooding the template.",
-        href: "https://github.com/01mvp/blog-starter",
+        eyebrow: "01MVP",
+        title: "Structured tutorials",
+        description: "AI product guides, workflows, and practical cases live in 01MVP.",
+        href: "https://01mvp.com",
       },
     ],
   };

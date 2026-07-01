@@ -95,6 +95,7 @@ function SignupForm() {
   return (
     <div className="flex flex-col gap-6">
       <form action="/api/account/signup" method="post" onSubmit={handleSubmit}>
+        <input type="hidden" name="redirectTo" value={redirectUrl} />
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <Link to="/" className="flex flex-col items-center gap-2 font-medium">
@@ -168,7 +169,11 @@ function SignupForm() {
 
       <div className="text-center text-sm">
         {m.signup_has_account()}{" "}
-        <Link to="/login" className="underline underline-offset-4">
+        <Link
+          to="/login"
+          search={accountRedirectSearch(redirectUrl)}
+          className="underline underline-offset-4"
+        >
           {m.login()}
         </Link>
       </div>
@@ -210,4 +215,8 @@ function PasswordInput(props: React.ComponentProps<typeof Input>) {
       </button>
     </div>
   );
+}
+
+function accountRedirectSearch(redirectTo: string): { redirectTo?: string } {
+  return redirectTo === "/app" ? {} : { redirectTo };
 }

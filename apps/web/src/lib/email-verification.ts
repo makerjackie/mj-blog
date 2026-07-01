@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import { digestText } from "@repo/core";
+import { digestText, normalizeEmail } from "@repo/core";
 import { createAuthDb } from "@repo/db";
 import { user as authUserTable, verification } from "@repo/db/schema";
 import { env } from "cloudflare:workers";
@@ -11,8 +11,12 @@ import {
   sendEmailVerificationEmail,
   type EmailDeliveryStatus,
 } from "#/lib/cms-email";
+import { getClientIp } from "#/lib/comment-guard";
 
 const emailVerificationTtlMinutes = 30;
+const emailVerificationWindowSeconds = 60 * 60;
+const emailVerificationIpLimit = 5;
+const emailVerificationEmailLimit = 3;
 
 function getAuthDb() {
   return createAuthDb(env.CMS_DB as Parameters<typeof createAuthDb>[0]);
@@ -41,6 +45,40 @@ export async function isCommentEmailVerificationRequired() {
   const status = await getEmailVerificationStatus();
 
   return status.enabled;
+}
+
+export async function requestCommentEmailVerification(input: { email?: string; request: Request }) {
+  const normalizedEmail = safeNormalizeEmail(input.email);
+  const rateLimited = await isEmailVerificationRateLimited(normalizedEmail, input.request).catch(
+    () => false,
+  );
+
+  if (normalizedEmail && !rateLimited && (await isCommentEmailVerificationRequired())) {
+    const db = getAuthDb();
+    const user = (
+      await db
+        .select({
+          email: authUserTable.email,
+          emailVerified: authUserTable.emailVerified,
+          id: authUserTable.id,
+          name: authUserTable.name,
+        })
+        .from(authUserTable)
+        .where(eq(authUserTable.email, normalizedEmail))
+        .limit(1)
+    )[0];
+
+    if (user && !user.emailVerified) {
+      await sendCommentEmailVerification({
+        email: user.email,
+        name: user.name,
+        request: input.request,
+        userId: user.id,
+      });
+    }
+  }
+
+  return { accepted: true };
 }
 
 export async function sendCommentEmailVerification(input: {
@@ -136,6 +174,39 @@ export async function deleteCommentEmailVerification(userId: string) {
 
 function emailVerificationIdentifier(userId: string) {
   return `comment-email-verification:${userId}`;
+}
+
+function safeNormalizeEmail(value: string | undefined) {
+  try {
+    return normalizeEmail(value);
+  } catch {
+    return null;
+  }
+}
+
+async function isEmailVerificationRateLimited(email: string | null, request: Request) {
+  const ip = getClientIp(request);
+  const [ipLimited, emailLimited] = await Promise.all([
+    consumeEmailVerificationBucket("ip", ip, emailVerificationIpLimit),
+    email ? consumeEmailVerificationBucket("email", email, emailVerificationEmailLimit) : false,
+  ]);
+
+  return ipLimited || emailLimited;
+}
+
+async function consumeEmailVerificationBucket(kind: string, value: string, limit: number) {
+  const key = `comment-email-verification-rate:${kind}:${await digestText(value)}`;
+  const current = Number(await env.CMS_CACHE.get(key).catch(() => null));
+
+  if (Number.isFinite(current) && current >= limit) {
+    return true;
+  }
+
+  await env.CMS_CACHE.put(key, String((Number.isFinite(current) ? current : 0) + 1), {
+    expirationTtl: emailVerificationWindowSeconds,
+  });
+
+  return false;
 }
 
 function publicSiteUrl(request: Request) {

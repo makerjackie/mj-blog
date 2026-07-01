@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/email/unsubscribe")({
             : await unsubscribeOptionalEmails(token)
           : false;
 
-        return new Response(unsubscribeHtml(ok, kind), {
+        return new Response(unsubscribeHtml(ok, kind, localeFromRequest(request)), {
           headers: { "content-type": "text/html; charset=utf-8" },
           status: ok ? 200 : 400,
         });
@@ -26,12 +26,20 @@ export const Route = createFileRoute("/api/email/unsubscribe")({
   },
 });
 
-function unsubscribeHtml(ok: boolean, kind: "comment_replies" | "optional") {
-  const title = ok ? "Email unsubscribed" : "Unsubscribe link expired";
-  const body = getUnsubscribeBody(ok, kind);
+function unsubscribeHtml(ok: boolean, kind: "comment_replies" | "optional", locale: "en" | "zh") {
+  const title =
+    locale === "zh"
+      ? ok
+        ? "邮件订阅已取消"
+        : "退订链接已失效"
+      : ok
+        ? "Email unsubscribed"
+        : "Unsubscribe link expired";
+  const body = getUnsubscribeBody(ok, kind, locale);
+  const home = locale === "zh" ? "返回网站" : "Return to the site";
 
   return `<!doctype html>
-<html lang="en">
+<html lang="${locale}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,13 +56,29 @@ function unsubscribeHtml(ok: boolean, kind: "comment_replies" | "optional") {
     <main>
       <h1>${title}</h1>
       <p>${body}</p>
-      <p><a href="/">Return to the site</a></p>
+      <p><a href="/">${home}</a></p>
     </main>
   </body>
 </html>`;
 }
 
-function getUnsubscribeBody(ok: boolean, kind: "comment_replies" | "optional") {
+function getUnsubscribeBody(
+  ok: boolean,
+  kind: "comment_replies" | "optional",
+  locale: "en" | "zh",
+) {
+  if (locale === "zh") {
+    if (!ok) {
+      return "这个退订链接无效或已过期。登录后可以在账号中心更新邮件偏好。";
+    }
+
+    if (kind === "comment_replies") {
+      return "你将不再收到评论回复邮件通知。";
+    }
+
+    return "你将不再收到可选的博客更新或产品通知邮件。";
+  }
+
   if (!ok) {
     return "This unsubscribe link is invalid or has expired. You can update email preferences after signing in.";
   }
@@ -64,4 +88,10 @@ function getUnsubscribeBody(ok: boolean, kind: "comment_replies" | "optional") {
   }
 
   return "You will no longer receive optional blog update or announcement emails.";
+}
+
+function localeFromRequest(request: Request): "en" | "zh" {
+  const language = request.headers.get("accept-language")?.toLowerCase() ?? "";
+
+  return language.includes("zh") ? "zh" : "en";
 }

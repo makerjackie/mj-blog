@@ -12,6 +12,22 @@ It ships with two content surfaces:
 - `/blog` is powered by the publishing backend for posts, admin writing, comments, RSS, OpenAPI publishing, imports, exports, and backups.
 - `/docs` is powered by Fumadocs and GitHub Markdown/MDX for product docs, developer docs, API guides, and template notes.
 
+For the MakerJackie deployment, long-term blog posts are authored in `content/posts/*.mdx`, then synced into the CMS. The CMS/D1 database is the production runtime layer for rendering, comments, RSS, search, exports, backups, and urgent small edits.
+
+## MakerJackie Publishing Flow
+
+Use local MDX as the source of truth for durable posts:
+
+```sh
+cd /Users/jackiexiao/code/makerjackie/mj-blog
+pnpm publish:mdx content/posts/my-post.mdx --draft
+pnpm publish:mdx content/posts/my-post.mdx --publish
+```
+
+The publish script upserts by `slug`: existing CMS posts are updated and missing posts are created. It reads the API token from `.tmp/makerjackie-blog-api-token.txt`, or from `CMS_API_TOKEN` in the environment.
+
+Use the CMS admin for comments, settings, image management, temporary typo fixes, and emergency changes. Lasting article changes should be made in the matching MDX file first, then synced to the CMS to avoid two sources drifting apart. See [Content publishing](./.agents/content-publishing.md) for the detailed agent workflow.
+
 ## Stack
 
 - TanStack Start + TanStack Router
@@ -97,6 +113,7 @@ This checks the required R2 bucket, builds the web app, applies remote D1 migrat
 
 ```txt
 apps/web                 TanStack Start app, admin UI, public site, docs, API routes
+content/posts            MakerJackie MDX post source files synced into the CMS
 packages/core            content types, demo data, Markdown and i18n helpers
 packages/db              Drizzle schema and D1 migrations
 packages/ui              shared UI primitives

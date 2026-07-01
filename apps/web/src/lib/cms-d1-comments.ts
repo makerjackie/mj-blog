@@ -20,7 +20,7 @@ import {
   drizzleRowToComment,
 } from "./cms-d1-shared";
 import { getCmsDb } from "./cms-db";
-import { resolveAiCommentStatus } from "./comment-ai-moderation.server";
+import { resolveAiCommentModerationOutcome } from "./comment-ai-moderation.server";
 
 // ---------------------------------------------------------------------------
 // Comments
@@ -106,6 +106,21 @@ export async function createD1Comment(
         }
       : null;
   const status = aiModeration ? "pending" : baseStatus;
+  const aiModerationRecord = aiModeration
+    ? {
+        status: "pending" as const,
+        decision: null,
+        reason: null,
+        error: null,
+        reviewedAt: null,
+      }
+    : {
+        status: "not_requested" as const,
+        decision: null,
+        reason: null,
+        error: null,
+        reviewedAt: null,
+      };
   const comment: Comment = {
     id: `comment_${crypto.randomUUID()}`,
     postId: post.id,
@@ -116,6 +131,7 @@ export async function createD1Comment(
     authorWebsite,
     body,
     status,
+    aiModeration: aiModerationRecord,
     createdAt: now,
   };
 
@@ -136,6 +152,11 @@ export async function createD1Comment(
     body: comment.body,
     i18n: comment.i18n ?? null,
     status: comment.status,
+    aiModerationStatus: aiModerationRecord.status,
+    aiModerationDecision: aiModerationRecord.decision,
+    aiModerationReason: aiModerationRecord.reason,
+    aiModerationError: aiModerationRecord.error,
+    aiModerationReviewedAt: aiModerationRecord.reviewedAt,
     createdAt: comment.createdAt,
     updatedAt: now,
   });
@@ -187,18 +208,36 @@ export async function resolveD1CommentAiModeration({
   comment: Comment;
   moderation: D1CommentAiModerationTask;
 }) {
-  const status = await resolveAiCommentStatus({
+  const outcome = await resolveAiCommentModerationOutcome({
     baseStatus: moderation.baseStatus,
     body: moderation.body,
     requireApproval: moderation.requireApproval,
     rules: moderation.rules,
   });
+  const db = getCmsDb();
 
-  if (status === comment.status) {
-    return comment;
-  }
+  await db
+    .update(schema.comments)
+    .set({
+      status: outcome.status,
+      aiModerationStatus: outcome.audit.status,
+      aiModerationDecision: outcome.audit.decision,
+      aiModerationReason: outcome.audit.reason,
+      aiModerationError: outcome.audit.error,
+      aiModerationReviewedAt: outcome.audit.reviewedAt,
+      updatedAt: outcome.audit.reviewedAt,
+    })
+    .where(eq(schema.comments.id, comment.id));
 
-  return (await updateD1CommentStatus(comment.id, status)) ?? { ...comment, status };
+  const rows = await db
+    .select()
+    .from(schema.comments)
+    .where(eq(schema.comments.id, comment.id))
+    .limit(1);
+
+  return rows[0]
+    ? drizzleRowToComment(rows[0])
+    : { ...comment, status: outcome.status, aiModeration: outcome.audit };
 }
 
 export async function listD1Comments() {

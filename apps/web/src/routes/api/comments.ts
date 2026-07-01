@@ -5,12 +5,7 @@ import { waitUntil } from "cloudflare:workers";
 import { CreateCommentSchema, validateBody } from "#/lib/api-validation";
 import { getApiLocale, jsonResponse, readJsonBody } from "#/lib/cms-api";
 import { requireCmsAccess } from "#/lib/cms-authz";
-import {
-  createD1Comment,
-  listD1Comments,
-  resolveD1CommentAiModeration,
-  type D1CommentAiModerationTask,
-} from "#/lib/cms-d1";
+import { createD1Comment, listD1Comments, resolveD1CommentAiModeration } from "#/lib/cms-d1";
 import { notifyCommentCreated } from "#/lib/cms-email";
 import { getCommentUserFromRequest } from "#/lib/comment-auth";
 import { checkCommentRateLimit, getClientIp, verifyTurnstile } from "#/lib/comment-guard";
@@ -94,16 +89,22 @@ export const Route = createFileRoute("/api/comments")({
         }
 
         const { aiModeration, comment, postTitle } = persistedResult.data;
+        const finalComment = aiModeration
+          ? await resolveD1CommentAiModeration({
+              comment,
+              moderation: aiModeration,
+            })
+          : comment;
+
         queueCommentCreatedEffects({
-          aiModeration,
-          comment,
+          comment: finalComment,
           postTitle,
           siteUrl: new URL(request.url).origin,
         });
 
         return jsonResponse(
           {
-            data: comment,
+            data: finalComment,
           },
           { status: 201 },
         );
@@ -116,29 +117,21 @@ function queueCommentCreatedEffects(input: {
   comment: Comment;
   postTitle: string;
   siteUrl: string;
-  aiModeration: D1CommentAiModerationTask | null;
 }) {
   waitUntil(
     (async () => {
-      const finalComment = input.aiModeration
-        ? await resolveD1CommentAiModeration({
-            comment: input.comment,
-            moderation: input.aiModeration,
-          })
-        : input.comment;
-
-      if (finalComment.status === "spam") {
+      if (input.comment.status === "spam") {
         return;
       }
 
       await notifyCommentCreated({
-        comment: finalComment,
+        comment: input.comment,
         postTitle: input.postTitle,
         siteUrl: input.siteUrl,
       });
 
-      if (finalComment.status === "approved") {
-        await notifyCommentReplyCreated(finalComment);
+      if (input.comment.status === "approved") {
+        await notifyCommentReplyCreated(input.comment);
       }
     })().catch((error: unknown) => {
       console.error("Comment post-create effects failed", error);

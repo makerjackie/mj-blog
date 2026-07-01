@@ -26,6 +26,7 @@
     "deps:major": "vpx taze@latest major -Ilwr --maturity-period 3",
     "tanstack": "vpx @tanstack/cli@latest",
     "sync:obsidian": "node scripts/sync-obsidian.mjs",
+    "publish:mdx": "node scripts/publish-mdx-post.mjs",
     "db": "vp run --filter=@repo/db db",
     "db:seed:local-admin": "node scripts/seed-local-admin.mjs",
     "ui": "vp run --filter=@repo/ui ui",

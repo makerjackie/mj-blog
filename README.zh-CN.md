@@ -12,6 +12,22 @@
 - `/blog` 由发布后台驱动，适合公开文章、后台写作、评论、RSS、OpenAPI 发布、导入、导出和备份。
 - `/docs` 由 Fumadocs 与 GitHub Markdown/MDX 驱动，适合产品文档、开发者文档、API 指南和模板说明。
 
+MakerJackie 当前部署中，长期博客文章以 `content/posts/*.mdx` 为源文件，再同步到 CMS。CMS/D1 是线上运行层，负责渲染、评论、RSS、搜索、导出、备份和紧急小修。
+
+## MakerJackie 发布流程
+
+正式文章以本地 MDX 为长期源文件：
+
+```sh
+cd /Users/jackiexiao/code/makerjackie/mj-blog
+pnpm publish:mdx content/posts/my-post.mdx --draft
+pnpm publish:mdx content/posts/my-post.mdx --publish
+```
+
+发布脚本会按 `slug` upsert：CMS 中已有文章会被更新，没有则创建。API Token 默认从 `.tmp/makerjackie-blog-api-token.txt` 读取，也可以通过环境变量 `CMS_API_TOKEN` 传入。
+
+CMS 后台主要用于评论、站点设置、图片管理、临时错别字修复和紧急修改。正式内容变更应先回到对应 MDX 文件修改，再同步到 CMS，避免 MDX 和 CMS 双向漂移。详细 agent 工作流见 [Content publishing](./.agents/content-publishing.md)。
+
 ## 技术栈
 
 - TanStack Start + TanStack Router
@@ -97,6 +113,7 @@ pnpm deploy:web
 
 ```txt
 apps/web                 TanStack Start 应用、管理后台、公开站点、文档和 API 路由
+content/posts            MakerJackie MDX 文章源文件，同步到 CMS 运行层
 packages/core            内容类型、演示数据、Markdown 与 i18n helper
 packages/db              Drizzle schema 与 D1 migrations
 packages/ui              共享 UI primitives

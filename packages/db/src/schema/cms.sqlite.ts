@@ -163,6 +163,17 @@ export const comments = sqliteTable(
     status: text("status", { enum: ["pending", "approved", "spam", "deleted"] })
       .notNull()
       .default("pending"),
+    aiModerationStatus: text("ai_moderation_status", {
+      enum: ["not_requested", "pending", "completed", "failed"],
+    })
+      .notNull()
+      .default("not_requested"),
+    aiModerationDecision: text("ai_moderation_decision", {
+      enum: ["approve", "review", "spam"],
+    }),
+    aiModerationReason: text("ai_moderation_reason"),
+    aiModerationError: text("ai_moderation_error"),
+    aiModerationReviewedAt: text("ai_moderation_reviewed_at"),
     ipHash: text("ip_hash"),
     userAgent: text("user_agent"),
     createdAt: text("created_at").notNull(),
@@ -172,6 +183,7 @@ export const comments = sqliteTable(
     index("comments_post_status_idx").on(table.postId, table.status),
     index("comments_status_created_idx").on(table.status, table.createdAt),
     index("comments_author_user_idx").on(table.authorUserId),
+    index("comments_ai_moderation_status_idx").on(table.aiModerationStatus, table.createdAt),
   ],
 );
 

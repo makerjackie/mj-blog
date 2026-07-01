@@ -3,10 +3,10 @@ import type { Asset, Comment, Post, Series, SiteSettings, Tag } from "./types";
 export const siteSettings: SiteSettings = {
   name: "MakerJackie",
   description: "AI product notes, indie hacking logs, and practical guides from MakerJackie.",
-  url: "https://new.makerjackie.com",
-  authorName: "Jackie",
-  authorBio: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
-  avatarUrl: "/jackie-avatar.jpg",
+  url: "https://makerjackie.com",
+  authorName: "MakerJackie",
+  authorBio: "独立开发者 / OPC / 数字游民，周周黑客松社区发起人，前 AI 算法工程师。",
+  avatarUrl: "/images/makerjackie-wind.jpg",
   defaultOgImage: "/og-default.svg",
   socialLinks: [
     { label: "GitHub", href: "https://github.com/makerjackie" },
@@ -47,7 +47,7 @@ export const siteSettings: SiteSettings = {
       zh: "记录 AI 产品、独立开发、自媒体和长期思考。",
     },
     authorBio: {
-      zh: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
+      zh: "独立开发者 / OPC / 数字游民，周周黑客松社区发起人，前 AI 算法工程师。",
     },
   },
 };

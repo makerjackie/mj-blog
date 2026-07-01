@@ -112,7 +112,7 @@ GitHub 登录、Google 登录、API Token 也都可以后面再配。
 
 我会把自己的博客当成第一个真实用户来迁移。
 
-先用 \`new.makerjackie.com\` 跑新站，原来的 \`makerjackie.com\` 先保留。等内容迁移、域名、评论、后台都确认没问题，再考虑正式切换。
+现在新博客已经切到 \`makerjackie.com\`，旧站归档到 \`old.makerjackie.com\`。接下来我会继续把内容、评论、后台和发布流程放到真实使用里打磨。
 
 这个过程里，Skill 如果哪里不顺，我会继续改。文档如果哪一步不够小白友好，我也会补。
 
@@ -629,7 +629,7 @@ GitHub 登录、Google 登录、API Token 都是进阶功能，不需要第一�
 
 我接下来会把自己的博客当成第一个真实用户。
 
-计划是先用 \`new.makerjackie.com\` 跑新站。老的 \`makerjackie.com\` 先保留，等迁移、文章、域名、访问都确认没问题，再决定正式切换。
+现在新博客已经跑在 \`makerjackie.com\`，旧站归档在 \`old.makerjackie.com\`。接下来要确认的不是临时域名，而是文章、后台、评论和日常发布流程能不能稳定跑起来。
 
 这一步对我来说很重要。
 
@@ -1315,7 +1315,7 @@ function buildReviewNotes() {
 
 ## 发布前需要补充
 
-MakerJackie 新站 dogfood 完成后，把公众号文章里关于 \`new.makerjackie.com\` 的段落改成实际访问结果和最终链接。
+MakerJackie 新站已经切到 \`makerjackie.com\` 后，再按最终访问结果检查公众号文章里的链接、截图和 CTA。
 `.trim();
 }
 

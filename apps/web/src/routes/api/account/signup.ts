@@ -14,6 +14,7 @@ export const Route = createFileRoute("/api/account/signup")({
           email: string;
           name: string;
           password: string;
+          redirectTo?: unknown;
         }>(request);
         const result = await signupAccount(body, request).catch((error: unknown) => ({
           error: error instanceof Error ? error.message : "Signup failed",
@@ -32,7 +33,9 @@ export const Route = createFileRoute("/api/account/signup")({
         }
 
         if (formPost) {
-          return formRedirect(redirectForRole(result.data), { headers: result.headers });
+          return formRedirect(redirectForRole(result.data, body.redirectTo), {
+            headers: result.headers,
+          });
         }
 
         return jsonResponse({ data: result.data }, { status: 201, headers: result.headers });

@@ -72,7 +72,11 @@ import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
 import { Route as ApiAdminEmailStatusRouteImport } from './routes/api/admin/email-status'
 import { Route as ApiAdminEmailBroadcastsRouteImport } from './routes/api/admin/email-broadcasts'
 import { Route as ApiAdminAiSettingsRouteImport } from './routes/api/admin/ai-settings'
+import { Route as ApiAccountVerificationEmailRouteImport } from './routes/api/account/verification-email'
 import { Route as ApiAccountSignupRouteImport } from './routes/api/account/signup'
+import { Route as ApiAccountProfileRouteImport } from './routes/api/account/profile'
+import { Route as ApiAccountPasswordResetRouteImport } from './routes/api/account/password-reset'
+import { Route as ApiAccountPasswordRouteImport } from './routes/api/account/password'
 import { Route as ApiAccountMeRouteImport } from './routes/api/account/me'
 import { Route as ApiAccountLogoutRouteImport } from './routes/api/account/logout'
 import { Route as ApiAccountLoginRouteImport } from './routes/api/account/login'
@@ -95,6 +99,8 @@ import { Route as ApiAdminAiSettingsTestRouteImport } from './routes/api/admin/a
 import { Route as ApiAdminAiSettingsApiKeyRouteImport } from './routes/api/admin/ai-settings/api-key'
 import { Route as AuthAdminPostsNewRouteImport } from './routes/_auth/admin/posts/new'
 import { Route as AuthAdminPostsPostIdRouteImport } from './routes/_auth/admin/posts/$postId'
+import { Route as ApiAdminUsersIdSessionsRouteImport } from './routes/api/admin/users/$id/sessions'
+import { Route as ApiAdminUsersIdPasswordResetRouteImport } from './routes/api/admin/users/$id/password-reset'
 import { Route as ApiAdminLoginSocialCompleteRouteImport } from './routes/api/admin/login/social/complete'
 import { Route as ApiAdminLoginProviderStartRouteImport } from './routes/api/admin/login/$provider/start'
 import { Route as ApiAccountLoginSocialCompleteRouteImport } from './routes/api/account/login/social/complete'
@@ -414,9 +420,30 @@ const ApiAdminAiSettingsRoute = ApiAdminAiSettingsRouteImport.update({
   path: '/api/admin/ai-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAccountVerificationEmailRoute =
+  ApiAccountVerificationEmailRouteImport.update({
+    id: '/api/account/verification-email',
+    path: '/api/account/verification-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAccountSignupRoute = ApiAccountSignupRouteImport.update({
   id: '/api/account/signup',
   path: '/api/account/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAccountProfileRoute = ApiAccountProfileRouteImport.update({
+  id: '/api/account/profile',
+  path: '/api/account/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAccountPasswordResetRoute = ApiAccountPasswordResetRouteImport.update({
+  id: '/api/account/password-reset',
+  path: '/api/account/password-reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAccountPasswordRoute = ApiAccountPasswordRouteImport.update({
+  id: '/api/account/password',
+  path: '/api/account/password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAccountMeRoute = ApiAccountMeRouteImport.update({
@@ -533,6 +560,17 @@ const AuthAdminPostsPostIdRoute = AuthAdminPostsPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => AuthAdminPostsRoute,
 } as any)
+const ApiAdminUsersIdSessionsRoute = ApiAdminUsersIdSessionsRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
+  getParentRoute: () => ApiAdminUsersIdRoute,
+} as any)
+const ApiAdminUsersIdPasswordResetRoute =
+  ApiAdminUsersIdPasswordResetRouteImport.update({
+    id: '/password-reset',
+    path: '/password-reset',
+    getParentRoute: () => ApiAdminUsersIdRoute,
+  } as any)
 const ApiAdminLoginSocialCompleteRoute =
   ApiAdminLoginSocialCompleteRouteImport.update({
     id: '/social/complete',
@@ -601,7 +639,11 @@ export interface FileRoutesByFullPath {
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
   '/api/account/logout': typeof ApiAccountLogoutRoute
   '/api/account/me': typeof ApiAccountMeRoute
+  '/api/account/password': typeof ApiAccountPasswordRoute
+  '/api/account/password-reset': typeof ApiAccountPasswordResetRoute
+  '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
+  '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
   '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
@@ -635,7 +677,7 @@ export interface FileRoutesByFullPath {
   '/admin/posts/new': typeof AuthAdminPostsNewRoute
   '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
   '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
-  '/api/admin/users/$id': typeof ApiAdminUsersIdRoute
+  '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
@@ -647,6 +689,8 @@ export interface FileRoutesByFullPath {
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
   '/api/admin/login/social/complete': typeof ApiAdminLoginSocialCompleteRoute
+  '/api/admin/users/$id/password-reset': typeof ApiAdminUsersIdPasswordResetRoute
+  '/api/admin/users/$id/sessions': typeof ApiAdminUsersIdSessionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -688,7 +732,11 @@ export interface FileRoutesByTo {
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
   '/api/account/logout': typeof ApiAccountLogoutRoute
   '/api/account/me': typeof ApiAccountMeRoute
+  '/api/account/password': typeof ApiAccountPasswordRoute
+  '/api/account/password-reset': typeof ApiAccountPasswordResetRoute
+  '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
+  '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
   '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
@@ -722,7 +770,7 @@ export interface FileRoutesByTo {
   '/admin/posts/new': typeof AuthAdminPostsNewRoute
   '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
   '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
-  '/api/admin/users/$id': typeof ApiAdminUsersIdRoute
+  '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
@@ -734,6 +782,8 @@ export interface FileRoutesByTo {
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
   '/api/admin/login/social/complete': typeof ApiAdminLoginSocialCompleteRoute
+  '/api/admin/users/$id/password-reset': typeof ApiAdminUsersIdPasswordResetRoute
+  '/api/admin/users/$id/sessions': typeof ApiAdminUsersIdSessionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -781,7 +831,11 @@ export interface FileRoutesById {
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
   '/api/account/logout': typeof ApiAccountLogoutRoute
   '/api/account/me': typeof ApiAccountMeRoute
+  '/api/account/password': typeof ApiAccountPasswordRoute
+  '/api/account/password-reset': typeof ApiAccountPasswordResetRoute
+  '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
+  '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
   '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
@@ -815,7 +869,7 @@ export interface FileRoutesById {
   '/_auth/admin/posts/new': typeof AuthAdminPostsNewRoute
   '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
   '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
-  '/api/admin/users/$id': typeof ApiAdminUsersIdRoute
+  '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
@@ -827,6 +881,8 @@ export interface FileRoutesById {
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
   '/api/admin/login/social/complete': typeof ApiAdminLoginSocialCompleteRoute
+  '/api/admin/users/$id/password-reset': typeof ApiAdminUsersIdPasswordResetRoute
+  '/api/admin/users/$id/sessions': typeof ApiAdminUsersIdSessionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -873,7 +929,11 @@ export interface FileRouteTypes {
     | '/api/account/login'
     | '/api/account/logout'
     | '/api/account/me'
+    | '/api/account/password'
+    | '/api/account/password-reset'
+    | '/api/account/profile'
     | '/api/account/signup'
+    | '/api/account/verification-email'
     | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
@@ -919,6 +979,8 @@ export interface FileRouteTypes {
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
     | '/api/admin/login/social/complete'
+    | '/api/admin/users/$id/password-reset'
+    | '/api/admin/users/$id/sessions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -960,7 +1022,11 @@ export interface FileRouteTypes {
     | '/api/account/login'
     | '/api/account/logout'
     | '/api/account/me'
+    | '/api/account/password'
+    | '/api/account/password-reset'
+    | '/api/account/profile'
     | '/api/account/signup'
+    | '/api/account/verification-email'
     | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
@@ -1006,6 +1072,8 @@ export interface FileRouteTypes {
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
     | '/api/admin/login/social/complete'
+    | '/api/admin/users/$id/password-reset'
+    | '/api/admin/users/$id/sessions'
   id:
     | '__root__'
     | '/'
@@ -1052,7 +1120,11 @@ export interface FileRouteTypes {
     | '/api/account/login'
     | '/api/account/logout'
     | '/api/account/me'
+    | '/api/account/password'
+    | '/api/account/password-reset'
+    | '/api/account/profile'
     | '/api/account/signup'
+    | '/api/account/verification-email'
     | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
@@ -1098,6 +1170,8 @@ export interface FileRouteTypes {
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
     | '/api/admin/login/social/complete'
+    | '/api/admin/users/$id/password-reset'
+    | '/api/admin/users/$id/sessions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1134,7 +1208,11 @@ export interface RootRouteChildren {
   ApiAccountLoginRoute: typeof ApiAccountLoginRouteWithChildren
   ApiAccountLogoutRoute: typeof ApiAccountLogoutRoute
   ApiAccountMeRoute: typeof ApiAccountMeRoute
+  ApiAccountPasswordRoute: typeof ApiAccountPasswordRoute
+  ApiAccountPasswordResetRoute: typeof ApiAccountPasswordResetRoute
+  ApiAccountProfileRoute: typeof ApiAccountProfileRoute
   ApiAccountSignupRoute: typeof ApiAccountSignupRoute
+  ApiAccountVerificationEmailRoute: typeof ApiAccountVerificationEmailRoute
   ApiAdminAiSettingsRoute: typeof ApiAdminAiSettingsRouteWithChildren
   ApiAdminEmailBroadcastsRoute: typeof ApiAdminEmailBroadcastsRoute
   ApiAdminEmailStatusRoute: typeof ApiAdminEmailStatusRoute
@@ -1605,11 +1683,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminAiSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/account/verification-email': {
+      id: '/api/account/verification-email'
+      path: '/api/account/verification-email'
+      fullPath: '/api/account/verification-email'
+      preLoaderRoute: typeof ApiAccountVerificationEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/account/signup': {
       id: '/api/account/signup'
       path: '/api/account/signup'
       fullPath: '/api/account/signup'
       preLoaderRoute: typeof ApiAccountSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account/profile': {
+      id: '/api/account/profile'
+      path: '/api/account/profile'
+      fullPath: '/api/account/profile'
+      preLoaderRoute: typeof ApiAccountProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account/password-reset': {
+      id: '/api/account/password-reset'
+      path: '/api/account/password-reset'
+      fullPath: '/api/account/password-reset'
+      preLoaderRoute: typeof ApiAccountPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account/password': {
+      id: '/api/account/password'
+      path: '/api/account/password'
+      fullPath: '/api/account/password'
+      preLoaderRoute: typeof ApiAccountPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/account/me': {
@@ -1765,6 +1871,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/posts/$postId'
       preLoaderRoute: typeof AuthAdminPostsPostIdRouteImport
       parentRoute: typeof AuthAdminPostsRoute
+    }
+    '/api/admin/users/$id/sessions': {
+      id: '/api/admin/users/$id/sessions'
+      path: '/sessions'
+      fullPath: '/api/admin/users/$id/sessions'
+      preLoaderRoute: typeof ApiAdminUsersIdSessionsRouteImport
+      parentRoute: typeof ApiAdminUsersIdRoute
+    }
+    '/api/admin/users/$id/password-reset': {
+      id: '/api/admin/users/$id/password-reset'
+      path: '/password-reset'
+      fullPath: '/api/admin/users/$id/password-reset'
+      preLoaderRoute: typeof ApiAdminUsersIdPasswordResetRouteImport
+      parentRoute: typeof ApiAdminUsersIdRoute
     }
     '/api/admin/login/social/complete': {
       id: '/api/admin/login/social/complete'
@@ -1986,12 +2106,26 @@ const ApiAdminLoginRouteWithChildren = ApiAdminLoginRoute._addFileChildren(
   ApiAdminLoginRouteChildren,
 )
 
+interface ApiAdminUsersIdRouteChildren {
+  ApiAdminUsersIdPasswordResetRoute: typeof ApiAdminUsersIdPasswordResetRoute
+  ApiAdminUsersIdSessionsRoute: typeof ApiAdminUsersIdSessionsRoute
+}
+
+const ApiAdminUsersIdRouteChildren: ApiAdminUsersIdRouteChildren = {
+  ApiAdminUsersIdPasswordResetRoute: ApiAdminUsersIdPasswordResetRoute,
+  ApiAdminUsersIdSessionsRoute: ApiAdminUsersIdSessionsRoute,
+}
+
+const ApiAdminUsersIdRouteWithChildren = ApiAdminUsersIdRoute._addFileChildren(
+  ApiAdminUsersIdRouteChildren,
+)
+
 interface ApiAdminUsersRouteChildren {
-  ApiAdminUsersIdRoute: typeof ApiAdminUsersIdRoute
+  ApiAdminUsersIdRoute: typeof ApiAdminUsersIdRouteWithChildren
 }
 
 const ApiAdminUsersRouteChildren: ApiAdminUsersRouteChildren = {
-  ApiAdminUsersIdRoute: ApiAdminUsersIdRoute,
+  ApiAdminUsersIdRoute: ApiAdminUsersIdRouteWithChildren,
 }
 
 const ApiAdminUsersRouteWithChildren = ApiAdminUsersRoute._addFileChildren(
@@ -2032,7 +2166,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAccountLoginRoute: ApiAccountLoginRouteWithChildren,
   ApiAccountLogoutRoute: ApiAccountLogoutRoute,
   ApiAccountMeRoute: ApiAccountMeRoute,
+  ApiAccountPasswordRoute: ApiAccountPasswordRoute,
+  ApiAccountPasswordResetRoute: ApiAccountPasswordResetRoute,
+  ApiAccountProfileRoute: ApiAccountProfileRoute,
   ApiAccountSignupRoute: ApiAccountSignupRoute,
+  ApiAccountVerificationEmailRoute: ApiAccountVerificationEmailRoute,
   ApiAdminAiSettingsRoute: ApiAdminAiSettingsRouteWithChildren,
   ApiAdminEmailBroadcastsRoute: ApiAdminEmailBroadcastsRoute,
   ApiAdminEmailStatusRoute: ApiAdminEmailStatusRoute,

@@ -12,6 +12,8 @@ import { Label } from "@repo/ui/components/label";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
   EyeIcon,
+  KeyRoundIcon,
+  LogOutIcon,
   MailIcon,
   type LucideIcon,
   MessageSquareTextIcon,
@@ -192,6 +194,54 @@ function AdminUsersPage() {
     );
   };
 
+  const sendPasswordReset = async (user: CmsUser) => {
+    setPendingUserId(user.id);
+    setActionStatus("idle");
+
+    const response = await fetch(`/api/admin/users/${user.id}/password-reset`, {
+      method: "POST",
+    }).catch(() => null);
+
+    setPendingUserId(null);
+
+    if (!response?.ok) {
+      setActionStatus("error");
+      toast.error(copy.passwordResetError, {
+        description: response
+          ? await getResponseErrorMessage(response, copy.passwordResetError)
+          : copy.networkError,
+      });
+      return;
+    }
+
+    setActionStatus("saved");
+    toast.success(copy.passwordResetSuccess(user.name));
+  };
+
+  const revokeSessions = async (user: CmsUser) => {
+    setPendingUserId(user.id);
+    setActionStatus("idle");
+
+    const response = await fetch(`/api/admin/users/${user.id}/sessions`, {
+      method: "POST",
+    }).catch(() => null);
+
+    setPendingUserId(null);
+
+    if (!response?.ok) {
+      setActionStatus("error");
+      toast.error(copy.sessionRevokeError, {
+        description: response
+          ? await getResponseErrorMessage(response, copy.sessionRevokeError)
+          : copy.networkError,
+      });
+      return;
+    }
+
+    setActionStatus("saved");
+    toast.success(copy.sessionRevokeSuccess(user.name));
+  };
+
   return (
     <section className="grid gap-5">
       <AdminPageHeader
@@ -364,6 +414,27 @@ function AdminUsersPage() {
                         <MessageSquareTextIcon className="size-4" />
                       )}
                       {commentsExpanded ? copy.hideComments : copy.viewComments}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={pendingUserId === user.id}
+                      onClick={() => void sendPasswordReset(user)}
+                    >
+                      <KeyRoundIcon className="size-4" />
+                      {copy.sendPasswordReset}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={pendingUserId === user.id || isCurrentAdmin}
+                      title={isCurrentAdmin ? copy.currentAdminSessionsLocked : undefined}
+                      onClick={() => void revokeSessions(user)}
+                    >
+                      <LogOutIcon className="size-4" />
+                      {copy.revokeSessions}
                     </Button>
                   </div>
                 </div>
@@ -624,6 +695,7 @@ function getUsersActionCopy(locale: "en" | "zh") {
       commentHistory: "按发布时间倒序显示",
       currentAccount: "当前账号",
       currentAdminRoleLocked: "不能在这里修改当前登录管理员的角色。",
+      currentAdminSessionsLocked: "不能在这里撤销当前登录管理员的会话。",
       emailNone: "不接收博客邮件",
       emailSubscribers: "邮件订阅",
       emailUpdates: "博客更新邮件",
@@ -640,8 +712,14 @@ function getUsersActionCopy(locale: "en" | "zh") {
       networkError: "网络异常，请稍后再试。",
       noUserComments: "这个用户还没有发表过评论。",
       optionalEmailOptOut: "已退订可选邮件",
+      passwordResetError: "重置邮件发送失败",
+      passwordResetSuccess: (name: string) => `已向“${name}”发送密码重置邮件`,
+      revokeSessions: "撤销会话",
       roleUpdateSuccess: (name: string, role: UserRole) =>
         role === "admin" ? `“${name}”已设为管理员` : `“${name}”已设为读者`,
+      sendPasswordReset: "发送重置邮件",
+      sessionRevokeError: "会话撤销失败",
+      sessionRevokeSuccess: (name: string) => `“${name}”的会话已撤销`,
       updateError: "用户状态更新失败",
       userComments: (count: number) => `用户评论 · ${count} 条`,
       unknownPost: "未知文章",
@@ -655,6 +733,7 @@ function getUsersActionCopy(locale: "en" | "zh") {
     commentHistory: "Newest first",
     currentAccount: "You",
     currentAdminRoleLocked: "The signed-in admin role cannot be changed here.",
+    currentAdminSessionsLocked: "The signed-in admin sessions cannot be revoked here.",
     emailNone: "No blog emails",
     emailSubscribers: "Email subscribers",
     emailUpdates: "Blog update emails",
@@ -671,8 +750,14 @@ function getUsersActionCopy(locale: "en" | "zh") {
     networkError: "Network error. Try again in a moment.",
     noUserComments: "This user has not posted comments yet.",
     optionalEmailOptOut: "Optional emails off",
+    passwordResetError: "Password reset email could not be sent",
+    passwordResetSuccess: (name: string) => `Password reset email sent to "${name}"`,
+    revokeSessions: "Revoke sessions",
     roleUpdateSuccess: (name: string, role: UserRole) =>
       role === "admin" ? `"${name}" is now an admin` : `"${name}" is now a reader`,
+    sendPasswordReset: "Send reset email",
+    sessionRevokeError: "Sessions could not be revoked",
+    sessionRevokeSuccess: (name: string) => `"${name}" sessions revoked`,
     updateError: "User status could not be updated",
     userComments: (count: number) => `User comments · ${count}`,
     unknownPost: "Unknown post",
