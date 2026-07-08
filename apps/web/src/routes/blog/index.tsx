@@ -3,7 +3,8 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { cn } from "@repo/ui/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
-import { SearchIcon } from "lucide-react";
+import { Loader2Icon, SearchIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { PostCard } from "#/components/post-card";
 import { SiteShell } from "#/components/site-shell";
@@ -43,12 +44,16 @@ function BlogIndexPage() {
   const locale = getCurrentLocale();
   const search = Route.useSearch();
   const data: BlogIndexPageData = Route.useLoaderData();
+  const requestKey = JSON.stringify([
+    search.q,
+    search.tag,
+    search.series,
+    data.page,
+    data.pageSize,
+  ]);
   const tags = dedupeBySlug(data.tags.map((tag) => localizeTag(tag, locale)));
   const series = dedupeBySlug(data.series.map((item) => localizeSeries(item, locale)));
-  const posts = data.posts.map((post) => localizePost(post, locale)).filter(isReaderFacingPost);
   const siteSettings = localizeSiteSettings(data.siteSettings, locale);
-  const pageCount = Math.max(1, Math.ceil(data.totalPosts / data.pageSize));
-  const currentPage = Math.min(data.page, pageCount);
 
   return (
     <SiteShell siteSettings={siteSettings}>
@@ -84,62 +89,152 @@ function BlogIndexPage() {
             <FilterGroups search={search} tags={tags} series={series} />
           </div>
         </form>
-        <div className="mt-8">
-          {posts.length ? (
-            posts.map((post, index) => (
-              <PostCard key={post.id} post={post} priority={index === 0} locale={locale} />
-            ))
-          ) : (
-            <p className="border-y border-border py-6 text-sm text-muted-foreground">
-              {m.blog_no_results()}
-            </p>
-          )}
-        </div>
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            {m.pagination_page({ current: currentPage, total: pageCount })}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              render={
-                <a
-                  href={blogHref({
-                    q: search.q,
-                    tag: search.tag,
-                    series: search.series,
-                    page: Math.max(1, currentPage - 1),
-                  })}
-                  aria-label={m.pagination_previous()}
-                />
-              }
-              nativeButton={false}
-              variant="outline"
-              disabled={currentPage <= 1}
-            >
-              {m.pagination_previous()}
-            </Button>
-            <Button
-              render={
-                <a
-                  href={blogHref({
-                    q: search.q,
-                    tag: search.tag,
-                    series: search.series,
-                    page: Math.min(pageCount, currentPage + 1),
-                  })}
-                  aria-label={m.pagination_next()}
-                />
-              }
-              nativeButton={false}
-              variant="outline"
-              disabled={currentPage >= pageCount}
-            >
-              {m.pagination_next()}
-            </Button>
-          </div>
-        </div>
+        <InfinitePostList key={requestKey} data={data} locale={locale} search={search} />
       </section>
     </SiteShell>
+  );
+}
+
+function InfinitePostList({
+  data,
+  locale,
+  search,
+}: {
+  readonly data: BlogIndexPageData;
+  readonly locale: ReturnType<typeof getCurrentLocale>;
+  readonly search: ReturnType<typeof Route.useSearch>;
+}) {
+  const [postState, setPostState] = useState(() => ({
+    loadedPage: data.page,
+    pageSize: data.pageSize,
+    posts: data.posts,
+    totalPosts: data.totalPosts,
+  }));
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const loadingRef = useRef(false);
+  const mountedRef = useRef(true);
+  const posts = postState.posts
+    .map((post) => localizePost(post, locale))
+    .filter(isReaderFacingPost);
+  const loadedPage = postState.loadedPage;
+  const pageCount = Math.max(1, Math.ceil(postState.totalPosts / postState.pageSize));
+  const hasMorePages = loadedPage < pageCount;
+
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!hasMorePages || loadMoreError) {
+      return;
+    }
+
+    const node = loadMoreRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    const loadMorePosts = async () => {
+      if (loadingRef.current) {
+        return;
+      }
+
+      loadingRef.current = true;
+      setIsLoadingMore(true);
+
+      try {
+        const nextData = await $getBlogIndexPage({
+          data: {
+            query: search.q,
+            tagSlug: search.tag || undefined,
+            seriesSlug: search.series || undefined,
+            page: loadedPage + 1,
+            pageSize: BLOG_PAGE_SIZE,
+          },
+        });
+
+        if (!mountedRef.current) {
+          return;
+        }
+
+        setPostState((current) => {
+          const existingIds = new Set(current.posts.map((post) => post.id));
+          const nextPosts = nextData.posts.filter((post) => !existingIds.has(post.id));
+
+          return {
+            loadedPage: Math.max(current.loadedPage, nextData.page),
+            pageSize: nextData.pageSize,
+            posts: [...current.posts, ...nextPosts],
+            totalPosts: nextData.totalPosts,
+          };
+        });
+      } catch {
+        if (mountedRef.current) {
+          setLoadMoreError(true);
+        }
+      } finally {
+        loadingRef.current = false;
+
+        if (mountedRef.current) {
+          setIsLoadingMore(false);
+        }
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void loadMorePosts();
+        }
+      },
+      { rootMargin: "240px 0px" },
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [hasMorePages, loadMoreError, loadedPage, search.q, search.series, search.tag]);
+
+  return (
+    <>
+      <div className="mt-8">
+        {posts.length ? (
+          posts.map((post, index) => (
+            <PostCard key={post.id} post={post} priority={index === 0} locale={locale} />
+          ))
+        ) : (
+          <p className="border-y border-border py-6 text-sm text-muted-foreground">
+            {m.blog_no_results()}
+          </p>
+        )}
+      </div>
+      <div
+        ref={loadMoreRef}
+        className="mt-8 flex min-h-12 items-center justify-center border-t border-border/50 pt-6"
+        aria-live="polite"
+      >
+        {isLoadingMore ? (
+          <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
+            {locale === "zh" ? "加载更多文章..." : "Loading more posts..."}
+          </p>
+        ) : loadMoreError ? (
+          <p className="text-sm text-muted-foreground">
+            {locale === "zh" ? "加载失败，刷新后再试。" : "Could not load more posts."}
+          </p>
+        ) : !hasMorePages && posts.length ? (
+          <p className="text-sm text-muted-foreground">
+            {locale === "zh" ? "全部文章已显示" : "All posts loaded"}
+          </p>
+        ) : null}
+      </div>
+    </>
   );
 }
 
@@ -208,12 +303,10 @@ function filterLinkClassName(active: boolean) {
 }
 
 function blogHref({
-  page,
   q,
   series,
   tag,
 }: {
-  readonly page?: number;
   readonly q?: string;
   readonly series?: string;
   readonly tag?: string;
@@ -222,7 +315,6 @@ function blogHref({
     ...(q ? { q } : {}),
     ...(tag ? { tag } : {}),
     ...(series ? { series } : {}),
-    ...(page && page > 1 ? { page: String(page) } : {}),
   });
   const value = search.toString();
 
