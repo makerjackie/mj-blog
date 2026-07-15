@@ -3,7 +3,7 @@ import { localizeSiteSettings } from "@repo/core";
 import { cn } from "@repo/ui/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLinkIcon, FileTextIcon, Globe2Icon, LayoutGridIcon, ListIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { SiteShell } from "#/components/site-shell";
 import { $getAboutPageData } from "#/lib/cms-server";
@@ -30,6 +30,7 @@ type ProjectItem = {
   readonly category: Exclude<ProjectCategory, "all">;
   readonly categoryLabel: string;
   readonly description: string;
+  readonly featured?: boolean;
   readonly image?: string;
   readonly links: readonly ProjectLink[];
   readonly status: string;
@@ -52,8 +53,8 @@ export const Route = createFileRoute("/projects")({
           name: "description",
           content:
             locale === "zh"
-              ? "一些已经公开的产品、网站和开源项目。"
-              : "Public products, websites, tools, and open source projects by MakerJackie.",
+              ? "MakerJackie 持续投入的 One Apps、01MVP，以及过去做过的实验和作品。"
+              : "MakerJackie's active work on One Apps and 01MVP, plus past experiments and projects.",
         },
       ],
     };
@@ -67,6 +68,8 @@ function ProjectsPage() {
   const siteSettings = localizeSiteSettings(data.siteSettings, locale);
   const copy = getProjectsCopy(locale);
   const projects = getProjects(locale);
+  const featuredProjects = projects.filter((project) => project.featured);
+  const otherProjects = projects.filter((project) => !project.featured);
 
   return (
     <SiteShell siteSettings={siteSettings}>
@@ -80,7 +83,7 @@ function ProjectsPage() {
           </p>
         </section>
 
-        <ProjectsIndex copy={copy} projects={projects} />
+        <ProjectsIndex copy={copy} featuredProjects={featuredProjects} projects={otherProjects} />
       </main>
     </SiteShell>
   );
@@ -88,84 +91,86 @@ function ProjectsPage() {
 
 function ProjectsIndex({
   copy,
+  featuredProjects,
   projects,
 }: {
   readonly copy: ReturnType<typeof getProjectsCopy>;
+  readonly featuredProjects: readonly ProjectItem[];
   readonly projects: readonly ProjectItem[];
 }) {
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const availableCategories = useMemo(
-    () => new Set(projects.map((project) => project.category)),
-    [projects],
-  );
-  const visibleFilters = copy.filters.filter(
-    (filter) => filter.category === "all" || availableCategories.has(filter.category),
-  );
-  const filteredProjects =
-    selectedCategory === "all"
-      ? projects
-      : projects.filter((project) => project.category === selectedCategory);
 
   return (
-    <section className="mt-8">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          {visibleFilters.map((filter) => {
-            const isActive = selectedCategory === filter.category;
-
-            return (
-              <button
-                key={filter.category}
-                type="button"
-                onClick={() => setSelectedCategory(filter.category)}
-                className={cn(
-                  "h-8 border border-border/30 px-3 font-mono text-[11px] font-bold transition-colors",
-                  isActive
-                    ? "bg-foreground text-background"
-                    : "bg-background text-foreground hover:bg-secondary",
-                )}
-              >
-                {filter.label}
-              </button>
-            );
-          })}
+    <div className="mt-10 space-y-14">
+      <section>
+        <div className="max-w-3xl">
+          <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground uppercase">
+            {copy.activeEyebrow}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {copy.activeTitle}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+            {copy.activeDescription}
+          </p>
         </div>
 
-        <div className="flex shrink-0 gap-1">
-          <button
-            type="button"
-            onClick={() => setViewMode("grid")}
-            title={copy.gridViewLabel}
-            className={viewButtonClassName(viewMode === "grid")}
-          >
-            <LayoutGridIcon className="size-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("list")}
-            title={copy.listViewLabel}
-            className={viewButtonClassName(viewMode === "list")}
-          >
-            <ListIcon className="size-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProjects.map((project) => (
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+          {featuredProjects.map((project) => (
             <ProjectCard key={project.title} project={project} />
           ))}
         </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {filteredProjects.map((project) => (
-            <ProjectListRow key={project.title} project={project} />
-          ))}
+      </section>
+
+      <section>
+        <div className="mb-5 flex items-end justify-between gap-3 border-t-2 border-border pt-8">
+          <div className="max-w-3xl">
+            <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground uppercase">
+              {copy.otherEyebrow}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+              {copy.otherTitle}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+              {copy.otherDescription}
+            </p>
+          </div>
+
+          <div className="flex shrink-0 gap-1">
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              title={copy.gridViewLabel}
+              className={viewButtonClassName(viewMode === "grid")}
+            >
+              <LayoutGridIcon className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("list")}
+              title={copy.listViewLabel}
+              className={viewButtonClassName(viewMode === "list")}
+            >
+              <ListIcon className="size-3.5" />
+            </button>
+          </div>
         </div>
-      )}
-    </section>
+
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+            {projects.map((project) => (
+              <ProjectCard key={project.title} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {projects.map((project) => (
+              <ProjectListRow key={project.title} project={project} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
 
@@ -297,39 +302,35 @@ function getProjectsCopy(locale: ReturnType<typeof getCurrentLocale>) {
   if (locale === "zh") {
     return {
       title: "作品集",
-      description: "一些已经公开的产品、网站和开源项目。",
+      description:
+        "现在持续投入的项目只有两条主线：One Apps 与 01MVP。其余多是过去做过的实验、小工具和好玩的作品，保留在这里作为创作记录。",
+      activeEyebrow: "正在做",
+      activeTitle: "持续更新的项目",
+      activeDescription:
+        "One Apps 收录我正在开发和维护的 App，01MVP 则持续沉淀 AI 产品创作教程与实践。具体 App 和最新状态以 One Apps 为准。",
+      otherEyebrow: "创作记录",
+      otherTitle: "实验与其他作品",
+      otherDescription:
+        "这些项目不代表仍在持续维护；其中有实验、小游戏、开源工具、社区项目和过去的网站。",
       gridViewLabel: "网格视图",
       listViewLabel: "列表视图",
-      filters: [
-        { category: "all", label: "全部" },
-        { category: "product", label: "产品" },
-        { category: "tool", label: "工具" },
-        { category: "game", label: "小游戏" },
-        { category: "ios", label: "iOS" },
-        { category: "template", label: "模板" },
-        { category: "community", label: "社区" },
-        { category: "website", label: "网站" },
-        { category: "experiment", label: "实验" },
-      ] as const satisfies readonly { category: ProjectCategory; label: string }[],
     };
   }
 
   return {
     title: "Projects",
-    description: "Public products, websites, tools, and open source projects.",
+    description:
+      "My ongoing work now has two homes: One Apps and 01MVP. Everything else here is a record of experiments, small tools, and playful builds from along the way.",
+    activeEyebrow: "Active",
+    activeTitle: "What I keep building",
+    activeDescription:
+      "One Apps is the current home for the apps I build and maintain. 01MVP is where I keep publishing practical AI product tutorials and field notes. See One Apps for the latest app lineup and status.",
+    otherEyebrow: "Archive",
+    otherTitle: "Experiments and other work",
+    otherDescription:
+      "These projects are not necessarily maintained. They include experiments, games, open-source tools, community work, and older websites.",
     gridViewLabel: "Grid view",
     listViewLabel: "List view",
-    filters: [
-      { category: "all", label: "All" },
-      { category: "product", label: "Products" },
-      { category: "tool", label: "Tools" },
-      { category: "game", label: "Games" },
-      { category: "ios", label: "iOS" },
-      { category: "template", label: "Templates" },
-      { category: "community", label: "Community" },
-      { category: "website", label: "Websites" },
-      { category: "experiment", label: "Experiments" },
-    ] as const satisfies readonly { category: ProjectCategory; label: string }[],
   };
 }
 
@@ -343,60 +344,28 @@ function getProjects(locale: ReturnType<typeof getCurrentLocale>): readonly Proj
 
 const zhProjects = [
   {
-    title: "一念 OneZen",
-    description: "一个免费、无账号、全离线的 iPhone 冥想应用，用 SwiftUI 独立开发。",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "已上线",
+    title: "One Apps Studio",
+    description:
+      "我正在开发和更新的 Apple 平台 App 都集中在这里。具体产品、进度和最新状态以 One Apps 为准。",
+    featured: true,
+    category: "product",
+    categoryLabel: "长期项目",
+    status: "持续更新",
     year: "2026",
-    image: "/projects/onezen.webp",
-    tags: ["SwiftUI", "iOS", "冥想"],
-    links: [{ label: "站点", href: "https://onezen.01mvp.com", kind: "site" }],
-  },
-  {
-    title: "删图 PhotoDelete",
-    description: "一个用手势快速整理相册的 iPhone 应用，左滑删除、右滑保留，支持批量确认。",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "已上线",
-    year: "2026",
-    image: "/projects/photodelete.webp",
-    tags: ["SwiftUI", "iOS", "照片管理"],
-    links: [{ label: "站点", href: "https://photodelete.01mvp.com", kind: "site" }],
-  },
-  {
-    title: "一愿 OneWish",
-    description: "一个用 AI 生成「未来自己」愿景图的 iPhone 应用，每日视觉提醒帮你靠近目标。",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "待上架",
-    year: "2026",
-    image: "/projects/onewish.webp",
-    tags: ["SwiftUI", "iOS", "AI"],
-    links: [{ label: "站点", href: "https://onewish.01mvp.com", kind: "site" }],
+    tags: ["iPhone", "iPad", "Mac"],
+    links: [{ label: "查看所有 App", href: "https://oneapps.studio/apps", kind: "site" }],
   },
   {
     title: "01MVP AI 实战教程",
     description:
-      "一个面向 AI 产品实践者的教程与案例站，把工具上手、MVP 案例和工作流沉淀成结构化内容。",
+      "AI 产品创作的长期项目，持续把工具上手、MVP 案例和工作流沉淀成可以直接实践的教程。",
+    featured: true,
     category: "website",
-    categoryLabel: "网站",
-    status: "已上线",
+    categoryLabel: "长期项目",
+    status: "持续更新",
     year: "2026",
-    image: "/projects/01mvp-website-design.webp",
-    tags: ["AI 教程", "Fumadocs", "01MVP"],
-    links: [{ label: "站点", href: "https://01mvp.com", kind: "site" }],
-  },
-  {
-    title: "01MVP Blog",
-    description: "面向独立开发者和 AI 产品实践者的内容站，涵盖工具指南、实战案例和一人公司方法论。",
-    category: "website",
-    categoryLabel: "网站",
-    status: "历史版本",
-    year: "2026",
-    image: "/projects/01mvp-blog.webp",
-    tags: ["VitePress", "AI 教程", "01MVP"],
-    links: [{ label: "站点", href: "https://blog.01mvp.com", kind: "site" }],
+    tags: ["AI 产品", "实战教程", "工作流"],
+    links: [{ label: "查看 01MVP", href: "https://01mvp.com", kind: "site" }],
   },
   {
     title: "Hackathon Weekly 社区网站",
@@ -426,17 +395,6 @@ const zhProjects = [
       { label: "归档站", href: "https://old.makerjackie.com", kind: "site" },
       { label: "代码", href: "https://github.com/makerjackie/makerjackie.com", kind: "github" },
     ],
-  },
-  {
-    title: "世界的形状",
-    description: "用有趣的 tree map 帮助读者从面积、人口、经济等维度重新探索世界。",
-    category: "product",
-    categoryLabel: "产品",
-    status: "已上线",
-    year: "2026",
-    image: "/projects/shapeof-world.webp",
-    tags: ["Data Viz", "Tree Map", "World Explorer"],
-    links: [{ label: "站点", href: "https://shapeof.world", kind: "site" }],
   },
   {
     title: "Paperboat",
@@ -521,42 +479,6 @@ const zhProjects = [
     ],
   },
   {
-    title: "01MVP Starter Kit",
-    description: "面向独立开发者的全栈代码模板，内置登录、支付、AI、后台和部署路径。",
-    category: "template",
-    categoryLabel: "模板",
-    status: "持续更新",
-    year: "2026",
-    image: "/projects/01mvp-template-docs.webp",
-    tags: ["代码模板", "Starter Kit", "Next.js"],
-    links: [{ label: "在线文档", href: "https://01mvp.com/template", kind: "article" }],
-  },
-  {
-    title: "Skills 手册",
-    description: "01MVP 工作流与 AI 技能库的使用手册，涵盖写作、设计、开发和发布流程。",
-    category: "template",
-    categoryLabel: "模板",
-    status: "持续更新",
-    year: "2026",
-    image: "/projects/01mvp-skills-docs.webp",
-    tags: ["知识库", "AI Skills", "手册"],
-    links: [
-      { label: "在线阅读", href: "https://www.01mvp.com/docs/skills", kind: "live" },
-      { label: "代码", href: "https://github.com/makerjackie/skills", kind: "github" },
-    ],
-  },
-  {
-    title: "源问 RootQuestion",
-    description: "基于第一性原理的个人世界模型系统，帮你找到问题背后的问题。",
-    category: "experiment",
-    categoryLabel: "实验",
-    status: "已上线",
-    year: "2026",
-    image: "/projects/rootquestion.webp",
-    tags: ["AI", "First Principles", "Thinking Tool"],
-    links: [{ label: "体验源问", href: "http://rootquestion.01mvp.com/", kind: "live" }],
-  },
-  {
     title: "UnboundX 品牌视觉",
     description: "从 Logo 到动效，用 Claude Opus 和 Gemini 打造 UnboundX 品牌视觉系统。",
     category: "experiment",
@@ -593,62 +515,28 @@ const zhProjects = [
 
 const enProjects = [
   {
-    title: "OneZen",
-    description: "A free, offline-first iPhone meditation app built independently with SwiftUI.",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "Live",
-    year: "2026",
-    image: "/projects/onezen.webp",
-    tags: ["SwiftUI", "iOS", "Meditation"],
-    links: [{ label: "Website", href: "https://onezen.01mvp.com", kind: "site" }],
-  },
-  {
-    title: "PhotoDelete",
+    title: "One Apps Studio",
     description:
-      "An iPhone photo-cleaning app for sorting albums with swipe gestures and batch confirmation.",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "Live",
+      "The home for the Apple-platform apps I am actively building and updating. See One Apps for the current lineup, progress, and release status.",
+    featured: true,
+    category: "product",
+    categoryLabel: "Long-term project",
+    status: "Actively updated",
     year: "2026",
-    image: "/projects/photodelete.webp",
-    tags: ["SwiftUI", "iOS", "Photos"],
-    links: [{ label: "Website", href: "https://photodelete.01mvp.com", kind: "site" }],
-  },
-  {
-    title: "OneWish",
-    description: "An iPhone app that turns goals into AI-generated future-self vision images.",
-    category: "ios",
-    categoryLabel: "iOS",
-    status: "Pre-release",
-    year: "2026",
-    image: "/projects/onewish.webp",
-    tags: ["SwiftUI", "iOS", "AI"],
-    links: [{ label: "Website", href: "https://onewish.01mvp.com", kind: "site" }],
+    tags: ["iPhone", "iPad", "Mac"],
+    links: [{ label: "Explore all apps", href: "https://oneapps.studio/apps", kind: "site" }],
   },
   {
     title: "01MVP",
     description:
-      "A practical AI product handbook that turns tools, workflows, and MVP cases into structured guides.",
+      "A long-term practical AI product project that turns tools, workflows, and MVP cases into guides people can use.",
+    featured: true,
     category: "website",
-    categoryLabel: "Website",
-    status: "Live",
+    categoryLabel: "Long-term project",
+    status: "Actively updated",
     year: "2026",
-    image: "/projects/01mvp-website-design.webp",
-    tags: ["AI Tutorials", "Fumadocs", "01MVP"],
-    links: [{ label: "Website", href: "https://01mvp.com", kind: "site" }],
-  },
-  {
-    title: "01MVP Blog",
-    description:
-      "A historical content hub for AI product practice, tool guides, and indie maker notes.",
-    category: "website",
-    categoryLabel: "Website",
-    status: "Archived",
-    year: "2026",
-    image: "/projects/01mvp-blog.webp",
-    tags: ["VitePress", "AI Tutorials", "01MVP"],
-    links: [{ label: "Website", href: "https://blog.01mvp.com", kind: "site" }],
+    tags: ["AI Products", "Tutorials", "Workflows"],
+    links: [{ label: "Explore 01MVP", href: "https://01mvp.com", kind: "site" }],
   },
   {
     title: "Hackathon Weekly Community",
@@ -678,18 +566,6 @@ const enProjects = [
       { label: "Archive", href: "https://old.makerjackie.com", kind: "site" },
       { label: "Code", href: "https://github.com/makerjackie/makerjackie.com", kind: "github" },
     ],
-  },
-  {
-    title: "Shape of World",
-    description:
-      "A tree-map interface for exploring the world by area, population, economy, and more.",
-    category: "product",
-    categoryLabel: "Product",
-    status: "Live",
-    year: "2026",
-    image: "/projects/shapeof-world.webp",
-    tags: ["Data Viz", "Tree Map", "World Explorer"],
-    links: [{ label: "Website", href: "https://shapeof.world", kind: "site" }],
   },
   {
     title: "Paperboat",
@@ -775,45 +651,6 @@ const enProjects = [
       { label: "Website", href: "https://01kit-chrome.01mvp.com", kind: "site" },
       { label: "Code", href: "https://github.com/makerjackie/01kit-chrome", kind: "github" },
     ],
-  },
-  {
-    title: "01MVP Starter Kit",
-    description:
-      "A full-stack starter kit for indie builders with auth, payments, AI, admin, and deployment paths.",
-    category: "template",
-    categoryLabel: "Template",
-    status: "Updating",
-    year: "2026",
-    image: "/projects/01mvp-template-docs.webp",
-    tags: ["Starter Kit", "Next.js", "Full Stack"],
-    links: [{ label: "Docs", href: "https://01mvp.com/template", kind: "article" }],
-  },
-  {
-    title: "Skills Handbook",
-    description:
-      "A practical handbook for MakerJackie and 01MVP skills across writing, design, development, and publishing.",
-    category: "template",
-    categoryLabel: "Template",
-    status: "Updating",
-    year: "2026",
-    image: "/projects/01mvp-skills-docs.webp",
-    tags: ["Knowledge Base", "AI Skills", "Handbook"],
-    links: [
-      { label: "Read", href: "https://www.01mvp.com/docs/skills", kind: "live" },
-      { label: "Code", href: "https://github.com/makerjackie/skills", kind: "github" },
-    ],
-  },
-  {
-    title: "RootQuestion",
-    description:
-      "A first-principles thinking tool that helps find the question behind the question.",
-    category: "experiment",
-    categoryLabel: "Experiment",
-    status: "Live",
-    year: "2026",
-    image: "/projects/rootquestion.webp",
-    tags: ["AI", "First Principles", "Thinking Tool"],
-    links: [{ label: "Try", href: "http://rootquestion.01mvp.com/", kind: "live" }],
   },
   {
     title: "UnboundX Visual Identity",
