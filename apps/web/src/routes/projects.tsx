@@ -83,9 +83,6 @@ function ProjectsPage() {
           <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
             {copy.title}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-            {copy.description}
-          </p>
         </section>
 
         <ProjectsIndex
@@ -115,19 +112,7 @@ function ProjectsIndex({
   return (
     <div className="mt-10 space-y-14">
       <section>
-        <div className="max-w-3xl">
-          <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground uppercase">
-            {copy.activeEyebrow}
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {copy.activeTitle}
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
-            {copy.activeDescription}
-          </p>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {featuredProjects.map((project) => (
             <ProjectCard key={project.title} project={project} />
           ))}
@@ -334,12 +319,6 @@ function getProjectsCopy(locale: ReturnType<typeof getCurrentLocale>) {
   if (locale === "zh") {
     return {
       title: "作品集",
-      description:
-        "MakerJackie 的作品分成四条脉络：01MVP、One Apps、Independent Works 与 Experiments。长期产品持续维护，独立作品追求表达，实验则允许失败。",
-      activeEyebrow: "长期主线",
-      activeTitle: "01MVP 与 One Apps",
-      activeDescription:
-        "01MVP 沉淀教程、课程、模板、陪跑与开发案例；One Apps 是面向普通用户、小而美并长期维护的正式 App。",
       independentEyebrow: "Independent Works",
       independentTitle: "独立作品",
       independentDescription:
@@ -355,12 +334,6 @@ function getProjectsCopy(locale: ReturnType<typeof getCurrentLocale>) {
 
   return {
     title: "Projects",
-    description:
-      "MakerJackie's work follows four paths: 01MVP, One Apps, Independent Works, and Experiments. Products are maintained, independent works pursue expression, and experiments are allowed to fail.",
-    activeEyebrow: "Long-term",
-    activeTitle: "01MVP and One Apps",
-    activeDescription:
-      "01MVP collects tutorials, courses, templates, coaching, and development cases. One Apps is for small, polished, long-maintained apps made for everyday users.",
     independentEyebrow: "Independent Works",
     independentTitle: "Independent works",
     independentDescription:
