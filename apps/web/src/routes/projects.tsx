@@ -433,21 +433,6 @@ const zhProjects = [
     ],
   },
   {
-    title: "MakerJackie.com 旧版博客",
-    description:
-      "从仓库结构、内容工作流到 GitHub Actions + Cloudflare Workers 部署，记录旧版个人博客的开发过程。",
-    category: "website",
-    categoryLabel: "网站",
-    status: "已归档",
-    year: "2026",
-    image: "/projects/how-i-built-and-deployed-this-blog.webp",
-    tags: ["建站", "Next.js", "Cloudflare"],
-    links: [
-      { label: "归档站", href: "https://old.makerjackie.com", kind: "site" },
-      { label: "代码", href: "https://github.com/makerjackie/makerjackie.com", kind: "github" },
-    ],
-  },
-  {
     title: "Paperboat",
     description:
       "一个和朋友共同开发的 AI 心理漂流瓶小产品，让用户把当下的情绪写下来，再收到一段温和回应。",
@@ -624,21 +609,6 @@ const enProjects = [
     links: [
       { label: "Website", href: "https://hackathonweekly.com", kind: "site" },
       { label: "Code", href: "https://github.com/hackathonweekly/community", kind: "github" },
-    ],
-  },
-  {
-    title: "MakerJackie.com Legacy Blog",
-    description:
-      "The archived MDX-first personal blog built with Next.js, Fumadocs, GitHub Actions, and Cloudflare Workers.",
-    category: "website",
-    categoryLabel: "Website",
-    status: "Archived",
-    year: "2026",
-    image: "/projects/how-i-built-and-deployed-this-blog.webp",
-    tags: ["Website", "Next.js", "Cloudflare"],
-    links: [
-      { label: "Archive", href: "https://old.makerjackie.com", kind: "site" },
-      { label: "Code", href: "https://github.com/makerjackie/makerjackie.com", kind: "github" },
     ],
   },
   {
