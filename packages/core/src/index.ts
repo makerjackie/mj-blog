@@ -120,6 +120,7 @@ const defaultNavigationLabels: Record<SupportedLocale, Record<string, string>> =
     "/docs": "Docs",
     "/series": "Series",
     "/tags": "Tags",
+    "/projects": "Portfolio",
     "/about": "About",
   },
   zh: {
@@ -128,6 +129,7 @@ const defaultNavigationLabels: Record<SupportedLocale, Record<string, string>> =
     "/docs": "文档",
     "/series": "专栏",
     "/tags": "标签",
+    "/projects": "作品集",
     "/about": "关于",
   },
 };

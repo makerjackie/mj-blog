@@ -130,8 +130,7 @@ type ShellNavigationItem = SiteSettings["navigation"][number];
 
 const defaultMarketingNavigation: ShellNavigationItem[] = [
   { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
-  { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
-  { label: "Projects", href: "/projects", i18n: { label: { zh: "项目" } } },
+  { label: "Portfolio", href: "/projects", i18n: { label: { zh: "作品集" } } },
   { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
 ];
 
@@ -144,11 +143,18 @@ function getMarketingNavigation(
       ? configuredNavigation
       : defaultMarketingNavigation;
 
-  return navigation.map((item) => ({
-    ...item,
-    href: normalizeMarketingNavigationHref(item.href),
-    label: item.i18n?.label?.[locale] ?? item.label,
-  }));
+  return navigation
+    .map((item) => ({
+      ...item,
+      href: normalizeMarketingNavigationHref(item.href),
+      label: item.i18n?.label?.[locale] ?? item.label,
+    }))
+    .filter((item) => item.href !== "/tags")
+    .map((item) =>
+      item.href === "/projects"
+        ? { ...item, label: locale === "zh" ? "作品集" : "Portfolio" }
+        : item,
+    );
 }
 
 function normalizeMarketingNavigationHref(href: string) {
@@ -187,7 +193,7 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
     },
     {
       href: "/projects",
-      label: locale === "zh" ? "项目" : "Projects",
+      label: locale === "zh" ? "作品集" : "Portfolio",
       icon: FolderKanbanIcon,
     },
     {

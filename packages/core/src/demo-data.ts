@@ -15,11 +15,10 @@ export const siteSettings: SiteSettings = {
   ],
   navigation: [
     { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
-    { label: "Tags", href: "/tags", i18n: { label: { zh: "标签" } } },
     {
-      label: "Projects",
+      label: "Portfolio",
       href: "/projects",
-      i18n: { label: { zh: "项目" } },
+      i18n: { label: { zh: "作品集" } },
     },
     { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
   ],
