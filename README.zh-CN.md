@@ -1,7 +1,6 @@
 # 01mvp-blog-starter
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/01MVP/blog-starter)
-[![Cloudflare deploy](https://github.com/01MVP/blog-starter/actions/workflows/cloudflare-deploy.yml/badge.svg)](https://github.com/01MVP/blog-starter/actions/workflows/cloudflare-deploy.yml)
 
 [English README](./README.md)
 
@@ -58,18 +57,15 @@ pnpm deploy:web
 - `GITHUB_CLIENT_ID` 和 `GITHUB_CLIENT_SECRET`：只有启用 GitHub 登录时才需要
 - `GOOGLE_CLIENT_ID` 和 `GOOGLE_CLIENT_SECRET`：只有启用 Google 登录时才需要
 
-## Push 后自动部署
+## 部署约定
 
-仓库已包含 `.github/workflows/cloudflare-deploy.yml`。每次 push 到 `main` 后，GitHub Actions 会安装依赖、构建 Web 应用、把 D1 migrations 应用到远程数据库，并部署 Worker 到 Cloudflare。
-
-先给 GitHub 仓库添加这两个 secrets：
+生产环境统一从可信的本地环境，通过 Cloudflare 工具显式部署。代码 push 到 GitHub 后不会自动发布站点。
 
 ```sh
-gh secret set CLOUDFLARE_API_TOKEN --repo 01MVP/blog-starter --body "$CLOUDFLARE_API_TOKEN"
-gh secret set CLOUDFLARE_ACCOUNT_ID --repo 01MVP/blog-starter --body "$CLOUDFLARE_ACCOUNT_ID"
+pnpm deploy:web
 ```
 
-Token 需要能部署 Workers，并能管理 `apps/web/wrangler.jsonc` 里绑定的 D1、R2 和 KV 资源。
+Cloudflare 凭据只保存在本地部署环境，不要把生产部署 Token 添加到 GitHub Actions。
 
 ## 本地开发
 

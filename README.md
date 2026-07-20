@@ -1,7 +1,6 @@
 # 01mvp-blog-starter
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/01MVP/blog-starter)
-[![Cloudflare deploy](https://github.com/01MVP/blog-starter/actions/workflows/cloudflare-deploy.yml/badge.svg)](https://github.com/01MVP/blog-starter/actions/workflows/cloudflare-deploy.yml)
 
 [中文 README](./README.zh-CN.md)
 
@@ -58,18 +57,15 @@ Required production secrets:
 - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`: optional unless GitHub login is enabled
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: optional unless Google login is enabled
 
-## Automatic Deploys
+## Deployment Policy
 
-This repo includes a GitHub Actions workflow at `.github/workflows/cloudflare-deploy.yml`. Every push to `main` installs dependencies, builds the web app, applies D1 migrations to the remote database, and deploys the Worker to Cloudflare.
-
-Add these GitHub repository secrets once:
+Production deployments are run explicitly from a trusted local environment with the Cloudflare tooling. Pushing to GitHub does not deploy the site.
 
 ```sh
-gh secret set CLOUDFLARE_API_TOKEN --repo 01MVP/blog-starter --body "$CLOUDFLARE_API_TOKEN"
-gh secret set CLOUDFLARE_ACCOUNT_ID --repo 01MVP/blog-starter --body "$CLOUDFLARE_ACCOUNT_ID"
+pnpm deploy:web
 ```
 
-The token needs permission to deploy Workers and manage the bound D1, R2, and KV resources used by `apps/web/wrangler.jsonc`.
+Keep Cloudflare credentials in the local deployment environment. Do not add production deployment tokens to GitHub Actions.
 
 ## Local Development
 
