@@ -69,7 +69,12 @@ function ProjectsPage() {
   const copy = getProjectsCopy(locale);
   const projects = getProjects(locale);
   const featuredProjects = projects.filter((project) => project.featured);
-  const otherProjects = projects.filter((project) => !project.featured);
+  const independentProjects = projects.filter(
+    (project) => !project.featured && project.category !== "experiment",
+  );
+  const experimentProjects = projects.filter(
+    (project) => !project.featured && project.category === "experiment",
+  );
 
   return (
     <SiteShell siteSettings={siteSettings}>
@@ -83,7 +88,12 @@ function ProjectsPage() {
           </p>
         </section>
 
-        <ProjectsIndex copy={copy} featuredProjects={featuredProjects} projects={otherProjects} />
+        <ProjectsIndex
+          copy={copy}
+          featuredProjects={featuredProjects}
+          independentProjects={independentProjects}
+          experimentProjects={experimentProjects}
+        />
       </main>
     </SiteShell>
   );
@@ -91,12 +101,14 @@ function ProjectsPage() {
 
 function ProjectsIndex({
   copy,
+  experimentProjects,
   featuredProjects,
-  projects,
+  independentProjects,
 }: {
   readonly copy: ReturnType<typeof getProjectsCopy>;
+  readonly experimentProjects: readonly ProjectItem[];
   readonly featuredProjects: readonly ProjectItem[];
-  readonly projects: readonly ProjectItem[];
+  readonly independentProjects: readonly ProjectItem[];
 }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -126,13 +138,13 @@ function ProjectsIndex({
         <div className="mb-5 flex items-end justify-between gap-3 border-t-2 border-border pt-8">
           <div className="max-w-3xl">
             <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground uppercase">
-              {copy.otherEyebrow}
+              {copy.independentEyebrow}
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-              {copy.otherTitle}
+              {copy.independentTitle}
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
-              {copy.otherDescription}
+              {copy.independentDescription}
             </p>
           </div>
 
@@ -158,17 +170,37 @@ function ProjectsIndex({
 
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-            {projects.map((project) => (
+            {independentProjects.map((project) => (
               <ProjectCard key={project.title} project={project} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {projects.map((project) => (
+            {independentProjects.map((project) => (
               <ProjectListRow key={project.title} project={project} />
             ))}
           </div>
         )}
+      </section>
+
+      <section>
+        <div className="max-w-3xl border-t-2 border-border pt-8">
+          <p className="font-mono text-xs font-bold tracking-widest text-muted-foreground uppercase">
+            {copy.experimentsEyebrow}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {copy.experimentsTitle}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+            {copy.experimentsDescription}
+          </p>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {experimentProjects.map((project) => (
+            <ProjectCard key={project.title} project={project} />
+          ))}
+        </div>
       </section>
     </div>
   );
@@ -303,15 +335,19 @@ function getProjectsCopy(locale: ReturnType<typeof getCurrentLocale>) {
     return {
       title: "作品集",
       description:
-        "现在持续投入的项目只有两条主线：One Apps 与 01MVP。其余多是过去做过的实验、小工具和好玩的作品，保留在这里作为创作记录。",
-      activeEyebrow: "正在做",
-      activeTitle: "持续更新的项目",
+        "MakerJackie 的作品分成四条脉络：01MVP、One Apps、Independent Works 与 Experiments。长期产品持续维护，独立作品追求表达，实验则允许失败。",
+      activeEyebrow: "长期主线",
+      activeTitle: "01MVP 与 One Apps",
       activeDescription:
-        "One Apps 收录我正在开发和维护的 App，01MVP 则持续沉淀 AI 产品创作教程与实践。具体 App 和最新状态以 One Apps 为准。",
-      otherEyebrow: "创作记录",
-      otherTitle: "实验与其他作品",
-      otherDescription:
-        "这些项目不代表仍在持续维护；其中有实验、小游戏、开源工具、社区项目和过去的网站。",
+        "01MVP 沉淀教程、课程、模板、陪跑与开发案例；One Apps 是面向普通用户、小而美并长期维护的正式 App。",
+      independentEyebrow: "Independent Works",
+      independentTitle: "独立作品",
+      independentDescription:
+        "这里收录 shapeof.world、独立游戏、互动网站，以及我真正喜欢的叙事与艺术作品。",
+      experimentsEyebrow: "Experiments",
+      experimentsTitle: "实验与失败",
+      experimentsDescription:
+        "原型、周末作品、无用 App 和技术实验。它们不一定成功，也不承诺继续维护，但仍记录了真实的探索过程。",
       gridViewLabel: "网格视图",
       listViewLabel: "列表视图",
     };
@@ -320,15 +356,19 @@ function getProjectsCopy(locale: ReturnType<typeof getCurrentLocale>) {
   return {
     title: "Projects",
     description:
-      "My ongoing work now has two homes: One Apps and 01MVP. Everything else here is a record of experiments, small tools, and playful builds from along the way.",
-    activeEyebrow: "Active",
-    activeTitle: "What I keep building",
+      "MakerJackie's work follows four paths: 01MVP, One Apps, Independent Works, and Experiments. Products are maintained, independent works pursue expression, and experiments are allowed to fail.",
+    activeEyebrow: "Long-term",
+    activeTitle: "01MVP and One Apps",
     activeDescription:
-      "One Apps is the current home for the apps I build and maintain. 01MVP is where I keep publishing practical AI product tutorials and field notes. See One Apps for the latest app lineup and status.",
-    otherEyebrow: "Archive",
-    otherTitle: "Experiments and other work",
-    otherDescription:
-      "These projects are not necessarily maintained. They include experiments, games, open-source tools, community work, and older websites.",
+      "01MVP collects tutorials, courses, templates, coaching, and development cases. One Apps is for small, polished, long-maintained apps made for everyday users.",
+    independentEyebrow: "Independent Works",
+    independentTitle: "Independent works",
+    independentDescription:
+      "shapeof.world, independent games, interactive websites, and narrative or artistic work I genuinely care about.",
+    experimentsEyebrow: "Experiments",
+    experimentsTitle: "Experiments and failures",
+    experimentsDescription:
+      "Prototypes, weekend builds, useless apps, and technical experiments. They may fail and may no longer be maintained, but they remain part of the record.",
     gridViewLabel: "Grid view",
     listViewLabel: "List view",
   };
@@ -357,8 +397,7 @@ const zhProjects = [
   },
   {
     title: "01MVP AI 实战教程",
-    description:
-      "AI 产品创作的长期项目，持续把工具上手、MVP 案例和工作流沉淀成可以直接实践的教程。",
+    description: "AI 产品创作的长期项目，持续沉淀教程、课程、模板、陪跑服务和真实开发案例。",
     featured: true,
     category: "website",
     categoryLabel: "长期项目",
@@ -366,6 +405,18 @@ const zhProjects = [
     year: "2026",
     tags: ["AI 产品", "实战教程", "工作流"],
     links: [{ label: "查看 01MVP", href: "https://01mvp.com", kind: "site" }],
+  },
+  {
+    title: "shapeof.world",
+    description:
+      "一个关于世界形状、感知与表达的互动作品。它不是效率产品，而是我目前最喜欢、也最接近理想效果的独立创作之一。",
+    category: "website",
+    categoryLabel: "独立作品",
+    status: "代表作",
+    year: "2026",
+    image: "/projects/shapeof-world.webp",
+    tags: ["互动网站", "叙事", "艺术作品"],
+    links: [{ label: "体验作品", href: "https://shapeof.world", kind: "live" }],
   },
   {
     title: "Hackathon Weekly 社区网站",
@@ -490,6 +541,17 @@ const zhProjects = [
     links: [{ label: "展示", href: "https://logo.unboundxai.com", kind: "site" }],
   },
   {
+    title: "Tiny Planets",
+    description:
+      "一次带有叙事、探索与星球场景的网页游戏实验。场景模式始终没有达到我期待的可玩性，目前已经停止维护。",
+    category: "experiment",
+    categoryLabel: "失败实验",
+    status: "停止维护",
+    year: "2026",
+    tags: ["独立游戏", "场景实验", "Three.js"],
+    links: [{ label: "保留现场", href: "https://tinyplanets.oneapps.studio", kind: "live" }],
+  },
+  {
     title: "联机桌游",
     description: "支持多人联机的轻量桌游网站，打开浏览器就能和朋友一起玩。",
     category: "game",
@@ -529,7 +591,7 @@ const enProjects = [
   {
     title: "01MVP",
     description:
-      "A long-term practical AI product project that turns tools, workflows, and MVP cases into guides people can use.",
+      "A long-term AI product practice covering tutorials, courses, templates, coaching, and real development cases.",
     featured: true,
     category: "website",
     categoryLabel: "Long-term project",
@@ -537,6 +599,18 @@ const enProjects = [
     year: "2026",
     tags: ["AI Products", "Tutorials", "Workflows"],
     links: [{ label: "Explore 01MVP", href: "https://01mvp.com", kind: "site" }],
+  },
+  {
+    title: "shapeof.world",
+    description:
+      "An interactive work about the shape of the world, perception, and expression. It is one of the independent pieces whose result I genuinely like.",
+    category: "website",
+    categoryLabel: "Independent work",
+    status: "Selected work",
+    year: "2026",
+    image: "/projects/shapeof-world.webp",
+    tags: ["Interactive", "Narrative", "Art"],
+    links: [{ label: "Experience", href: "https://shapeof.world", kind: "live" }],
   },
   {
     title: "Hackathon Weekly Community",
@@ -663,6 +737,17 @@ const enProjects = [
     image: "/projects/2026-04-05.webp",
     tags: ["UnboundX", "Logo", "Remotion"],
     links: [{ label: "Showcase", href: "https://logo.unboundxai.com", kind: "site" }],
+  },
+  {
+    title: "Tiny Planets",
+    description:
+      "A browser-game experiment in narrative exploration and planetary scenes. The scene-based mode never became as fun as intended, so the project is no longer maintained.",
+    category: "experiment",
+    categoryLabel: "Failed experiment",
+    status: "No longer maintained",
+    year: "2026",
+    tags: ["Indie Game", "Scene Study", "Three.js"],
+    links: [{ label: "View archive", href: "https://tinyplanets.oneapps.studio", kind: "live" }],
   },
   {
     title: "Online Board Games",
