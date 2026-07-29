@@ -1,11 +1,12 @@
 import "@tanstack/react-start/server-only";
 import * as schema from "@repo/db/schema/cms";
 import { env } from "cloudflare:workers";
-import { and, asc, desc, eq, gte, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import { and, asc, desc, gte, inArray, isNotNull, ne, sql } from "drizzle-orm";
 
 import type { AnalyticsDayMetric, AnalyticsOverview } from "./analytics-types";
 import { getCmsDb } from "./cms-db";
 import { getClientIp } from "./comment-guard";
+import { getContentPostBySlug } from "./content-posts";
 
 const ANALYTICS_DEFAULT_DAYS = 7;
 const ANALYTICS_MAX_DAYS = 30;
@@ -94,12 +95,10 @@ export async function getD1AnalyticsOverview(
   const topPostRows = await db
     .select({
       slug: schema.analyticsEvents.postSlug,
-      title: schema.posts.title,
       views: sql<number>`count(*)`,
       visitors: sql<number>`count(distinct ${schema.analyticsEvents.visitorHash})`,
     })
     .from(schema.analyticsEvents)
-    .leftJoin(schema.posts, eq(schema.analyticsEvents.postSlug, schema.posts.slug))
     .where(
       and(
         gte(schema.analyticsEvents.occurredDate, startDate),
@@ -107,7 +106,7 @@ export async function getD1AnalyticsOverview(
         ne(schema.analyticsEvents.postSlug, ""),
       ),
     )
-    .groupBy(schema.analyticsEvents.postSlug, schema.posts.title)
+    .groupBy(schema.analyticsEvents.postSlug)
     .orderBy(desc(sql`count(*)`))
     .limit(5);
 
@@ -117,16 +116,17 @@ export async function getD1AnalyticsOverview(
   const commentRows = topSlugs.length
     ? await db
         .select({
-          slug: schema.posts.slug,
+          slug: schema.comments.postSlug,
           comments: sql<number>`count(${schema.comments.id})`,
         })
-        .from(schema.posts)
-        .leftJoin(
-          schema.comments,
-          and(eq(schema.comments.postId, schema.posts.id), eq(schema.comments.status, "approved")),
+        .from(schema.comments)
+        .where(
+          and(
+            inArray(schema.comments.postSlug, topSlugs),
+            sql`${schema.comments.status} = 'approved'`,
+          ),
         )
-        .where(inArray(schema.posts.slug, topSlugs))
-        .groupBy(schema.posts.slug)
+        .groupBy(schema.comments.postSlug)
     : [];
   const commentsBySlug = new Map(
     commentRows.map((row) => [row.slug, normalizeCount(row.comments)] as const),
@@ -164,7 +164,7 @@ export async function getD1AnalyticsOverview(
 
       return {
         slug,
-        title: row.title?.trim() || slug,
+        title: getContentPostBySlug(slug)?.title || slug,
         views: normalizeCount(row.views),
         visitors: normalizeCount(row.visitors),
         comments: commentsBySlug.get(slug) ?? 0,

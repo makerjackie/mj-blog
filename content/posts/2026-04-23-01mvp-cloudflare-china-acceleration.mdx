@@ -1,0 +1,395 @@
+---
+title: "Cloudflare 网站国内访问慢？3 个解决方案"
+slug: "2026-04-23-01mvp-cloudflare-china-acceleration"
+excerpt: "网站部署在 Cloudflare 上，国内访问却很慢？这篇文章用人话讲清楚问题在哪，以及 3 个实用的解决方案和具体配置方法。"
+status: "published"
+publishedAt: "2026-04-23T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:23.469Z"
+authorName: "Jackie"
+featured: false
+pinned: false
+commentsEnabled: true
+coverImage: "/images/01mvp-cloudflare-axisnow-plan.svg"
+seoTitle: "Cloudflare 网站国内访问慢？3 个解决方案"
+seoDescription: "网站部署在 Cloudflare 上，国内访问却很慢？这篇文章用人话讲清楚问题在哪，以及 3 个实用的解决方案和具体配置方法。"
+tags:
+  - "Cloudflare"
+  - "DNS"
+  - "网络优化"
+  - "部署"
+---
+
+如果你把网站部署在 Cloudflare Workers 或 Pages 上，可能会发现一个尴尬的问题：
+
+**全球访问都挺快，但国内用户打开时，Cloudflare 反而成了减速器。**
+
+这篇文章就是要解决这个问题。我会先快速说清楚问题是什么，然后给出 3 个方案，每个方案都会讲清楚具体怎么配置。
+
+## 问题到底是什么
+
+你的网站部署在 Cloudflare 上，架构大概是这样：
+
+```
+你的应用 -> Cloudflare Workers -> 你的域名
+```
+
+这套架构很方便：部署简单、全球 CDN、证书自动搞定。
+
+但问题是：**Cloudflare 默认给你分配的入口，对国内线路不一定友好。**
+
+结果就是：有些地区快、有些地区慢、有些地区时好时坏。
+
+## 为什么会这样
+
+简单说，问题出在两个地方：
+
+**1. DNS 解析层**
+
+用户访问你的域名时，DNS 决定把请求送到哪个 Cloudflare 入口。如果这个入口对国内线路不友好，第一步就慢了。
+
+**2. 路由规则层**
+
+就算你找到了一个更快的 Cloudflare IP，直接把域名解析过去也不行。因为 Cloudflare 还得知道：这个请求是哪个网站的？该走哪个 Worker？
+
+所以真正要解决的是：**在不破坏 Cloudflare 路由的前提下，换一个更快的入口。**
+
+## 3 个方案快速对比
+
+### 方案 1：AxisNow + Cloudflare for SaaS（推荐）
+
+让 AxisNow 帮你选更快的入口，请求还是走 Cloudflare。配置一次就行，后续自动维护。
+
+**适合**：想要省心方案的人。
+
+### 方案 2：自己维护优选 IP
+
+不用第三方服务，自己找快的 Cloudflare IP，定期更新。完全掌控，但需要持续维护。
+
+**适合**：喜欢自己掌控一切的人。
+
+### 方案 3：Cloudflare China Network
+
+Cloudflare 官方的中国加速方案，但需要 Enterprise 订阅 + ICP 备案。门槛很高。
+
+**适合**：大公司、有预算、有备案的网站。
+
+---
+
+下面我会详细讲每个方案具体怎么配置。
+
+## 方案 1：AxisNow + Cloudflare for SaaS（详细配置）
+
+![方案 1：AxisNow + Cloudflare for SaaS](/images/01mvp-cloudflare-axisnow-plan.svg)
+
+### 核心思路
+
+AxisNow 帮你在国内找更快的 Cloudflare 入口，请求进入 Cloudflare 后，还是走你原来的应用。
+
+以 `www.01mvp.com` 为例：
+
+1. 用户访问 `www.01mvp.com`
+2. AxisNow 选择最快的 Cloudflare 入口
+3. 请求进入 Cloudflare，Cloudflare 认出这是你的网站
+4. 请求到达你的应用，返回页面
+
+**配置目标：让 Cloudflare 知道，从 AxisNow 进来的请求是你的网站。**
+
+### Cloudflare 配置步骤
+
+#### 步骤 1：开启"识别其他入口"功能
+
+在 Cloudflare 控制台：
+
+```
+选择域名 01mvp.com → SSL/TLS → Custom Hostnames → 启用
+```
+
+正常情况下，Cloudflare 只认识你直接添加到账号的域名。开启这个功能后，即使请求从其他入口（比如 AxisNow）进来，Cloudflare 也能认出这是你的网站。
+
+#### 步骤 2：创建一个备用地址
+
+在 Cloudflare 控制台：
+
+```
+DNS → Records → Add record
+```
+
+添加这条记录：
+
+```
+类型: AAAA
+名称: cf-origin
+内容: 100::
+代理状态: 选择橙色云朵（Proxied）
+```
+
+这会创建一个叫 `cf-origin.01mvp.com` 的地址。
+
+**为什么需要这个备用地址？**
+
+当你开启"识别其他入口"功能后，Cloudflare 需要知道：如果有请求进来，但没有匹配到任何规则，该把请求送到哪里？
+
+这个备用地址就是告诉 Cloudflare："如果你不知道该怎么处理，就送到这里。"
+
+**什么时候会用到？**
+
+正常情况下不会用到，因为你的应用会直接处理请求。但如果配置出了问题，或者 AxisNow 出现异常，这个地址可以保证请求不会直接失败。
+
+`100::` 只是个占位符，实际不会用到。
+
+#### 步骤 3：告诉 Cloudflare 备用地址在哪
+
+在 Cloudflare 控制台：
+
+```
+SSL/TLS → Custom Hostnames → Fallback Origin（备用源）
+```
+
+填入刚才创建的地址：
+
+```
+cf-origin.01mvp.com
+```
+
+#### 步骤 4：让 Cloudflare 认识你的域名
+
+在 Cloudflare 控制台：
+
+```
+SSL/TLS → Custom Hostnames → Add Custom Hostname
+```
+
+输入你的域名：
+
+```
+www.01mvp.com
+```
+
+等几分钟，等它验证通过。
+
+**这是最关键的一步**，做完这步，Cloudflare 就知道 `www.01mvp.com` 是你的网站了。
+
+#### 步骤 5：让你的应用处理这个域名
+
+在 Cloudflare 控制台：
+
+```
+Workers & Pages → 选择你的 Worker → Settings → Triggers → Routes
+```
+
+添加这条规则：
+
+```
+www.01mvp.com/*
+```
+
+这样，所有访问 `www.01mvp.com` 的请求都会交给你的应用处理。
+
+### AxisNow 配置
+
+在 AxisNow 创建：
+
+1. 国内优化入口
+2. 一级调度入口
+3. 将国内优化入口和 `cf-origin.01mvp.com` 加入地址池
+4. 开启健康检查和延迟优选
+
+详细步骤参考 [AxisNow 文档](https://www.axisnow.io/zh/docs/guide/axisnow-cloudflare)。
+
+### DNS 配置
+
+在 DNS 服务商添加 CNAME 记录：
+
+```
+www.01mvp.com  CNAME  AxisNow 提供的调度域名
+```
+
+### 注意事项
+
+**为什么用 www 开头的域名？**
+
+Cloudflare 有个限制：如果你的域名是 `01mvp.com`，就不能直接用 `01mvp.com` 本身来做这个配置，只能用 `www.01mvp.com`。
+
+建议这样做：
+
+- `01mvp.com` 自动跳转到 `https://www.01mvp.com`
+- `www.01mvp.com` 作为真正的访问地址
+
+### 优缺点
+
+**优点：**
+
+- 配置一次，后续自动维护
+- 国内访问速度明显改善
+- 保留 Cloudflare 所有功能
+
+**缺点：**
+
+- 依赖第三方服务
+- 可能有额外成本
+
+**注意：** AxisNow 这个方案理论上是可行的，但目前服务不太稳定，建议暂时观望，等服务成熟后再使用。
+
+## 方案 2：自己维护优选 IP（详细配置）
+
+![方案 2：单域名优选](/images/01mvp-cloudflare-single-domain-plan.svg)
+
+### 核心思路
+
+不依赖第三方服务，自己找一批对国内线路友好的 Cloudflare IP，把域名直接解析到这些 IP。通过 Cloudflare for SaaS 的 Custom Hostname 机制，让 Cloudflare 还能识别你的网站。
+
+### 两种做法
+
+这个方案有两种具体做法：
+
+#### 做法 A：使用社区提供的优选域名（简单但不稳定）
+
+有些开发者会提供免费的优选域名，比如 [enhanced-FaaS-in-China](https://github.com/xingpingcn/enhanced-FaaS-in-China) 项目提供的 `cf-cname.xingpingcn.top`。
+
+**怎么用：**
+
+把你的域名 CNAME 到这个优选域名：
+
+```
+www.01mvp.com  CNAME  cf-cname.xingpingcn.top
+```
+
+**问题：**
+
+1. **依赖第三方免费服务**：这些服务可能随时停止维护
+2. **稳定性无法保证**：免费服务的可用性和速度都不稳定，实际测试效果可能并不理想
+3. **是个 trick**：这种方法本质上是利用了 Cloudflare 的机制，不一定长期有效
+
+**适合谁：**想快速测试效果，但不适合生产环境。
+
+#### 做法 B：自己维护优选 IP（稳定但需要维护）
+
+自己找一批对国内线路友好的 Cloudflare IP，直接把域名解析到这些 IP。
+
+**怎么用：**
+
+1. 找到一批优选 IP（下面会讲怎么找）
+2. 把域名的 A/AAAA 记录指向这些 IP：
+
+```
+A     www.example.com  162.159.x.x
+```
+
+**优点：**
+
+- 不依赖第三方服务
+- 完全自己掌控
+
+**缺点：**
+
+- 需要自己找优选 IP
+- 需要定期测试和更新
+- IP 失效要手动换
+
+**适合谁：**愿意投入时间维护，想要稳定方案的人。
+
+### 请求流程（以做法 B 为例）
+
+1. 用户访问 `https://www.example.com`
+2. DNS 把 `www.example.com` 解析到你维护的优选 IP（如 `162.159.x.x`）
+3. 请求进入 Cloudflare，Cloudflare 看到 `Host: www.example.com`
+4. 因为这个域名是 Custom Hostname，Cloudflare 知道这是你的站
+5. 请求到达你的 Worker，返回页面
+
+### Cloudflare 配置步骤
+
+和方案 1 基本一样：
+
+1. 启用 Cloudflare for SaaS
+2. 创建 Fallback Origin（`cf-origin.example.com`）
+3. 设置 Fallback Origin
+4. 添加 Custom Hostname：`www.example.com`
+5. 配置 Worker 路由
+
+具体步骤参考方案 1 的详细说明。
+
+### 怎么找优选 IP
+
+你需要找一批对国内线路友好的 Cloudflare IP。可以：
+
+1. **使用测速工具**：自己测试哪些 Cloudflare IP 在国内快
+2. **参考社区列表**：网上有一些优选 IP 列表，但要注意时效性
+
+### DNS 配置
+
+把 `www.example.com` 的 A/AAAA 记录指向优选 IP：
+
+```
+A     www.example.com  162.159.x.x
+```
+
+### 维护工作
+
+这个方案需要你定期：
+
+1. 测试 IP 速度和可用性
+2. 更新失效的 IP
+3. 根据线路变化调整 IP 池
+
+### 我的建议
+
+- **如果只是想测试效果**：可以试试做法 A（使用社区优选域名），但不要用在生产环境
+- **如果想要稳定方案**：用做法 B（自己维护优选 IP），但要做好长期维护的准备
+- **如果不想折腾**：还是回到方案 1（AxisNow），省心很多
+
+## 方案 3：Cloudflare China Network（详细说明）
+
+![方案 3：Cloudflare China Network](/images/01mvp-cloudflare-china-network-plan.svg)
+
+### 核心思路
+
+这是 Cloudflare 官方提供的中国加速服务，通过与中国本地运营商合作，提供更快的访问速度。
+
+### 要求
+
+1. **Enterprise 订阅**：需要升级到 Cloudflare Enterprise 计划
+2. **China Network 订阅**：单独购买 China Network 服务
+3. **ICP 备案**：网站必须有 ICP 备案
+4. **内容审核**：内容需要符合中国法规
+
+### 配置步骤
+
+1. 联系 Cloudflare 销售团队
+2. 升级到 Enterprise 计划
+3. 购买 China Network 服务
+4. 提供 ICP 备案信息
+5. 配置 China Network 相关设置
+
+### 优缺点
+
+**优点：**
+
+- 官方方案，最稳定
+- 速度最快
+- 无需自己维护
+
+**缺点：**
+
+- 成本很高（Enterprise + China Network）
+- 需要 ICP 备案
+- 内容需要审核
+- 对独立开发者来说门槛太高
+
+## 我的建议
+
+如果你现在就想解决这个问题：
+
+1. **优先选方案 1**：省心，效果好，维护成本低。适合大多数人。
+2. **如果不想用第三方服务，选方案 2**：但要做好长期维护的准备。
+3. **方案 3 暂时不用考虑**：除非你是大公司，有预算和备案。
+
+说到底，这个问题的核心是：**怎么在保留 Cloudflare 架构的前提下，让国内访问更快。**
+
+方案 1 和方案 2 都能做到，区别只是你想省心还是想掌控。
+
+## 参考资料
+
+- [AxisNow Cloudflare 指南](https://www.axisnow.io/zh/docs/guide/axisnow-cloudflare)
+- [二叉树树：Cloudflare IP 优选](https://2x.nz/posts/cf-fastip/)
+- [Cloudflare for SaaS 文档](https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/)
+- [Cloudflare China Network 文档](https://developers.cloudflare.com/china-network/)

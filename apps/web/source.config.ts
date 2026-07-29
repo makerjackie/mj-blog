@@ -1,4 +1,5 @@
-import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { defineCollections, defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { z } from "zod";
 
 export const docs = defineDocs({
   dir: "content/docs",
@@ -8,6 +9,36 @@ export const docs = defineDocs({
   meta: {
     files: ["**/meta.json", "**/meta.*.json"],
   },
+});
+
+export const posts = defineCollections({
+  type: "doc",
+  dir: "../../content/posts",
+  files: ["**/*.mdx"],
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    excerpt: z.string(),
+    status: z.enum(["draft", "published", "scheduled", "archived"]).default("published"),
+    publishedAt: z.string(),
+    updatedAt: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    series: z
+      .object({
+        name: z.string(),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+        sortOrder: z.number().optional(),
+      })
+      .optional(),
+    coverImage: z.string().optional(),
+    featured: z.boolean().default(false),
+    pinned: z.boolean().default(false),
+    commentsEnabled: z.boolean().default(true),
+    authorName: z.string().optional(),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+  }),
 });
 
 export default defineConfig({

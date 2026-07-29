@@ -9,8 +9,6 @@ import {
 import * as schema from "@repo/db/schema/cms";
 import { eq, and, desc, asc } from "drizzle-orm";
 
-import { getD1SiteSettings } from "./cms-d1-assets";
-import { getD1PostBySlug } from "./cms-d1-posts";
 import {
   MIN_COMMENT_LENGTH,
   MAX_COMMENT_LENGTH,
@@ -21,6 +19,8 @@ import {
 } from "./cms-d1-shared";
 import { getCmsDb } from "./cms-db";
 import { resolveAiCommentModerationOutcome } from "./comment-ai-moderation.server";
+import { getContentPostBySlug } from "./content-posts";
+import { getSiteSettings } from "./site-config";
 
 // ---------------------------------------------------------------------------
 // Comments
@@ -42,8 +42,8 @@ export type D1CommentCreateResult = {
 export async function createD1Comment(
   input: CommentInput,
 ): Promise<D1Result<D1CommentCreateResult>> {
-  const currentSettings = await getD1SiteSettings();
-  const post = await getD1PostBySlug(input.postSlug);
+  const currentSettings = getSiteSettings();
+  const post = getContentPostBySlug(input.postSlug);
 
   if (!post || !post.commentsEnabled || !currentSettings.commentsEnabled) {
     return { error: "Post not found or comments are disabled" };
@@ -78,7 +78,7 @@ export async function createD1Comment(
           .where(
             and(
               eq(schema.comments.id, parentId),
-              eq(schema.comments.postId, post.id),
+              eq(schema.comments.postSlug, post.slug),
               eq(schema.comments.status, "approved"),
             ),
           )
@@ -123,7 +123,7 @@ export async function createD1Comment(
       };
   const comment: Comment = {
     id: `comment_${crypto.randomUUID()}`,
-    postId: post.id,
+    postSlug: post.slug,
     parentId,
     authorUserId: input.authorUserId ?? null,
     authorName,
@@ -143,7 +143,7 @@ export async function createD1Comment(
 
   await db.insert(schema.comments).values({
     id: comment.id,
-    postId: comment.postId,
+    postSlug: comment.postSlug,
     parentId: comment.parentId,
     authorUserId: comment.authorUserId,
     authorName: comment.authorName,
@@ -170,12 +170,12 @@ export async function createD1Comment(
   };
 }
 
-export async function listD1ApprovedComments(postId: string) {
+export async function listD1ApprovedComments(postSlug: string) {
   const db = getCmsDb();
   const rows = await db
     .select()
     .from(schema.comments)
-    .where(and(eq(schema.comments.postId, postId), eq(schema.comments.status, "approved")))
+    .where(and(eq(schema.comments.postSlug, postSlug), eq(schema.comments.status, "approved")))
     .orderBy(asc(schema.comments.createdAt));
 
   const comments = rows.map(drizzleRowToComment);

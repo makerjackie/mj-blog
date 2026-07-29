@@ -5,16 +5,11 @@ import { cn } from "@repo/ui/lib/utils";
 import { Link, Outlet } from "@tanstack/react-router";
 import {
   ArrowLeftIcon,
-  FileTextIcon,
-  ImageIcon,
-  LibraryIcon,
   LockKeyholeIcon,
   MessageSquareIcon,
-  SettingsIcon,
   SquareLibraryIcon,
   UsersIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 import { LanguageToggle } from "#/components/language-toggle";
 import { SignOutButton } from "#/components/sign-out-button";
@@ -32,53 +27,16 @@ import { m } from "#/paraglide/messages.js";
 
 const adminNav = [
   { label: m.admin_nav_overview, href: "/admin", icon: SquareLibraryIcon },
-  { label: m.admin_nav_posts, href: "/admin/posts", icon: FileTextIcon },
-  { label: m.admin_nav_series, href: "/admin/series", icon: LibraryIcon },
-  { label: m.admin_nav_assets, href: "/admin/assets", icon: ImageIcon },
   { label: m.admin_nav_comments, href: "/admin/comments", icon: MessageSquareIcon },
   { label: m.admin_nav_users, href: "/admin/users", icon: UsersIcon },
-  { label: m.admin_nav_settings, href: "/admin/settings", icon: SettingsIcon },
 ];
 
 export function AdminShell({ user }: { readonly user: AuthQueryResult }) {
   const locale = getCurrentLocale();
   const isAdmin = user?.role === "admin";
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(getSiteSettingsForLocale(locale));
+  const siteSettings: SiteSettings = getSiteSettingsForLocale(locale);
   const settingsPreset = resolveStylePreset(siteSettings.themePreset, siteSettings.layoutPreset);
-  const { preset, nextPreset, selectPreset, resetPreset } = useStylePreset(settingsPreset);
-
-  useEffect(() => {
-    if (!isAdmin) {
-      return;
-    }
-
-    let ignore = false;
-    const handleSettingsUpdate = (event: Event) => {
-      const nextSettings = (event as CustomEvent<SiteSettings>).detail;
-
-      if (nextSettings) {
-        resetPreset();
-        setSiteSettings(nextSettings);
-      }
-    };
-
-    void fetch(`/api/site?lang=${locale}`)
-      .then((response) => (response.ok ? response.json() : undefined))
-      .then((payload) => {
-        const data = (payload as { data?: SiteSettings } | undefined)?.data;
-
-        if (!ignore && data) {
-          setSiteSettings(data);
-        }
-      });
-
-    window.addEventListener("blogcms:site-settings-updated", handleSettingsUpdate);
-
-    return () => {
-      ignore = true;
-      window.removeEventListener("blogcms:site-settings-updated", handleSettingsUpdate);
-    };
-  }, [isAdmin, locale, resetPreset]);
+  const { preset, nextPreset, selectPreset } = useStylePreset(settingsPreset);
 
   if (!isAdmin) {
     return <AdminAccessDenied locale={locale} siteName={siteSettings.name} />;

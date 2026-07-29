@@ -8,13 +8,9 @@ const localAdmin = {
 };
 
 const adminRoutes = [
-  { path: "/admin", heading: "Publishing overview" },
-  { path: "/admin/posts", heading: "Posts" },
-  { path: "/admin/series", heading: "Series" },
-  { path: "/admin/assets", heading: "Assets" },
+  { path: "/admin", heading: "Admin overview" },
   { path: "/admin/comments", heading: "Comments" },
   { path: "/admin/users", heading: "Users" },
-  { path: "/admin/settings", heading: "Site settings" },
 ] as const;
 
 test.describe("Admin authentication", () => {
@@ -82,7 +78,7 @@ test.describe("Admin authentication", () => {
     await expect(page).toHaveURL(/\/admin\/?$/);
     await expect(page.getByRole("heading", { name: "Admin area unavailable" })).toBeVisible();
     await expect(page.getByText("This account does not have admin access.")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Publishing overview" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Admin overview" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Posts/ })).toHaveCount(0);
   });
 
@@ -111,78 +107,6 @@ test.describe("Admin authentication", () => {
     }
   });
 
-  test("loads the new post editor without client runtime errors", async ({ page }) => {
-    const pageErrors: string[] = [];
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-
-    await logInAsLocalAdmin(page);
-
-    const response = await page.goto("/admin/posts/new", { waitUntil: "domcontentloaded" });
-    expect(response?.status(), "new post editor should not return a server error").toBeLessThan(
-      500,
-    );
-    await expect(page.getByRole("heading", { name: "New post" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Editor" })).toBeVisible();
-    await expect(page.locator('[contenteditable="true"]').first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByText("Something went wrong")).toHaveCount(0);
-    expect(pageErrors).toEqual([]);
-  });
-
-  test("loads an existing post editor without client runtime errors", async ({ page }) => {
-    const pageErrors: string[] = [];
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-
-    await logInAsLocalAdmin(page);
-
-    const runId = `${Date.now()}-${test.info().parallelIndex}`;
-    const title = `E2E edit smoke ${runId}`;
-    const createResponse = await page.context().request.post("/api/posts", {
-      data: {
-        title,
-        slug: `e2e-edit-smoke-${runId}`,
-        excerpt: "Post used by the Playwright admin edit smoke test.",
-        contentMarkdown: [
-          `# ${title}`,
-          "",
-          "This post intentionally includes Markdown that exercises the existing-post editor path.",
-          "",
-          "| Area | Status |",
-          "| --- | --- |",
-          "| Admin edit | Smoke tested |",
-          "",
-          "```tsx",
-          "export function SmokeExample() {",
-          '  return <span data-kind="admin-edit">covered</span>;',
-          "}",
-          "```",
-        ].join("\n"),
-        status: "draft",
-        commentsEnabled: true,
-      },
-      headers: sameOriginHeaders(),
-    });
-    expect(createResponse.status()).toBe(201);
-
-    const payload = (await createResponse.json()) as { data?: { id?: string } };
-    const postId = payload.data?.id;
-    expect(postId).toBeTruthy();
-
-    const response = await page.goto(`/admin/posts/${postId}`, { waitUntil: "domcontentloaded" });
-    expect(
-      response?.status(),
-      "existing post editor should not return a server error",
-    ).toBeLessThan(500);
-    await expect(page.getByRole("heading", { name: "Edit post" })).toBeVisible();
-    await expect(page.locator("#editor-title")).toHaveValue(title);
-    await expect(
-      page.locator('[contenteditable="true"], textarea[aria-label="Markdown source"]').first(),
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("Something went wrong")).toHaveCount(0);
-    expect(pageErrors).toEqual([]);
-  });
-
   test("logs in with the native form fallback", async ({ browser }) => {
     const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
     const page = await context.newPage();
@@ -197,7 +121,7 @@ test.describe("Admin authentication", () => {
     await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
     await page.getByRole("button", { name: /Open admin/ }).click();
     await expect(page).toHaveURL(/\/admin\/?$/);
-    await expect(page.getByRole("heading", { name: "Publishing overview" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Admin overview" })).toBeVisible();
 
     await context.close();
   });
@@ -225,20 +149,10 @@ async function logInAsLocalAdmin(page: Page) {
   await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
   await page.getByRole("button", { name: /Open admin/ }).click();
   await expect(page).toHaveURL(/\/admin\/?$/);
-  await expect(page.getByRole("heading", { name: "Publishing overview" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Admin overview" })).toBeVisible();
 }
 
 async function prepareEmailPasswordSignup(page: Page) {
-  await logInAsLocalAdmin(page);
-
-  const response = await page.context().request.put("/api/site", {
-    data: {
-      emailVerificationEnabled: false,
-    },
-    headers: sameOriginHeaders(),
-  });
-  expect(response.status()).toBe(200);
-
   await page.context().clearCookies();
 }
 

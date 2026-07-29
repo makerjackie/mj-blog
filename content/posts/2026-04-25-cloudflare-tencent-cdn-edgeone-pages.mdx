@@ -1,0 +1,321 @@
+---
+title: "朋友海风推荐的 Cloudflare 国内加速方案"
+slug: "2026-04-25-cloudflare-tencent-cdn-edgeone-pages"
+excerpt: "如果网站已经部署在 Cloudflare Pages，可以用腾讯云 CDN + DNSPod 智能解析给国内用户加速；如果是 2026 年新项目，我更推荐直接用 EdgeOne Pages。"
+status: "published"
+publishedAt: "2026-04-25T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:28.951Z"
+authorName: "Jackie"
+featured: false
+pinned: false
+commentsEnabled: true
+seoTitle: "朋友海风推荐的 Cloudflare 国内加速方案"
+seoDescription: "如果网站已经部署在 Cloudflare Pages，可以用腾讯云 CDN + DNSPod 智能解析给国内用户加速；如果是 2026 年新项目，我更推荐直接用 EdgeOne Pages。"
+tags:
+  - "CDN"
+  - "Cloudflare"
+  - "DNS"
+  - "EdgeOne"
+  - "腾讯云"
+---
+
+前几天写 Cloudflare 国内访问加速的时候，朋友海风给我补了一个思路。
+
+这个方案挺适合一种场景：
+
+你的网站已经部署在 Cloudflare Pages，海外访问很舒服，但国内打开不稳定。你又不想彻底迁走，因为 Cloudflare Pages 的部署体验、GitHub 集成、自定义域名都已经配好了。
+
+海风推荐的做法是，国内用户走腾讯云 CDN，海外用户继续走 Cloudflare。
+
+如果是新项目，我现在会更推荐另一条路，直接用腾讯云的 EdgeOne Pages 部署。
+
+这篇就当作上一篇 [Cloudflare 网站国内访问慢？3 个解决方案](/blog/2026-04-23-01mvp-cloudflare-china-acceleration) 的补充。
+
+## 这个方案长什么样
+
+假设你的域名是 `myweb.com`。
+
+你现在有一个 Cloudflare Pages 项目，源域名是：
+
+```txt
+xxx.pages.dev
+```
+
+正式访问域名是：
+
+```txt
+www.myweb.com
+```
+
+完整链路大概是这样：
+
+```txt
+国内用户
+  -> DNSPod 智能解析
+  -> 腾讯云 CDN
+  -> 回源到 xxx.pages.dev
+  -> Cloudflare Pages
+
+海外用户
+  -> DNSPod 智能解析
+  -> xxx.pages.dev / Cloudflare Pages 自定义域名
+  -> Cloudflare CDN
+  -> Cloudflare Pages
+
+myweb.com
+  -> 腾讯云 DNSPod 显性 URL 转发
+  -> https://www.myweb.com
+```
+
+核心思路很直接：
+
+同一个 `www.myweb.com`，国内解析到腾讯云 CDN，境外解析到 Cloudflare Pages。
+
+用户不用关心自己走哪条线路，DNS 会帮他选。
+
+## 为什么这个方案可行
+
+这里用到了三个能力。
+
+**第一，Cloudflare Pages 支持自定义子域名。**
+
+你可以在 Cloudflare Pages 项目里绑定 `www.myweb.com`。如果域名不托管在 Cloudflare，也可以在自己的 DNS 服务商那里添加 CNAME 到 `<project>.pages.dev`。
+
+注意，不要只加 DNS 记录。Cloudflare 文档里写得很清楚，自定义域名需要先在 Pages 的 Custom domains 里添加，否则可能会直接 522。
+
+**第二，腾讯云 CDN 可以用外部域名作为源站。**
+
+腾讯云 CDN 的回源配置里，源站地址可以填外部域名。也就是说，国内用户先访问腾讯云 CDN，腾讯云 CDN 再去 `xxx.pages.dev` 拉内容。
+
+这里有两个概念要分清：
+
+- 源站地址，CDN 去哪里拉内容
+- 回源 Host，CDN 拉内容时告诉源站自己要访问哪个网站
+
+对于纯静态页面，源站地址和回源 Host 都填 `xxx.pages.dev` 通常最省事。
+
+如果你的站点依赖域名判断、跳转、Cookie 或 API，就要小心。回源 Host 可能需要填 `www.myweb.com`，同时确保 Cloudflare Pages 已经绑定并签好了这个自定义域名证书。
+
+**第三，DNSPod 支持按线路智能解析。**
+
+DNSPod 可以给同一个主机记录配置不同线路。比如：
+
+```txt
+www.myweb.com  境内   CNAME  腾讯云 CDN 分配的 CNAME
+www.myweb.com  境外   CNAME  xxx.pages.dev
+www.myweb.com  默认   CNAME  xxx.pages.dev
+```
+
+默认线路一定要留。
+
+因为总会有没匹配到的用户、公共 DNS、特殊运营商线路。如果没有默认线路，某些用户可能直接解析失败。
+
+## 具体怎么配
+
+### 步骤 1：先在 Cloudflare Pages 绑定 www 域名
+
+在 Cloudflare 控制台：
+
+```txt
+Workers & Pages
+  -> 选择你的 Pages 项目
+  -> Custom domains
+  -> Set up a domain
+  -> 填 www.myweb.com
+```
+
+这一步的作用是，让 Cloudflare 知道 `www.myweb.com` 属于这个 Pages 项目。
+
+如果你后面要让境外用户继续直连 Cloudflare，这一步必须先做。
+
+### 步骤 2：在腾讯云 CDN 添加加速域名
+
+在腾讯云 CDN 控制台添加：
+
+```txt
+加速域名：www.myweb.com
+源站类型：外部源站 / 自有源
+源站地址：xxx.pages.dev
+回源协议：HTTPS
+回源 Host：xxx.pages.dev
+```
+
+然后给 `www.myweb.com` 配置 HTTPS 证书。
+
+如果你发现页面里出现跳转循环，大概率是 `xxx.pages.dev` 被你设置成了自动跳转到 `www.myweb.com`。
+
+这种情况下，不要让 CDN 回源到一个会反跳回来的地址。要么取消 `pages.dev` 到自定义域名的跳转，要么重新检查回源 Host 和 Cloudflare Pages 的域名绑定。
+
+### 步骤 3：用 DNSPod 做智能解析
+
+在 DNSPod 里给 `www` 添加几条 CNAME。
+
+```txt
+主机记录：www
+记录类型：CNAME
+线路类型：境内
+记录值：腾讯云 CDN 分配的 CNAME
+```
+
+再加境外和默认：
+
+```txt
+主机记录：www
+记录类型：CNAME
+线路类型：境外
+记录值：xxx.pages.dev
+
+主机记录：www
+记录类型：CNAME
+线路类型：默认
+记录值：xxx.pages.dev
+```
+
+如果你不确定默认线路应该指向哪，我建议先指向 Cloudflare Pages。
+
+这样至少海外和未知线路还是走原来的 Cloudflare 链路，国内再逐步切到腾讯云 CDN。
+
+### 步骤 4：把根域名跳到 www
+
+如果你希望 `myweb.com` 自动跳到 `www.myweb.com`，可以在 DNSPod 做显性 URL 转发。
+
+配置类似这样：
+
+```txt
+主机记录：@
+记录类型：显性 URL
+线路类型：默认
+目标 URL：https://www.myweb.com
+```
+
+显性 URL 会返回 301 跳转。
+
+这块有两个限制要注意：
+
+- DNSPod 的 URL 转发有备案要求
+- 如果你要覆盖 `https://myweb.com`，需要在腾讯云控制台申请或配置对应证书
+
+如果你的网站没有备案，或者你想完全控制 HTTPS、路径保留、查询参数保留，最好还是用 CDN、边缘函数或一个很小的 Nginx 来做 301。
+
+## 这个方案适合谁
+
+它适合已经在 Cloudflare Pages 上跑起来的网站。
+
+尤其是这些情况：
+
+- 网站主要是静态页面、博客、文档站
+- 国内用户不少，但海外访问也要保留
+- 你不想马上迁移部署平台
+- 域名已经在腾讯云或 DNSPod 管理
+- 你愿意维护两套 CDN 缓存和证书配置
+
+但它不太适合复杂应用。
+
+如果你的网站有登录、支付、频繁 API、SSR、图片鉴权、按地区返回不同内容，这个方案会变得很麻烦。
+
+因为你等于同时维护了两层 CDN：
+
+```txt
+国内：DNSPod -> 腾讯云 CDN -> Cloudflare Pages
+海外：DNSPod -> Cloudflare CDN -> Cloudflare Pages
+```
+
+一旦缓存、Cookie、跳转、证书、回源 Host 里面有一个点没对齐，问题会很隐蔽。
+
+## 2026 年我更推荐 EdgeOne Pages
+
+如果是一个新站，尤其是目标用户主要在国内，我现在更推荐直接用 EdgeOne Pages。
+
+原因不是它听起来更新，而是链路更短。
+
+原来的 Cloudflare + 腾讯云 CDN 方案是这样：
+
+```txt
+用户 -> DNS 智能解析 -> CDN 分流 -> 回源 -> Cloudflare Pages
+```
+
+EdgeOne Pages 的思路是：
+
+```txt
+用户 -> EdgeOne Pages
+```
+
+EdgeOne Pages 本身就是腾讯云基于 EdgeOne 做的前端部署平台，支持静态站点和 Serverless 应用，也能通过 Git 仓库、模板或直接上传来创建项目。
+
+对个人开发者来说，少一层转发，就少一层心智负担。
+
+你不用再纠结：
+
+- 国内解析到哪里
+- 海外解析到哪里
+- 腾讯云 CDN 回源 Host 填什么
+- Cloudflare Pages 的 `pages.dev` 要不要跳转
+- 两边缓存怎么刷新
+- 两边证书有没有都签好
+
+直接部署到 EdgeOne Pages，域名、证书、CDN、边缘能力都在腾讯云这一套里处理。
+
+这对国内访问体验会更自然。
+
+## 什么时候仍然保留 Cloudflare
+
+如果你已经深度用了 Cloudflare 的生态，就不用为了加速硬迁。
+
+比如：
+
+- Workers
+- D1
+- R2
+- Durable Objects
+- Cloudflare Access
+- Pages Functions
+- 一堆现成的 Cloudflare API 自动化脚本
+
+这时候迁移成本可能比加速收益更高。
+
+我的建议是：
+
+```txt
+已有 Cloudflare Pages 项目：
+  先用腾讯云 CDN + DNSPod 智能解析做国内加速
+
+新项目，国内用户为主：
+  直接试 EdgeOne Pages
+
+新项目，海外用户为主：
+  Cloudflare Pages 依然很舒服
+```
+
+## 最后提醒几个坑
+
+**不要把 `www.myweb.com` 同时在 DNS 里做成普通 CNAME 和智能线路 CNAME。**
+
+同一个主机记录、同一种记录类型，可以按线路区分，但不要混成几套互相打架的配置。
+
+**不要忘记默认线路。**
+
+DNSPod 官方文档也强调了默认线路的重要性。境内、境外都配了，不代表所有请求都能准确命中。
+
+**不要把会跳转的地址拿来当 CDN 源站。**
+
+如果 `xxx.pages.dev` 会 301 到 `www.myweb.com`，而 `www.myweb.com` 的国内解析又指向腾讯云 CDN，就可能出现绕圈。
+
+**不要忽略备案。**
+
+腾讯云 CDN、URL 转发、国内 HTTPS 证书相关配置，很多地方都会和备案状态绑定。这个不是技术问题，是国内云服务的前置规则。
+
+**不要同时改太多。**
+
+先让海外线路直连 Cloudflare 正常，再加腾讯云 CDN 回源，再切境内线路。
+
+每一步都用 `curl -I` 看一下状态码、`server`、缓存头和 `location`。
+
+这样出问题时，你知道是哪一层错了。
+
+## 参考资料
+
+- [Cloudflare Pages 自定义域名文档](https://developers.cloudflare.com/pages/configuration/custom-domains/)
+- [腾讯云 CDN 源站配置文档](https://intl.cloud.tencent.com/document/product/228/6289)
+- [DNSPod 智能解析线路说明](https://docs.dnspod.cn/dns/dns-record-line/)
+- [腾讯云 DNSPod 显性 URL 记录文档](https://cloud.tencent.com/document/product/302/12649)
+- [腾讯云 EdgeOne Pages 快速部署文档](https://www.tencentcloud.com/document/product/1145/70404?lang=en)

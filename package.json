@@ -9,7 +9,7 @@
     "dev": "pnpm run --recursive --parallel dev",
     "dev:web": "vp run --filter=@repo/web dev",
     "deploy": "pnpm run deploy:web",
-    "deploy:web": "node scripts/check-r2-buckets.mjs && pnpm build:web && pnpm run db:migrate:remote && pnpm --filter @repo/web exec wrangler deploy --config dist/server/wrangler.json && node scripts/sync-obsidian.mjs --if-configured",
+    "deploy:web": "pnpm build:web && pnpm run db:migrate:remote && pnpm --filter @repo/web exec wrangler deploy --config dist/server/wrangler.json",
     "lint": "vp lint --type-aware --type-check",
     "lint:fix": "vp lint --type-aware --type-check --fix",
     "format": "vp fmt",
@@ -25,8 +25,6 @@
     "deps": "vpx taze@latest -Ilwr --maturity-period 3",
     "deps:major": "vpx taze@latest major -Ilwr --maturity-period 3",
     "tanstack": "vpx @tanstack/cli@latest",
-    "sync:obsidian": "node scripts/sync-obsidian.mjs",
-    "publish:mdx": "node scripts/publish-mdx-post.mjs",
     "db": "vp run --filter=@repo/db db",
     "db:seed:local-admin": "node scripts/seed-local-admin.mjs",
     "ui": "vp run --filter=@repo/ui ui",
@@ -56,7 +54,7 @@
         "description": "KV namespace for cache metadata and short-lived records."
       },
       "CMS_DB": {
-        "description": "D1 database for posts, comments, settings, users, sessions, and API tokens."
+        "description": "D1 database for comments, users, sessions, subscriptions, notifications, and analytics."
       },
       "CMS_EMAIL": {
         "description": "Optional Cloudflare Email Service binding for outbound notifications and password reset email."
@@ -66,9 +64,6 @@
       },
       "CMS_EMAIL_TO": {
         "description": "Default recipient for admin notifications when an email does not provide a more specific recipient."
-      },
-      "CMS_STORAGE": {
-        "description": "R2 bucket for uploaded assets, import packages, exports, and backups."
       },
       "GITHUB_CLIENT_ID": {
         "description": "Optional GitHub OAuth client id for account and comment login. Leave empty if GitHub login is disabled."

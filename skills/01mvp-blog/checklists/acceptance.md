@@ -1,24 +1,18 @@
 # Generated Site Acceptance Checklist
 
-- Public homepage loads.
-- `/blog` lists published posts.
-- A post detail page renders Markdown content.
-- `/rss.xml` responds with XML.
-- `/sitemap.xml` responds with XML.
-- `/robots.txt` responds with text.
-- `/openapi.json` responds with the automation contract.
-- English and Chinese public UI copy render through Paraglide.js.
-- The selected primary language is reflected in D1 site settings.
-- The selected theme preset is reflected in D1 site settings and page UI tokens.
-- The first post has English and Chinese title, excerpt, body, and SEO fields.
-- Admin login page loads.
-- First admin user can sign in.
-- Image upload writes to R2.
-- JSON export writes a backup object to R2.
-- ZIP export includes Markdown, HTML, JSON manifests, comments, settings, and R2 assets.
-- Manual backup writes a ZIP archive to R2.
-- Email Sending can remain disabled without blocking login, comments, imports, exports, or backups.
-- If Email Sending is enabled, password reset and moderation notifications can be sent.
-- Comment submission creates a pending comment.
-- Comment approval publishes it on the post page.
-- Skill log records automated steps and user intervention steps.
+- `content/posts/*.mdx` is the only article source.
+- MDX source generation, lint, and production build pass.
+- Public homepage and `/blog` list published posts.
+- A representative article renders MDX, SEO metadata, and its table of contents.
+- Tags, series, RSS, sitemap, and robots output include current compiled content.
+- English and Chinese UI copy render through Paraglide.
+- D1 stores only comments, Better Auth data, subscriptions, notifications, broadcasts, and analytics.
+- Comments reference an article `post_slug` and existing comments survive a deployment.
+- Reader signup/login and email preferences work.
+- Comment submission creates the configured moderation state.
+- An administrator can approve, mark spam, and delete comments.
+- `/admin` exposes overview, comments, and users, but no article editor.
+- Article write, import/export, asset, site-settings, backup, and publishing-token routes are absent.
+- Git backs up articles and documentation; D1 operational backup covers dynamic data separately.
+- Optional email can remain disabled without blocking article publishing, login, or comments.
+- The execution log separates automated actions, user actions, verification, and unperformed production mutations.

@@ -24,20 +24,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagsIndexRouteImport } from './routes/tags/index'
 import { Route as SeriesIndexRouteImport } from './routes/series/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as UploadsSplatRouteImport } from './routes/uploads/$'
 import { Route as TagsSlugRouteImport } from './routes/tags/$slug'
 import { Route as SeriesSlugRouteImport } from './routes/series/$slug'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
-import { Route as ApiTokensRouteImport } from './routes/api/tokens'
-import { Route as ApiSiteRouteImport } from './routes/api/site'
-import { Route as ApiSeriesRouteImport } from './routes/api/series'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiPostsRouteImport } from './routes/api/posts'
-import { Route as ApiExportRouteImport } from './routes/api/export'
 import { Route as ApiCommentsRouteImport } from './routes/api/comments'
-import { Route as ApiBackupsRouteImport } from './routes/api/backups'
-import { Route as ApiAssetsRouteImport } from './routes/api/assets'
 import { Route as GuestSignupRouteImport } from './routes/_guest/signup'
 import { Route as GuestResetPasswordRouteImport } from './routes/_guest/reset-password'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
@@ -46,13 +39,6 @@ import { Route as AuthAdminRouteRouteImport } from './routes/_auth/admin/route'
 import { Route as AuthAppIndexRouteImport } from './routes/_auth/app/index'
 import { Route as AuthAdminIndexRouteImport } from './routes/_auth/admin/index'
 import { Route as ZhDocsSplatRouteImport } from './routes/zh/docs/$'
-import { Route as ApiSyncObsidianRouteImport } from './routes/api/sync/obsidian'
-import { Route as ApiSeriesIdRouteImport } from './routes/api/series/$id'
-import { Route as ApiPostsBatchRouteImport } from './routes/api/posts/batch'
-import { Route as ApiPostsIdRouteImport } from './routes/api/posts/$id'
-import { Route as ApiImportZipRouteImport } from './routes/api/import/zip'
-import { Route as ApiImportMarkdownRouteImport } from './routes/api/import/markdown'
-import { Route as ApiImportHtmlRouteImport } from './routes/api/import/html'
 import { Route as ApiEmailUnsubscribeRouteImport } from './routes/api/email/unsubscribe'
 import { Route as ApiCommentAuthVerifyEmailRouteImport } from './routes/api/comment-auth/verify-email'
 import { Route as ApiCommentAuthSignupRouteImport } from './routes/api/comment-auth/signup'
@@ -60,7 +46,6 @@ import { Route as ApiCommentAuthMeRouteImport } from './routes/api/comment-auth/
 import { Route as ApiCommentAuthLogoutRouteImport } from './routes/api/comment-auth/logout'
 import { Route as ApiCommentAuthLoginRouteImport } from './routes/api/comment-auth/login'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiAssetsIdRouteImport } from './routes/api/assets/$id'
 import { Route as ApiAnalyticsTrackRouteImport } from './routes/api/analytics/track'
 import { Route as ApiAnalyticsOverviewRouteImport } from './routes/api/analytics/overview'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
@@ -71,7 +56,6 @@ import { Route as ApiAdminLogoutRouteImport } from './routes/api/admin/logout'
 import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
 import { Route as ApiAdminEmailStatusRouteImport } from './routes/api/admin/email-status'
 import { Route as ApiAdminEmailBroadcastsRouteImport } from './routes/api/admin/email-broadcasts'
-import { Route as ApiAdminAiSettingsRouteImport } from './routes/api/admin/ai-settings'
 import { Route as ApiAccountVerificationEmailRouteImport } from './routes/api/account/verification-email'
 import { Route as ApiAccountSignupRouteImport } from './routes/api/account/signup'
 import { Route as ApiAccountProfileRouteImport } from './routes/api/account/profile'
@@ -82,23 +66,13 @@ import { Route as ApiAccountLogoutRouteImport } from './routes/api/account/logou
 import { Route as ApiAccountLoginRouteImport } from './routes/api/account/login'
 import { Route as ApiAccountEmailPreferencesRouteImport } from './routes/api/account/email-preferences'
 import { Route as AuthAdminUsersRouteImport } from './routes/_auth/admin/users'
-import { Route as AuthAdminSettingsRouteImport } from './routes/_auth/admin/settings'
-import { Route as AuthAdminSeriesRouteImport } from './routes/_auth/admin/series'
-import { Route as AuthAdminPostsRouteImport } from './routes/_auth/admin/posts'
 import { Route as AuthAdminCommentsRouteImport } from './routes/_auth/admin/comments'
-import { Route as AuthAdminAssetsRouteImport } from './routes/_auth/admin/assets'
-import { Route as AuthAdminPostsIndexRouteImport } from './routes/_auth/admin/posts/index'
-import { Route as ApiTokensIdRevokeRouteImport } from './routes/api/tokens/$id/revoke'
 import { Route as ApiCommentsIdSpamRouteImport } from './routes/api/comments/$id/spam'
 import { Route as ApiCommentsIdDeleteRouteImport } from './routes/api/comments/$id/delete'
 import { Route as ApiCommentsIdApproveRouteImport } from './routes/api/comments/$id/approve'
 import { Route as ApiCommentAuthGoogleStartRouteImport } from './routes/api/comment-auth/google/start'
 import { Route as ApiCommentAuthGithubStartRouteImport } from './routes/api/comment-auth/github/start'
 import { Route as ApiAdminUsersIdRouteImport } from './routes/api/admin/users/$id'
-import { Route as ApiAdminAiSettingsTestRouteImport } from './routes/api/admin/ai-settings/test'
-import { Route as ApiAdminAiSettingsApiKeyRouteImport } from './routes/api/admin/ai-settings/api-key'
-import { Route as AuthAdminPostsNewRouteImport } from './routes/_auth/admin/posts/new'
-import { Route as AuthAdminPostsPostIdRouteImport } from './routes/_auth/admin/posts/$postId'
 import { Route as ApiAdminUsersIdSessionsRouteImport } from './routes/api/admin/users/$id/sessions'
 import { Route as ApiAdminUsersIdPasswordResetRouteImport } from './routes/api/admin/users/$id/password-reset'
 import { Route as ApiAdminLoginSocialCompleteRouteImport } from './routes/api/admin/login/social/complete'
@@ -179,11 +153,6 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UploadsSplatRoute = UploadsSplatRouteImport.update({
-  id: '/uploads/$',
-  path: '/uploads/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TagsSlugRoute = TagsSlugRouteImport.update({
   id: '/tags/$slug',
   path: '/tags/$slug',
@@ -204,21 +173,6 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTokensRoute = ApiTokensRouteImport.update({
-  id: '/api/tokens',
-  path: '/api/tokens',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSiteRoute = ApiSiteRouteImport.update({
-  id: '/api/site',
-  path: '/api/site',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSeriesRoute = ApiSeriesRouteImport.update({
-  id: '/api/series',
-  path: '/api/series',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiSearchRoute = ApiSearchRouteImport.update({
   id: '/api/search',
   path: '/api/search',
@@ -229,24 +183,9 @@ const ApiPostsRoute = ApiPostsRouteImport.update({
   path: '/api/posts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiExportRoute = ApiExportRouteImport.update({
-  id: '/api/export',
-  path: '/api/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiCommentsRoute = ApiCommentsRouteImport.update({
   id: '/api/comments',
   path: '/api/comments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBackupsRoute = ApiBackupsRouteImport.update({
-  id: '/api/backups',
-  path: '/api/backups',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAssetsRoute = ApiAssetsRouteImport.update({
-  id: '/api/assets',
-  path: '/api/assets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuestSignupRoute = GuestSignupRouteImport.update({
@@ -289,41 +228,6 @@ const ZhDocsSplatRoute = ZhDocsSplatRouteImport.update({
   path: '/zh/docs/$',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/zh/docs/$.lazy').then((d) => d.Route))
-const ApiSyncObsidianRoute = ApiSyncObsidianRouteImport.update({
-  id: '/api/sync/obsidian',
-  path: '/api/sync/obsidian',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSeriesIdRoute = ApiSeriesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiSeriesRoute,
-} as any)
-const ApiPostsBatchRoute = ApiPostsBatchRouteImport.update({
-  id: '/batch',
-  path: '/batch',
-  getParentRoute: () => ApiPostsRoute,
-} as any)
-const ApiPostsIdRoute = ApiPostsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiPostsRoute,
-} as any)
-const ApiImportZipRoute = ApiImportZipRouteImport.update({
-  id: '/api/import/zip',
-  path: '/api/import/zip',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiImportMarkdownRoute = ApiImportMarkdownRouteImport.update({
-  id: '/api/import/markdown',
-  path: '/api/import/markdown',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiImportHtmlRoute = ApiImportHtmlRouteImport.update({
-  id: '/api/import/html',
-  path: '/api/import/html',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiEmailUnsubscribeRoute = ApiEmailUnsubscribeRouteImport.update({
   id: '/api/email/unsubscribe',
   path: '/api/email/unsubscribe',
@@ -359,11 +263,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAssetsIdRoute = ApiAssetsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiAssetsRoute,
 } as any)
 const ApiAnalyticsTrackRoute = ApiAnalyticsTrackRouteImport.update({
   id: '/api/analytics/track',
@@ -413,11 +312,6 @@ const ApiAdminEmailStatusRoute = ApiAdminEmailStatusRouteImport.update({
 const ApiAdminEmailBroadcastsRoute = ApiAdminEmailBroadcastsRouteImport.update({
   id: '/api/admin/email-broadcasts',
   path: '/api/admin/email-broadcasts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAiSettingsRoute = ApiAdminAiSettingsRouteImport.update({
-  id: '/api/admin/ai-settings',
-  path: '/api/admin/ai-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAccountVerificationEmailRoute =
@@ -472,40 +366,10 @@ const AuthAdminUsersRoute = AuthAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthAdminRouteRoute,
 } as any)
-const AuthAdminSettingsRoute = AuthAdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthAdminRouteRoute,
-} as any)
-const AuthAdminSeriesRoute = AuthAdminSeriesRouteImport.update({
-  id: '/series',
-  path: '/series',
-  getParentRoute: () => AuthAdminRouteRoute,
-} as any)
-const AuthAdminPostsRoute = AuthAdminPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => AuthAdminRouteRoute,
-} as any)
 const AuthAdminCommentsRoute = AuthAdminCommentsRouteImport.update({
   id: '/comments',
   path: '/comments',
   getParentRoute: () => AuthAdminRouteRoute,
-} as any)
-const AuthAdminAssetsRoute = AuthAdminAssetsRouteImport.update({
-  id: '/assets',
-  path: '/assets',
-  getParentRoute: () => AuthAdminRouteRoute,
-} as any)
-const AuthAdminPostsIndexRoute = AuthAdminPostsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthAdminPostsRoute,
-} as any)
-const ApiTokensIdRevokeRoute = ApiTokensIdRevokeRouteImport.update({
-  id: '/$id/revoke',
-  path: '/$id/revoke',
-  getParentRoute: () => ApiTokensRoute,
 } as any)
 const ApiCommentsIdSpamRoute = ApiCommentsIdSpamRouteImport.update({
   id: '/$id/spam',
@@ -538,27 +402,6 @@ const ApiAdminUsersIdRoute = ApiAdminUsersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiAdminUsersRoute,
-} as any)
-const ApiAdminAiSettingsTestRoute = ApiAdminAiSettingsTestRouteImport.update({
-  id: '/test',
-  path: '/test',
-  getParentRoute: () => ApiAdminAiSettingsRoute,
-} as any)
-const ApiAdminAiSettingsApiKeyRoute =
-  ApiAdminAiSettingsApiKeyRouteImport.update({
-    id: '/api-key',
-    path: '/api-key',
-    getParentRoute: () => ApiAdminAiSettingsRoute,
-  } as any)
-const AuthAdminPostsNewRoute = AuthAdminPostsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthAdminPostsRoute,
-} as any)
-const AuthAdminPostsPostIdRoute = AuthAdminPostsPostIdRouteImport.update({
-  id: '/$postId',
-  path: '/$postId',
-  getParentRoute: () => AuthAdminPostsRoute,
 } as any)
 const ApiAdminUsersIdSessionsRoute = ApiAdminUsersIdSessionsRouteImport.update({
   id: '/sessions',
@@ -612,28 +455,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof GuestLoginRoute
   '/reset-password': typeof GuestResetPasswordRoute
   '/signup': typeof GuestSignupRoute
-  '/api/assets': typeof ApiAssetsRouteWithChildren
-  '/api/backups': typeof ApiBackupsRoute
   '/api/comments': typeof ApiCommentsRouteWithChildren
-  '/api/export': typeof ApiExportRoute
-  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/posts': typeof ApiPostsRoute
   '/api/search': typeof ApiSearchRoute
-  '/api/series': typeof ApiSeriesRouteWithChildren
-  '/api/site': typeof ApiSiteRoute
-  '/api/tokens': typeof ApiTokensRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/series/$slug': typeof SeriesSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/uploads/$': typeof UploadsSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/series/': typeof SeriesIndexRoute
   '/tags/': typeof TagsIndexRoute
-  '/admin/assets': typeof AuthAdminAssetsRoute
   '/admin/comments': typeof AuthAdminCommentsRoute
-  '/admin/posts': typeof AuthAdminPostsRouteWithChildren
-  '/admin/series': typeof AuthAdminSeriesRoute
-  '/admin/settings': typeof AuthAdminSettingsRoute
   '/admin/users': typeof AuthAdminUsersRoute
   '/api/account/email-preferences': typeof ApiAccountEmailPreferencesRoute
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
@@ -644,7 +476,6 @@ export interface FileRoutesByFullPath {
   '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
   '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
-  '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
   '/api/admin/login': typeof ApiAdminLoginRouteWithChildren
@@ -655,7 +486,6 @@ export interface FileRoutesByFullPath {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/analytics/overview': typeof ApiAnalyticsOverviewRoute
   '/api/analytics/track': typeof ApiAnalyticsTrackRoute
-  '/api/assets/$id': typeof ApiAssetsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/comment-auth/login': typeof ApiCommentAuthLoginRoute
   '/api/comment-auth/logout': typeof ApiCommentAuthLogoutRoute
@@ -663,28 +493,15 @@ export interface FileRoutesByFullPath {
   '/api/comment-auth/signup': typeof ApiCommentAuthSignupRoute
   '/api/comment-auth/verify-email': typeof ApiCommentAuthVerifyEmailRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
-  '/api/import/html': typeof ApiImportHtmlRoute
-  '/api/import/markdown': typeof ApiImportMarkdownRoute
-  '/api/import/zip': typeof ApiImportZipRoute
-  '/api/posts/$id': typeof ApiPostsIdRoute
-  '/api/posts/batch': typeof ApiPostsBatchRoute
-  '/api/series/$id': typeof ApiSeriesIdRoute
-  '/api/sync/obsidian': typeof ApiSyncObsidianRoute
   '/zh/docs/$': typeof ZhDocsSplatRoute
   '/admin/': typeof AuthAdminIndexRoute
   '/app/': typeof AuthAppIndexRoute
-  '/admin/posts/$postId': typeof AuthAdminPostsPostIdRoute
-  '/admin/posts/new': typeof AuthAdminPostsNewRoute
-  '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
-  '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
   '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
   '/api/comments/$id/delete': typeof ApiCommentsIdDeleteRoute
   '/api/comments/$id/spam': typeof ApiCommentsIdSpamRoute
-  '/api/tokens/$id/revoke': typeof ApiTokensIdRevokeRoute
-  '/admin/posts/': typeof AuthAdminPostsIndexRoute
   '/api/account/login/$provider/start': typeof ApiAccountLoginProviderStartRoute
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
@@ -706,27 +523,17 @@ export interface FileRoutesByTo {
   '/login': typeof GuestLoginRoute
   '/reset-password': typeof GuestResetPasswordRoute
   '/signup': typeof GuestSignupRoute
-  '/api/assets': typeof ApiAssetsRouteWithChildren
-  '/api/backups': typeof ApiBackupsRoute
   '/api/comments': typeof ApiCommentsRouteWithChildren
-  '/api/export': typeof ApiExportRoute
-  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/posts': typeof ApiPostsRoute
   '/api/search': typeof ApiSearchRoute
-  '/api/series': typeof ApiSeriesRouteWithChildren
-  '/api/site': typeof ApiSiteRoute
-  '/api/tokens': typeof ApiTokensRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/series/$slug': typeof SeriesSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/uploads/$': typeof UploadsSplatRoute
   '/blog': typeof BlogIndexRoute
   '/series': typeof SeriesIndexRoute
   '/tags': typeof TagsIndexRoute
-  '/admin/assets': typeof AuthAdminAssetsRoute
   '/admin/comments': typeof AuthAdminCommentsRoute
-  '/admin/series': typeof AuthAdminSeriesRoute
-  '/admin/settings': typeof AuthAdminSettingsRoute
   '/admin/users': typeof AuthAdminUsersRoute
   '/api/account/email-preferences': typeof ApiAccountEmailPreferencesRoute
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
@@ -737,7 +544,6 @@ export interface FileRoutesByTo {
   '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
   '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
-  '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
   '/api/admin/login': typeof ApiAdminLoginRouteWithChildren
@@ -748,7 +554,6 @@ export interface FileRoutesByTo {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/analytics/overview': typeof ApiAnalyticsOverviewRoute
   '/api/analytics/track': typeof ApiAnalyticsTrackRoute
-  '/api/assets/$id': typeof ApiAssetsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/comment-auth/login': typeof ApiCommentAuthLoginRoute
   '/api/comment-auth/logout': typeof ApiCommentAuthLogoutRoute
@@ -756,28 +561,15 @@ export interface FileRoutesByTo {
   '/api/comment-auth/signup': typeof ApiCommentAuthSignupRoute
   '/api/comment-auth/verify-email': typeof ApiCommentAuthVerifyEmailRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
-  '/api/import/html': typeof ApiImportHtmlRoute
-  '/api/import/markdown': typeof ApiImportMarkdownRoute
-  '/api/import/zip': typeof ApiImportZipRoute
-  '/api/posts/$id': typeof ApiPostsIdRoute
-  '/api/posts/batch': typeof ApiPostsBatchRoute
-  '/api/series/$id': typeof ApiSeriesIdRoute
-  '/api/sync/obsidian': typeof ApiSyncObsidianRoute
   '/zh/docs/$': typeof ZhDocsSplatRoute
   '/admin': typeof AuthAdminIndexRoute
   '/app': typeof AuthAppIndexRoute
-  '/admin/posts/$postId': typeof AuthAdminPostsPostIdRoute
-  '/admin/posts/new': typeof AuthAdminPostsNewRoute
-  '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
-  '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
   '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
   '/api/comments/$id/delete': typeof ApiCommentsIdDeleteRoute
   '/api/comments/$id/spam': typeof ApiCommentsIdSpamRoute
-  '/api/tokens/$id/revoke': typeof ApiTokensIdRevokeRoute
-  '/admin/posts': typeof AuthAdminPostsIndexRoute
   '/api/account/login/$provider/start': typeof ApiAccountLoginProviderStartRoute
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
@@ -804,28 +596,17 @@ export interface FileRoutesById {
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/reset-password': typeof GuestResetPasswordRoute
   '/_guest/signup': typeof GuestSignupRoute
-  '/api/assets': typeof ApiAssetsRouteWithChildren
-  '/api/backups': typeof ApiBackupsRoute
   '/api/comments': typeof ApiCommentsRouteWithChildren
-  '/api/export': typeof ApiExportRoute
-  '/api/posts': typeof ApiPostsRouteWithChildren
+  '/api/posts': typeof ApiPostsRoute
   '/api/search': typeof ApiSearchRoute
-  '/api/series': typeof ApiSeriesRouteWithChildren
-  '/api/site': typeof ApiSiteRoute
-  '/api/tokens': typeof ApiTokensRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/series/$slug': typeof SeriesSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/uploads/$': typeof UploadsSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/series/': typeof SeriesIndexRoute
   '/tags/': typeof TagsIndexRoute
-  '/_auth/admin/assets': typeof AuthAdminAssetsRoute
   '/_auth/admin/comments': typeof AuthAdminCommentsRoute
-  '/_auth/admin/posts': typeof AuthAdminPostsRouteWithChildren
-  '/_auth/admin/series': typeof AuthAdminSeriesRoute
-  '/_auth/admin/settings': typeof AuthAdminSettingsRoute
   '/_auth/admin/users': typeof AuthAdminUsersRoute
   '/api/account/email-preferences': typeof ApiAccountEmailPreferencesRoute
   '/api/account/login': typeof ApiAccountLoginRouteWithChildren
@@ -836,7 +617,6 @@ export interface FileRoutesById {
   '/api/account/profile': typeof ApiAccountProfileRoute
   '/api/account/signup': typeof ApiAccountSignupRoute
   '/api/account/verification-email': typeof ApiAccountVerificationEmailRoute
-  '/api/admin/ai-settings': typeof ApiAdminAiSettingsRouteWithChildren
   '/api/admin/email-broadcasts': typeof ApiAdminEmailBroadcastsRoute
   '/api/admin/email-status': typeof ApiAdminEmailStatusRoute
   '/api/admin/login': typeof ApiAdminLoginRouteWithChildren
@@ -847,7 +627,6 @@ export interface FileRoutesById {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/analytics/overview': typeof ApiAnalyticsOverviewRoute
   '/api/analytics/track': typeof ApiAnalyticsTrackRoute
-  '/api/assets/$id': typeof ApiAssetsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/comment-auth/login': typeof ApiCommentAuthLoginRoute
   '/api/comment-auth/logout': typeof ApiCommentAuthLogoutRoute
@@ -855,28 +634,15 @@ export interface FileRoutesById {
   '/api/comment-auth/signup': typeof ApiCommentAuthSignupRoute
   '/api/comment-auth/verify-email': typeof ApiCommentAuthVerifyEmailRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
-  '/api/import/html': typeof ApiImportHtmlRoute
-  '/api/import/markdown': typeof ApiImportMarkdownRoute
-  '/api/import/zip': typeof ApiImportZipRoute
-  '/api/posts/$id': typeof ApiPostsIdRoute
-  '/api/posts/batch': typeof ApiPostsBatchRoute
-  '/api/series/$id': typeof ApiSeriesIdRoute
-  '/api/sync/obsidian': typeof ApiSyncObsidianRoute
   '/zh/docs/$': typeof ZhDocsSplatRoute
   '/_auth/admin/': typeof AuthAdminIndexRoute
   '/_auth/app/': typeof AuthAppIndexRoute
-  '/_auth/admin/posts/$postId': typeof AuthAdminPostsPostIdRoute
-  '/_auth/admin/posts/new': typeof AuthAdminPostsNewRoute
-  '/api/admin/ai-settings/api-key': typeof ApiAdminAiSettingsApiKeyRoute
-  '/api/admin/ai-settings/test': typeof ApiAdminAiSettingsTestRoute
   '/api/admin/users/$id': typeof ApiAdminUsersIdRouteWithChildren
   '/api/comment-auth/github/start': typeof ApiCommentAuthGithubStartRoute
   '/api/comment-auth/google/start': typeof ApiCommentAuthGoogleStartRoute
   '/api/comments/$id/approve': typeof ApiCommentsIdApproveRoute
   '/api/comments/$id/delete': typeof ApiCommentsIdDeleteRoute
   '/api/comments/$id/spam': typeof ApiCommentsIdSpamRoute
-  '/api/tokens/$id/revoke': typeof ApiTokensIdRevokeRoute
-  '/_auth/admin/posts/': typeof AuthAdminPostsIndexRoute
   '/api/account/login/$provider/start': typeof ApiAccountLoginProviderStartRoute
   '/api/account/login/social/complete': typeof ApiAccountLoginSocialCompleteRoute
   '/api/admin/login/$provider/start': typeof ApiAdminLoginProviderStartRoute
@@ -902,28 +668,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/api/assets'
-    | '/api/backups'
     | '/api/comments'
-    | '/api/export'
     | '/api/posts'
     | '/api/search'
-    | '/api/series'
-    | '/api/site'
-    | '/api/tokens'
     | '/blog/$slug'
     | '/docs/$'
     | '/series/$slug'
     | '/tags/$slug'
-    | '/uploads/$'
     | '/blog/'
     | '/series/'
     | '/tags/'
-    | '/admin/assets'
     | '/admin/comments'
-    | '/admin/posts'
-    | '/admin/series'
-    | '/admin/settings'
     | '/admin/users'
     | '/api/account/email-preferences'
     | '/api/account/login'
@@ -934,7 +689,6 @@ export interface FileRouteTypes {
     | '/api/account/profile'
     | '/api/account/signup'
     | '/api/account/verification-email'
-    | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
     | '/api/admin/login'
@@ -945,7 +699,6 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/analytics/overview'
     | '/api/analytics/track'
-    | '/api/assets/$id'
     | '/api/auth/$'
     | '/api/comment-auth/login'
     | '/api/comment-auth/logout'
@@ -953,28 +706,15 @@ export interface FileRouteTypes {
     | '/api/comment-auth/signup'
     | '/api/comment-auth/verify-email'
     | '/api/email/unsubscribe'
-    | '/api/import/html'
-    | '/api/import/markdown'
-    | '/api/import/zip'
-    | '/api/posts/$id'
-    | '/api/posts/batch'
-    | '/api/series/$id'
-    | '/api/sync/obsidian'
     | '/zh/docs/$'
     | '/admin/'
     | '/app/'
-    | '/admin/posts/$postId'
-    | '/admin/posts/new'
-    | '/api/admin/ai-settings/api-key'
-    | '/api/admin/ai-settings/test'
     | '/api/admin/users/$id'
     | '/api/comment-auth/github/start'
     | '/api/comment-auth/google/start'
     | '/api/comments/$id/approve'
     | '/api/comments/$id/delete'
     | '/api/comments/$id/spam'
-    | '/api/tokens/$id/revoke'
-    | '/admin/posts/'
     | '/api/account/login/$provider/start'
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
@@ -996,27 +736,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/api/assets'
-    | '/api/backups'
     | '/api/comments'
-    | '/api/export'
     | '/api/posts'
     | '/api/search'
-    | '/api/series'
-    | '/api/site'
-    | '/api/tokens'
     | '/blog/$slug'
     | '/docs/$'
     | '/series/$slug'
     | '/tags/$slug'
-    | '/uploads/$'
     | '/blog'
     | '/series'
     | '/tags'
-    | '/admin/assets'
     | '/admin/comments'
-    | '/admin/series'
-    | '/admin/settings'
     | '/admin/users'
     | '/api/account/email-preferences'
     | '/api/account/login'
@@ -1027,7 +757,6 @@ export interface FileRouteTypes {
     | '/api/account/profile'
     | '/api/account/signup'
     | '/api/account/verification-email'
-    | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
     | '/api/admin/login'
@@ -1038,7 +767,6 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/analytics/overview'
     | '/api/analytics/track'
-    | '/api/assets/$id'
     | '/api/auth/$'
     | '/api/comment-auth/login'
     | '/api/comment-auth/logout'
@@ -1046,28 +774,15 @@ export interface FileRouteTypes {
     | '/api/comment-auth/signup'
     | '/api/comment-auth/verify-email'
     | '/api/email/unsubscribe'
-    | '/api/import/html'
-    | '/api/import/markdown'
-    | '/api/import/zip'
-    | '/api/posts/$id'
-    | '/api/posts/batch'
-    | '/api/series/$id'
-    | '/api/sync/obsidian'
     | '/zh/docs/$'
     | '/admin'
     | '/app'
-    | '/admin/posts/$postId'
-    | '/admin/posts/new'
-    | '/api/admin/ai-settings/api-key'
-    | '/api/admin/ai-settings/test'
     | '/api/admin/users/$id'
     | '/api/comment-auth/github/start'
     | '/api/comment-auth/google/start'
     | '/api/comments/$id/approve'
     | '/api/comments/$id/delete'
     | '/api/comments/$id/spam'
-    | '/api/tokens/$id/revoke'
-    | '/admin/posts'
     | '/api/account/login/$provider/start'
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
@@ -1093,28 +808,17 @@ export interface FileRouteTypes {
     | '/_guest/login'
     | '/_guest/reset-password'
     | '/_guest/signup'
-    | '/api/assets'
-    | '/api/backups'
     | '/api/comments'
-    | '/api/export'
     | '/api/posts'
     | '/api/search'
-    | '/api/series'
-    | '/api/site'
-    | '/api/tokens'
     | '/blog/$slug'
     | '/docs/$'
     | '/series/$slug'
     | '/tags/$slug'
-    | '/uploads/$'
     | '/blog/'
     | '/series/'
     | '/tags/'
-    | '/_auth/admin/assets'
     | '/_auth/admin/comments'
-    | '/_auth/admin/posts'
-    | '/_auth/admin/series'
-    | '/_auth/admin/settings'
     | '/_auth/admin/users'
     | '/api/account/email-preferences'
     | '/api/account/login'
@@ -1125,7 +829,6 @@ export interface FileRouteTypes {
     | '/api/account/profile'
     | '/api/account/signup'
     | '/api/account/verification-email'
-    | '/api/admin/ai-settings'
     | '/api/admin/email-broadcasts'
     | '/api/admin/email-status'
     | '/api/admin/login'
@@ -1136,7 +839,6 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/analytics/overview'
     | '/api/analytics/track'
-    | '/api/assets/$id'
     | '/api/auth/$'
     | '/api/comment-auth/login'
     | '/api/comment-auth/logout'
@@ -1144,28 +846,15 @@ export interface FileRouteTypes {
     | '/api/comment-auth/signup'
     | '/api/comment-auth/verify-email'
     | '/api/email/unsubscribe'
-    | '/api/import/html'
-    | '/api/import/markdown'
-    | '/api/import/zip'
-    | '/api/posts/$id'
-    | '/api/posts/batch'
-    | '/api/series/$id'
-    | '/api/sync/obsidian'
     | '/zh/docs/$'
     | '/_auth/admin/'
     | '/_auth/app/'
-    | '/_auth/admin/posts/$postId'
-    | '/_auth/admin/posts/new'
-    | '/api/admin/ai-settings/api-key'
-    | '/api/admin/ai-settings/test'
     | '/api/admin/users/$id'
     | '/api/comment-auth/github/start'
     | '/api/comment-auth/google/start'
     | '/api/comments/$id/approve'
     | '/api/comments/$id/delete'
     | '/api/comments/$id/spam'
-    | '/api/tokens/$id/revoke'
-    | '/_auth/admin/posts/'
     | '/api/account/login/$provider/start'
     | '/api/account/login/social/complete'
     | '/api/admin/login/$provider/start'
@@ -1187,20 +876,13 @@ export interface RootRouteChildren {
   RssDotxmlRoute: typeof RssDotxmlRoute
   SitemapPostsDotxmlRoute: typeof SitemapPostsDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiAssetsRoute: typeof ApiAssetsRouteWithChildren
-  ApiBackupsRoute: typeof ApiBackupsRoute
   ApiCommentsRoute: typeof ApiCommentsRouteWithChildren
-  ApiExportRoute: typeof ApiExportRoute
-  ApiPostsRoute: typeof ApiPostsRouteWithChildren
+  ApiPostsRoute: typeof ApiPostsRoute
   ApiSearchRoute: typeof ApiSearchRoute
-  ApiSeriesRoute: typeof ApiSeriesRouteWithChildren
-  ApiSiteRoute: typeof ApiSiteRoute
-  ApiTokensRoute: typeof ApiTokensRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
   DocsSplatRoute: typeof DocsSplatRoute
   SeriesSlugRoute: typeof SeriesSlugRoute
   TagsSlugRoute: typeof TagsSlugRoute
-  UploadsSplatRoute: typeof UploadsSplatRoute
   BlogIndexRoute: typeof BlogIndexRoute
   SeriesIndexRoute: typeof SeriesIndexRoute
   TagsIndexRoute: typeof TagsIndexRoute
@@ -1213,7 +895,6 @@ export interface RootRouteChildren {
   ApiAccountProfileRoute: typeof ApiAccountProfileRoute
   ApiAccountSignupRoute: typeof ApiAccountSignupRoute
   ApiAccountVerificationEmailRoute: typeof ApiAccountVerificationEmailRoute
-  ApiAdminAiSettingsRoute: typeof ApiAdminAiSettingsRouteWithChildren
   ApiAdminEmailBroadcastsRoute: typeof ApiAdminEmailBroadcastsRoute
   ApiAdminEmailStatusRoute: typeof ApiAdminEmailStatusRoute
   ApiAdminLoginRoute: typeof ApiAdminLoginRouteWithChildren
@@ -1231,10 +912,6 @@ export interface RootRouteChildren {
   ApiCommentAuthSignupRoute: typeof ApiCommentAuthSignupRoute
   ApiCommentAuthVerifyEmailRoute: typeof ApiCommentAuthVerifyEmailRoute
   ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
-  ApiImportHtmlRoute: typeof ApiImportHtmlRoute
-  ApiImportMarkdownRoute: typeof ApiImportMarkdownRoute
-  ApiImportZipRoute: typeof ApiImportZipRoute
-  ApiSyncObsidianRoute: typeof ApiSyncObsidianRoute
   ZhDocsSplatRoute: typeof ZhDocsSplatRoute
   ApiCommentAuthGithubStartRoute: typeof ApiCommentAuthGithubStartRoute
   ApiCommentAuthGoogleStartRoute: typeof ApiCommentAuthGoogleStartRoute
@@ -1347,13 +1024,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/uploads/$': {
-      id: '/uploads/$'
-      path: '/uploads/$'
-      fullPath: '/uploads/$'
-      preLoaderRoute: typeof UploadsSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tags/$slug': {
       id: '/tags/$slug'
       path: '/tags/$slug'
@@ -1382,27 +1052,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/tokens': {
-      id: '/api/tokens'
-      path: '/api/tokens'
-      fullPath: '/api/tokens'
-      preLoaderRoute: typeof ApiTokensRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/site': {
-      id: '/api/site'
-      path: '/api/site'
-      fullPath: '/api/site'
-      preLoaderRoute: typeof ApiSiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/series': {
-      id: '/api/series'
-      path: '/api/series'
-      fullPath: '/api/series'
-      preLoaderRoute: typeof ApiSeriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/search': {
       id: '/api/search'
       path: '/api/search'
@@ -1417,32 +1066,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPostsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/export': {
-      id: '/api/export'
-      path: '/api/export'
-      fullPath: '/api/export'
-      preLoaderRoute: typeof ApiExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/comments': {
       id: '/api/comments'
       path: '/api/comments'
       fullPath: '/api/comments'
       preLoaderRoute: typeof ApiCommentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/backups': {
-      id: '/api/backups'
-      path: '/api/backups'
-      fullPath: '/api/backups'
-      preLoaderRoute: typeof ApiBackupsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/assets': {
-      id: '/api/assets'
-      path: '/api/assets'
-      fullPath: '/api/assets'
-      preLoaderRoute: typeof ApiAssetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_guest/signup': {
@@ -1501,55 +1129,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ZhDocsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/sync/obsidian': {
-      id: '/api/sync/obsidian'
-      path: '/api/sync/obsidian'
-      fullPath: '/api/sync/obsidian'
-      preLoaderRoute: typeof ApiSyncObsidianRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/series/$id': {
-      id: '/api/series/$id'
-      path: '/$id'
-      fullPath: '/api/series/$id'
-      preLoaderRoute: typeof ApiSeriesIdRouteImport
-      parentRoute: typeof ApiSeriesRoute
-    }
-    '/api/posts/batch': {
-      id: '/api/posts/batch'
-      path: '/batch'
-      fullPath: '/api/posts/batch'
-      preLoaderRoute: typeof ApiPostsBatchRouteImport
-      parentRoute: typeof ApiPostsRoute
-    }
-    '/api/posts/$id': {
-      id: '/api/posts/$id'
-      path: '/$id'
-      fullPath: '/api/posts/$id'
-      preLoaderRoute: typeof ApiPostsIdRouteImport
-      parentRoute: typeof ApiPostsRoute
-    }
-    '/api/import/zip': {
-      id: '/api/import/zip'
-      path: '/api/import/zip'
-      fullPath: '/api/import/zip'
-      preLoaderRoute: typeof ApiImportZipRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/import/markdown': {
-      id: '/api/import/markdown'
-      path: '/api/import/markdown'
-      fullPath: '/api/import/markdown'
-      preLoaderRoute: typeof ApiImportMarkdownRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/import/html': {
-      id: '/api/import/html'
-      path: '/api/import/html'
-      fullPath: '/api/import/html'
-      preLoaderRoute: typeof ApiImportHtmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/email/unsubscribe': {
       id: '/api/email/unsubscribe'
       path: '/api/email/unsubscribe'
@@ -1598,13 +1177,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/assets/$id': {
-      id: '/api/assets/$id'
-      path: '/$id'
-      fullPath: '/api/assets/$id'
-      preLoaderRoute: typeof ApiAssetsIdRouteImport
-      parentRoute: typeof ApiAssetsRoute
     }
     '/api/analytics/track': {
       id: '/api/analytics/track'
@@ -1674,13 +1246,6 @@ declare module '@tanstack/react-router' {
       path: '/api/admin/email-broadcasts'
       fullPath: '/api/admin/email-broadcasts'
       preLoaderRoute: typeof ApiAdminEmailBroadcastsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/ai-settings': {
-      id: '/api/admin/ai-settings'
-      path: '/api/admin/ai-settings'
-      fullPath: '/api/admin/ai-settings'
-      preLoaderRoute: typeof ApiAdminAiSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/account/verification-email': {
@@ -1753,54 +1318,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminUsersRouteImport
       parentRoute: typeof AuthAdminRouteRoute
     }
-    '/_auth/admin/settings': {
-      id: '/_auth/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthAdminSettingsRouteImport
-      parentRoute: typeof AuthAdminRouteRoute
-    }
-    '/_auth/admin/series': {
-      id: '/_auth/admin/series'
-      path: '/series'
-      fullPath: '/admin/series'
-      preLoaderRoute: typeof AuthAdminSeriesRouteImport
-      parentRoute: typeof AuthAdminRouteRoute
-    }
-    '/_auth/admin/posts': {
-      id: '/_auth/admin/posts'
-      path: '/posts'
-      fullPath: '/admin/posts'
-      preLoaderRoute: typeof AuthAdminPostsRouteImport
-      parentRoute: typeof AuthAdminRouteRoute
-    }
     '/_auth/admin/comments': {
       id: '/_auth/admin/comments'
       path: '/comments'
       fullPath: '/admin/comments'
       preLoaderRoute: typeof AuthAdminCommentsRouteImport
       parentRoute: typeof AuthAdminRouteRoute
-    }
-    '/_auth/admin/assets': {
-      id: '/_auth/admin/assets'
-      path: '/assets'
-      fullPath: '/admin/assets'
-      preLoaderRoute: typeof AuthAdminAssetsRouteImport
-      parentRoute: typeof AuthAdminRouteRoute
-    }
-    '/_auth/admin/posts/': {
-      id: '/_auth/admin/posts/'
-      path: '/'
-      fullPath: '/admin/posts/'
-      preLoaderRoute: typeof AuthAdminPostsIndexRouteImport
-      parentRoute: typeof AuthAdminPostsRoute
-    }
-    '/api/tokens/$id/revoke': {
-      id: '/api/tokens/$id/revoke'
-      path: '/$id/revoke'
-      fullPath: '/api/tokens/$id/revoke'
-      preLoaderRoute: typeof ApiTokensIdRevokeRouteImport
-      parentRoute: typeof ApiTokensRoute
     }
     '/api/comments/$id/spam': {
       id: '/api/comments/$id/spam'
@@ -1843,34 +1366,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/admin/users/$id'
       preLoaderRoute: typeof ApiAdminUsersIdRouteImport
       parentRoute: typeof ApiAdminUsersRoute
-    }
-    '/api/admin/ai-settings/test': {
-      id: '/api/admin/ai-settings/test'
-      path: '/test'
-      fullPath: '/api/admin/ai-settings/test'
-      preLoaderRoute: typeof ApiAdminAiSettingsTestRouteImport
-      parentRoute: typeof ApiAdminAiSettingsRoute
-    }
-    '/api/admin/ai-settings/api-key': {
-      id: '/api/admin/ai-settings/api-key'
-      path: '/api-key'
-      fullPath: '/api/admin/ai-settings/api-key'
-      preLoaderRoute: typeof ApiAdminAiSettingsApiKeyRouteImport
-      parentRoute: typeof ApiAdminAiSettingsRoute
-    }
-    '/_auth/admin/posts/new': {
-      id: '/_auth/admin/posts/new'
-      path: '/new'
-      fullPath: '/admin/posts/new'
-      preLoaderRoute: typeof AuthAdminPostsNewRouteImport
-      parentRoute: typeof AuthAdminPostsRoute
-    }
-    '/_auth/admin/posts/$postId': {
-      id: '/_auth/admin/posts/$postId'
-      path: '/$postId'
-      fullPath: '/admin/posts/$postId'
-      preLoaderRoute: typeof AuthAdminPostsPostIdRouteImport
-      parentRoute: typeof AuthAdminPostsRoute
     }
     '/api/admin/users/$id/sessions': {
       id: '/api/admin/users/$id/sessions'
@@ -1917,38 +1412,14 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthAdminPostsRouteChildren {
-  AuthAdminPostsPostIdRoute: typeof AuthAdminPostsPostIdRoute
-  AuthAdminPostsNewRoute: typeof AuthAdminPostsNewRoute
-  AuthAdminPostsIndexRoute: typeof AuthAdminPostsIndexRoute
-}
-
-const AuthAdminPostsRouteChildren: AuthAdminPostsRouteChildren = {
-  AuthAdminPostsPostIdRoute: AuthAdminPostsPostIdRoute,
-  AuthAdminPostsNewRoute: AuthAdminPostsNewRoute,
-  AuthAdminPostsIndexRoute: AuthAdminPostsIndexRoute,
-}
-
-const AuthAdminPostsRouteWithChildren = AuthAdminPostsRoute._addFileChildren(
-  AuthAdminPostsRouteChildren,
-)
-
 interface AuthAdminRouteRouteChildren {
-  AuthAdminAssetsRoute: typeof AuthAdminAssetsRoute
   AuthAdminCommentsRoute: typeof AuthAdminCommentsRoute
-  AuthAdminPostsRoute: typeof AuthAdminPostsRouteWithChildren
-  AuthAdminSeriesRoute: typeof AuthAdminSeriesRoute
-  AuthAdminSettingsRoute: typeof AuthAdminSettingsRoute
   AuthAdminUsersRoute: typeof AuthAdminUsersRoute
   AuthAdminIndexRoute: typeof AuthAdminIndexRoute
 }
 
 const AuthAdminRouteRouteChildren: AuthAdminRouteRouteChildren = {
-  AuthAdminAssetsRoute: AuthAdminAssetsRoute,
   AuthAdminCommentsRoute: AuthAdminCommentsRoute,
-  AuthAdminPostsRoute: AuthAdminPostsRouteWithChildren,
-  AuthAdminSeriesRoute: AuthAdminSeriesRoute,
-  AuthAdminSettingsRoute: AuthAdminSettingsRoute,
   AuthAdminUsersRoute: AuthAdminUsersRoute,
   AuthAdminIndexRoute: AuthAdminIndexRoute,
 }
@@ -1999,18 +1470,6 @@ const GuestRouteRouteWithChildren = GuestRouteRoute._addFileChildren(
   GuestRouteRouteChildren,
 )
 
-interface ApiAssetsRouteChildren {
-  ApiAssetsIdRoute: typeof ApiAssetsIdRoute
-}
-
-const ApiAssetsRouteChildren: ApiAssetsRouteChildren = {
-  ApiAssetsIdRoute: ApiAssetsIdRoute,
-}
-
-const ApiAssetsRouteWithChildren = ApiAssetsRoute._addFileChildren(
-  ApiAssetsRouteChildren,
-)
-
 interface ApiCommentsRouteChildren {
   ApiCommentsIdApproveRoute: typeof ApiCommentsIdApproveRoute
   ApiCommentsIdDeleteRoute: typeof ApiCommentsIdDeleteRoute
@@ -2027,44 +1486,6 @@ const ApiCommentsRouteWithChildren = ApiCommentsRoute._addFileChildren(
   ApiCommentsRouteChildren,
 )
 
-interface ApiPostsRouteChildren {
-  ApiPostsIdRoute: typeof ApiPostsIdRoute
-  ApiPostsBatchRoute: typeof ApiPostsBatchRoute
-}
-
-const ApiPostsRouteChildren: ApiPostsRouteChildren = {
-  ApiPostsIdRoute: ApiPostsIdRoute,
-  ApiPostsBatchRoute: ApiPostsBatchRoute,
-}
-
-const ApiPostsRouteWithChildren = ApiPostsRoute._addFileChildren(
-  ApiPostsRouteChildren,
-)
-
-interface ApiSeriesRouteChildren {
-  ApiSeriesIdRoute: typeof ApiSeriesIdRoute
-}
-
-const ApiSeriesRouteChildren: ApiSeriesRouteChildren = {
-  ApiSeriesIdRoute: ApiSeriesIdRoute,
-}
-
-const ApiSeriesRouteWithChildren = ApiSeriesRoute._addFileChildren(
-  ApiSeriesRouteChildren,
-)
-
-interface ApiTokensRouteChildren {
-  ApiTokensIdRevokeRoute: typeof ApiTokensIdRevokeRoute
-}
-
-const ApiTokensRouteChildren: ApiTokensRouteChildren = {
-  ApiTokensIdRevokeRoute: ApiTokensIdRevokeRoute,
-}
-
-const ApiTokensRouteWithChildren = ApiTokensRoute._addFileChildren(
-  ApiTokensRouteChildren,
-)
-
 interface ApiAccountLoginRouteChildren {
   ApiAccountLoginProviderStartRoute: typeof ApiAccountLoginProviderStartRoute
   ApiAccountLoginSocialCompleteRoute: typeof ApiAccountLoginSocialCompleteRoute
@@ -2078,19 +1499,6 @@ const ApiAccountLoginRouteChildren: ApiAccountLoginRouteChildren = {
 const ApiAccountLoginRouteWithChildren = ApiAccountLoginRoute._addFileChildren(
   ApiAccountLoginRouteChildren,
 )
-
-interface ApiAdminAiSettingsRouteChildren {
-  ApiAdminAiSettingsApiKeyRoute: typeof ApiAdminAiSettingsApiKeyRoute
-  ApiAdminAiSettingsTestRoute: typeof ApiAdminAiSettingsTestRoute
-}
-
-const ApiAdminAiSettingsRouteChildren: ApiAdminAiSettingsRouteChildren = {
-  ApiAdminAiSettingsApiKeyRoute: ApiAdminAiSettingsApiKeyRoute,
-  ApiAdminAiSettingsTestRoute: ApiAdminAiSettingsTestRoute,
-}
-
-const ApiAdminAiSettingsRouteWithChildren =
-  ApiAdminAiSettingsRoute._addFileChildren(ApiAdminAiSettingsRouteChildren)
 
 interface ApiAdminLoginRouteChildren {
   ApiAdminLoginProviderStartRoute: typeof ApiAdminLoginProviderStartRoute
@@ -2145,20 +1553,13 @@ const rootRouteChildren: RootRouteChildren = {
   RssDotxmlRoute: RssDotxmlRoute,
   SitemapPostsDotxmlRoute: SitemapPostsDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ApiAssetsRoute: ApiAssetsRouteWithChildren,
-  ApiBackupsRoute: ApiBackupsRoute,
   ApiCommentsRoute: ApiCommentsRouteWithChildren,
-  ApiExportRoute: ApiExportRoute,
-  ApiPostsRoute: ApiPostsRouteWithChildren,
+  ApiPostsRoute: ApiPostsRoute,
   ApiSearchRoute: ApiSearchRoute,
-  ApiSeriesRoute: ApiSeriesRouteWithChildren,
-  ApiSiteRoute: ApiSiteRoute,
-  ApiTokensRoute: ApiTokensRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
   DocsSplatRoute: DocsSplatRoute,
   SeriesSlugRoute: SeriesSlugRoute,
   TagsSlugRoute: TagsSlugRoute,
-  UploadsSplatRoute: UploadsSplatRoute,
   BlogIndexRoute: BlogIndexRoute,
   SeriesIndexRoute: SeriesIndexRoute,
   TagsIndexRoute: TagsIndexRoute,
@@ -2171,7 +1572,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAccountProfileRoute: ApiAccountProfileRoute,
   ApiAccountSignupRoute: ApiAccountSignupRoute,
   ApiAccountVerificationEmailRoute: ApiAccountVerificationEmailRoute,
-  ApiAdminAiSettingsRoute: ApiAdminAiSettingsRouteWithChildren,
   ApiAdminEmailBroadcastsRoute: ApiAdminEmailBroadcastsRoute,
   ApiAdminEmailStatusRoute: ApiAdminEmailStatusRoute,
   ApiAdminLoginRoute: ApiAdminLoginRouteWithChildren,
@@ -2189,10 +1589,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCommentAuthSignupRoute: ApiCommentAuthSignupRoute,
   ApiCommentAuthVerifyEmailRoute: ApiCommentAuthVerifyEmailRoute,
   ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
-  ApiImportHtmlRoute: ApiImportHtmlRoute,
-  ApiImportMarkdownRoute: ApiImportMarkdownRoute,
-  ApiImportZipRoute: ApiImportZipRoute,
-  ApiSyncObsidianRoute: ApiSyncObsidianRoute,
   ZhDocsSplatRoute: ZhDocsSplatRoute,
   ApiCommentAuthGithubStartRoute: ApiCommentAuthGithubStartRoute,
   ApiCommentAuthGoogleStartRoute: ApiCommentAuthGoogleStartRoute,

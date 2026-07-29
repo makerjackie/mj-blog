@@ -1,0 +1,104 @@
+---
+title: "2026 最新自建 tizi 教程：VLESS+Reality+Argo，单 VPS 也能稳如老狗"
+slug: "2026-04-24-sing-box-argo-tutorial"
+excerpt: "2026 年 4 月自建 tizi 首选方案：利用 fscarmen/sing-box 脚本，结合 Reality 伪装与 Cloudflare Argo 隧道中转，解决海外 VPS 直连卡顿问题。"
+status: "published"
+publishedAt: "2026-04-24T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:27.220Z"
+authorName: "Jackie"
+featured: true
+pinned: false
+commentsEnabled: true
+seoTitle: "2026 最新自建 tizi 教程：VLESS+Reality+Argo，单 VPS 也能稳如老狗"
+seoDescription: "2026 年 4 月自建 tizi 首选方案：利用 fscarmen/sing-box 脚本，结合 Reality 伪装与 Cloudflare Argo 隧道中转，解决海外 VPS 直连卡顿问题。"
+tags:
+  - "AI"
+  - "sing-box"
+  - "tizi"
+  - "教程"
+---
+
+> 本文由 AI 写作
+
+最近国内封 tizi 比较狠，很多我在用的 VPN 都不太稳定了，无奈只能探索一下自建的方案
+
+我最近在腾讯云新加坡服务器上测了一套方案，测了两三天，目前还没啥问题，效果还挺好。今天就把这套方案分享给大家。
+
+核心逻辑就一句话：**VLESS + Reality 伪装成正常 HTTPS，再套一层 Cloudflare Argo 隧道中转。**
+
+哪怕是单台 VPS，只要开启了 Cloudflare 中转，稳定性会有一个质的提升。
+
+## 方案核心来源
+
+这次我们用的是社区大佬 **fscarmen** 长期维护的 sing-box 一键脚本。这个脚本纯 CLI 操作，无面板，非常轻量。
+
+项目地址：[fscarmen/sing-box](https://github.com/fscarmen/sing-box)
+
+## 懒人操作：直接发给 AI
+
+如果你觉得下面的步骤看着眼花，最简单的办法是：**把这篇文章的内容直接复制发给 AI（比如 Claude 或 GPT），然后把你的服务器地址、账号密码也告诉它。**（当然怕泄露密码的话就用 ssh 公钥吧）
+
+AI 自己就能帮你连接服务器操作完，然后直接给你发一个订阅链接。你拿到链接直接去客户端用就好了，非常简单。
+
+---
+
+## 实战步骤（10 分钟搞定）
+
+### 1. 准备工作
+
+你需要一台海外 VPS（推荐新加坡、香港等地区），SSH 连接进去。
+
+（我买的是 腾讯云新加坡的服务器， 听 AI 说直连线路质量还行。然后查了一下，虽然理论上不能用于 vpn ， 可能会被识别到，但自建个人用应该风险较小，后面有问题我再更新文章）
+
+首先更新下系统环境：
+
+```bash
+apt update -y && apt upgrade -y
+```
+
+### 2. 执行安装脚本
+
+复制下面的命令并执行：
+
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh)
+```
+
+### 3. 关键配置选择
+
+脚本运行后会进入交互式菜单，这里有几个坑需要注意：
+
+- **协议选择**：选 **VLESS + Reality**。这是目前最稳的伪装协议。
+- **Argo 中转**：**一定要选「是」**。这是解决直连卡顿的关键。它会自动帮你创建 Cloudflare 隧道，让流量走 CDN。如果没有开启这个，连接会很不稳定。
+- **SNI 设置**：建议填一些大厂域名，比如 `www.microsoft.com` 或 `dl.google.com`。
+- 其他选项：如果没有特殊需求，一路回车默认即可。
+
+安装完成后，脚本会直接输出你的**订阅链接**和二维码。输入 `sb` 命令可以随时查看管理后台。
+
+## 全平台客户端推荐（2026 最新版）
+
+有了订阅链接，下一步就是选择好用的客户端。
+
+### Mac：FlowZ (首选推荐)
+
+这是目前 Mac 端最现代化的 sing-box 客户端，界面是简洁的 shadcn/ui 风格，资源占用极低。
+
+- **下载**：[GitHub Releases](https://github.com/dododook/FlowZ/releases)
+- **注意**：如果提示「已损坏」，终端执行 `xattr -cr /Applications/FlowZ.app` 即可。
+- **使用**：Profiles -> New Subscription，粘贴你的订阅链接，开启 TUN 模式。
+
+### iOS：Stash / Shadowrocket
+
+- **Stash**：推荐使用。
+- **Shadowrocket**：老牌王者，支持最全，适合小白。
+- **免费首选**：**sing-box VT** (官方出品，App Store 搜索即可)。
+
+### Windows：v2rayN
+
+- **下载**：[GitHub Releases](https://github.com/2dust/v2rayN/releases)
+- **使用**：直接导入订阅链接即可。
+
+### Android：NekoBox
+
+- **下载**：[GitHub Releases](https://github.com/MatsuriDayo/NekoBoxForAndroid/releases)
+- **特点**：基于 sing-box 内核，完美支持 Reality 订阅。

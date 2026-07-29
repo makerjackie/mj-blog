@@ -1523,7 +1523,7 @@ export const admin_overview_eyebrow = /** @type {((inputs?: Admin_Overview_Eyebr
 /**
 * | output |
 * | --- |
-* | "Publishing overview" |
+* | "Admin overview" |
 *
 * @param {Admin_Overview_TitleInputs} inputs
 * @param {{ locale?: "en" | "zh" }} options

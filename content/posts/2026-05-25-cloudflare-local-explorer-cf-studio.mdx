@@ -1,0 +1,231 @@
+---
+title: "Cloudflare 的 D1、R2、KV 怎么管理？试了 3 个工具后我的选择"
+slug: "2026-05-25-cloudflare-local-explorer-cf-studio"
+excerpt: "用 Cloudflare 做小项目越来越多，D1、R2、KV 这些资源到底怎么管理才顺手？我试了 cf CLI、Local Explorer 和 cf-studio，说说实际体验。"
+status: "published"
+publishedAt: "2026-05-25T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:59.667Z"
+authorName: "Jackie"
+featured: false
+pinned: false
+commentsEnabled: true
+seoTitle: "Cloudflare 的 D1、R2、KV 怎么管理？试了 3 个工具后我的选择"
+seoDescription: "用 Cloudflare 做小项目越来越多，D1、R2、KV 这些资源到底怎么管理才顺手？我试了 cf CLI、Local Explorer 和 cf-studio，说说实际体验。"
+tags:
+  - "Cloudflare"
+  - "D1"
+  - "KV"
+  - "R2"
+  - "Wrangler"
+---
+
+先说个背景，如果你还没用过 Cloudflare 的存储服务，这段可以帮你省点时间。
+
+Cloudflare 除了能托管网站和做 CDN，还提供了一套免费额度很慷慨的存储服务：
+
+- **D1**：一个 SQL 数据库，SQLite 语法，适合存用户数据、文章内容这类结构化的东西
+- **R2**：一个对象存储，类似 S3，但不收流量费，适合存图片、文件
+- **KV**：一个键值存储，读快写慢，适合存配置、缓存、session 这类轻量数据
+
+这三样东西，个人项目基本够用了。我最近做的几个小项目全挂在这上面。
+
+问题是——用着用着，你就会碰到一个很实际的问题：**这些东西怎么管？**
+
+在浏览器打开 Cloudflare Dashboard 能看能改，但国内访问经常转圈。Wrangler 命令行能做所有事，但有时候只是想看一眼数据库里写了啥，敲一堆命令有点烦。
+
+最近我试了三个新工具，说说真实感受。
+
+## 先给结论
+
+| 你正在干的事             | 用什么                       |
+| ------------------------ | ---------------------------- |
+| 本地写代码、调试数据     | Local Explorer               |
+| 线上资源全量管理         | Cloudflare Dashboard         |
+| 天天要查远程数据库和文件 | cf-studio                    |
+| 自动化部署、CI/CD        | Wrangler                     |
+| 未来统一命令行           | `cf` CLI（先关注，别急着用） |
+
+下面展开说。
+
+## Local Explorer：本地开发最该先用起来的
+
+这个是我觉得性价比最高的工具，而且很多人不知道它已经内置在 Wrangler 里了。
+
+**它是什么？** 你跑 `wrangler dev` 开本地服务器的时候，它会在 `localhost:8787` 上开一个网页，让你用可视化界面查看和操作本地的 D1、R2、KV 数据。
+
+**怎么用？** 很简单，两步：
+
+第一步，确保你的 `wrangler.jsonc` 里配了数据库绑定：
+
+```jsonc
+{
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "app-db",
+      "database_id": "app-db",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "app-assets",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "app-kv",
+    },
+  ],
+}
+```
+
+第二步，启动开发服务器：
+
+```bash
+npx wrangler dev
+```
+
+启动后终端会出一个菜单，按 `e` 就打开 Local Explorer。或者直接浏览器访问：
+
+```txt
+http://localhost:8787/cdn-cgi/explorer
+```
+
+能看到类似这样的绑定列表：
+
+```txt
+env.MY_KV      KV Namespace      local
+env.DB         D1 Database       local
+env.MY_BUCKET  R2 Bucket         local
+```
+
+打开之后就是一个网页界面，可以浏览、编辑本地的数据库和存储。
+
+**我经常用它的场景：**
+
+- Worker 写入 D1 之后，想确认数据到底写对了没有
+- 本地插入几条测试数据，比写 seed 脚本快
+- 检查 KV 里存的 JSON 格式对不对
+- 给 R2 丢几个测试图片看看上传流程通不通
+
+以前做这些事，你得自己在 Worker 里临时写一个 `/debug` 接口。Local Explorer 相当于帮你省了这一步，每个项目都自带一个数据查看器。
+
+它还暴露了一个本地 OpenAPI 接口（`/cdn-cgi/explorer/api`），意味着你可以用 AI agent 或者脚本来操作本地数据。这个方向挺有意思的，不过我还没深入用。
+
+**注意一点：** Local Explorer 管的是本地模拟数据，不是线上真实数据。两个是分开的。
+
+## Cloudflare Dashboard：线上管理还是得靠它
+
+如果你要管线上资源——看生产环境的 D1 数据、配置 R2 权限、调 KV 的过期策略——Dashboard 还是最稳的。
+
+理由很实际：
+
+- 功能最全，什么都能做
+- 权限和计费显示最准确
+- 新功能上线最快
+- 出了问题能看到最完整的报错信息
+
+缺点也很明显，就是慢。尤其在国内，有时候打开一个页面要转好几圈。
+
+一个小技巧：把 Dashboard 安装成 PWA（浏览器里选「安装到桌面」），用起来会像一个独立 App，从 Dock 里点一下就切过去，体验好一点。但本质上速度还是会受网络和前端加载影响，不会质变。
+
+如果你每天都得反复查 D1 表、翻 R2 文件列表、复制链接，Dashboard 就有点重了。这时候可以考虑加一个轻量桌面工具。
+
+## cf-studio：一个轻量的桌面管理工具
+
+[cf-studio](https://github.com/mubashardev/cf-studio) 是一个用 Tauri 做的桌面 App，专门管远程 D1 和 R2。
+
+它的思路挺聪明：不搞自己的登录系统，直接读你电脑上 Wrangler 的登录信息，然后调 Cloudflare 官方 API。所以你不需要额外登录，只要之前用过 `wrangler login` 就行。
+
+**它能做什么：**
+
+- 列出你账号下所有 D1 数据库
+- 执行 SQL 查询、看表结构和索引
+- 列出 R2 bucket 和里面的文件
+- 上传下载文件、管理 bucket
+
+**它还不能做什么：**
+
+KV 管理还没做，README 里写了在 roadmap 里。所以目前它不是完整的 Cloudflare 管理器。
+
+**适合什么人？** 那种每天都要看好几次数据库的人。比如你在开发一个应用，写完代码就想跑个 SQL 看看数据对不对，用 Dashboard 太慢，用命令行又记不住表名，一个桌面工具点两下就查到了，这就很舒服。
+
+我自己觉得它更适合当成一个「个人工作台」——如果你愿意折腾，可以 fork 下来改改，加点自己常用的功能。
+
+## `cf` CLI：值得关注但现在还太早
+
+Cloudflare 最近发布了一个新的命令行工具叫 `cf`，目标是做成整个平台的统一 CLI（目前 Wrangler 主要管 Workers 那一套）。
+
+我装了 `cf@0.0.5` 试了一下，目前能看到的命令主要是：
+
+```txt
+auth
+context
+completions
+schema
+agent-context
+accounts
+dns
+registrar
+zones
+```
+
+D1、R2、KV 的 schema 信息在内部 metadata 里已经有了，但实际命令还没开放。试着跑 `cf d1 list` 会报错。
+
+所以现在它更像一个预告。Wrangler 该用还是用，等 `cf` CLI 成熟了再切不迟。
+
+## 如果你想搭一套顺手的工作流
+
+总结一下我目前的做法，供参考：
+
+**本地开发的时候：**
+
+用 `wrangler dev` 启动开发服务器，用 Local Explorer 看数据。这组合已经够用了。
+
+**管线上资源：**
+
+日常用 Dashboard，如果嫌慢就装个 PWA。高频操作可以加 cf-studio。
+
+**自动化和部署：**
+
+用 Wrangler + GitHub Actions。如果你在用 AI agent 辅助开发，也可以配上 Cloudflare 的 skill 让 agent 帮你操作。
+
+**如果想做个小工具玩玩：**
+
+不要想着做一个「Cloudflare 管理器」，太大了。找一个具体的痛点切入，比如：
+
+- R2 图床（上传图片、拿 Markdown 链接、绑自定义域名）
+- D1 数据对比工具（本地 vs 远程）
+- KV JSON 搜索和批量编辑
+
+这些小工具反而更有用，因为痛点够具体。
+
+## 如果你对 cf-studio 感兴趣，想 fork 来改
+
+两个我觉得最先该改的东西：
+
+**1. 修复 macOS 下找不到 Node 的问题**
+
+很多 Tauri 应用从 Finder 启动时，不会继承终端里的 PATH 环境变量。你在终端里 `which wrangler` 能找到，但 App 里找不到。这不是 cf-studio 的 bug，是 macOS 桌面应用的通病。
+
+修法是在 Rust 侧显式加载这些路径：
+
+```txt
+~/.nvm/nvm.sh
+~/.nvm/versions/node/*/bin
+~/.npm-global/bin
+/opt/homebrew/bin
+/usr/local/bin
+```
+
+**2. 加中文界面**
+
+先把导航、设置页、启动检查这些高频入口做中英双语就行，细节页面后面慢慢补。
+
+## 相关资料
+
+- [Cloudflare 发布 cf CLI 和 Local Explorer](https://blog.cloudflare.com/cf-cli-local-explorer/)
+- [Cloudflare Local Explorer 官方文档](https://developers.cloudflare.com/workers/development-testing/local-explorer/)
+- [cf-studio GitHub 仓库](https://github.com/mubashardev/cf-studio)

@@ -4,68 +4,37 @@
 
 [中文 README](./README.zh-CN.md)
 
-01mvp-blog-starter is a Cloudflare-native personal publishing system with a Git-managed documentation system.
+A code-first personal blog for Cloudflare. Articles and product documentation live in Git; D1 stores only dynamic user data.
 
-It ships with two content surfaces:
+## Content Model
 
-- `/blog` is powered by the publishing backend for posts, admin writing, comments, RSS, OpenAPI publishing, imports, exports, and backups.
-- `/docs` is powered by Fumadocs and GitHub Markdown/MDX for product docs, developer docs, API guides, and template notes.
+- `content/posts/*.mdx` is the only source for blog articles.
+- `apps/web/content/docs/*.md` is the source for product documentation.
+- The build compiles both collections directly into the TanStack Start application.
+- D1 stores comments, users, sessions, subscriptions, notification records, broadcasts, and analytics.
+- The admin area manages comments and users. It does not contain an article editor.
 
-For the MakerJackie deployment, long-term blog posts are authored in `content/posts/*.mdx`, then synced into the CMS. The CMS/D1 database is the production runtime layer for rendering, comments, RSS, search, exports, backups, and urgent small edits.
-
-## MakerJackie Publishing Flow
-
-Use local MDX as the source of truth for durable posts:
+To publish an article, add or edit an MDX file, commit it, and deploy:
 
 ```sh
-cd /Users/jackiexiao/code/makerjackie/mj-blog
-pnpm publish:mdx content/posts/my-post.mdx --draft
-pnpm publish:mdx content/posts/my-post.mdx --publish
+pnpm --filter @repo/web docs:source
+pnpm lint
+pnpm build:web
+pnpm deploy:web
 ```
 
-The publish script upserts by `slug`: existing CMS posts are updated and missing posts are created. It reads the API token from `.tmp/makerjackie-blog-api-token.txt`, or from `CMS_API_TOKEN` in the environment.
-
-Use the CMS admin for comments, settings, image management, temporary typo fixes, and emergency changes. Lasting article changes should be made in the matching MDX file first, then synced to the CMS to avoid two sources drifting apart. See [Content publishing](./.agents/content-publishing.md) for the detailed agent workflow.
+Keep a published article's `slug` stable because comments reference that slug.
 
 ## Stack
 
 - TanStack Start + TanStack Router
 - React 19 + React Compiler
 - Tailwind CSS + shadcn/ui
-- Fumadocs for Git-managed documentation
+- Fumadocs MDX collections for posts and docs
 - Paraglide.js for English and Chinese UI messages
-- Cloudflare Workers via `@cloudflare/vite-plugin`
-- Cloudflare D1 for posts, comments, settings, users, sessions, and API tokens
-- Cloudflare R2 for assets, imports, exports, and backups
-- Cloudflare KV for cache metadata and short-lived records
-
-## Deploy To Cloudflare
-
-Use the Deploy to Cloudflare button above to create and deploy your own copy from the public GitHub repository.
-
-The button works for Workers applications. This repository is a pnpm monorepo, so the root package script is the deployment entrypoint:
-
-```sh
-pnpm deploy:web
-```
-
-Before the first production deploy, create or choose the target D1 database, R2 bucket, and KV namespace, then replace the placeholders in `apps/web/wrangler.jsonc`. The deploy script fails early while placeholder IDs or placeholder URLs remain.
-
-Required production secrets:
-
-- `BETTER_AUTH_SECRET`: generate with `pnpm auth:secret`
-- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`: optional unless GitHub login is enabled
-- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: optional unless Google login is enabled
-
-## Deployment Policy
-
-Production deployments are run explicitly from a trusted local environment with the Cloudflare tooling. Pushing to GitHub does not deploy the site.
-
-```sh
-pnpm deploy:web
-```
-
-Keep Cloudflare credentials in the local deployment environment. Do not add production deployment tokens to GitHub Actions.
+- Cloudflare Workers
+- Cloudflare D1 for dynamic user data
+- Cloudflare KV for short-lived auth and rate-limit records
 
 ## Local Development
 
@@ -74,9 +43,9 @@ pnpm install
 pnpm dev:web
 ```
 
-The local web app runs on `http://localhost:3000`.
+The app runs at `http://localhost:3000`.
 
-Seed the local D1 database with a fixed admin account:
+Seed a local admin account:
 
 ```sh
 pnpm db:seed:local-admin
@@ -89,70 +58,30 @@ email: a@a.test
 password: 1
 ```
 
-## Build
+## Deployment
 
-```sh
-pnpm build:web
-```
-
-The build compiles Paraglide output, builds TanStack Start, and writes the Cloudflare Worker bundle.
-
-## Production Deploy
+Before the first deploy, configure the D1 database and KV namespace in `apps/web/wrangler.jsonc`, then set `BETTER_AUTH_SECRET`. GitHub and Google OAuth credentials are optional.
 
 ```sh
 pnpm deploy:web
 ```
 
-This checks the required R2 bucket, builds the web app, applies remote D1 migrations, deploys the Worker with the generated Cloudflare config, and runs the Git-managed notes sync when `CMS_PUBLIC_SITE_URL` and `CMS_API_TOKEN` are configured.
+The deploy script builds the code-managed articles, applies remote D1 migrations for dynamic data, and deploys the Worker. Pushing to GitHub alone does not deploy production.
 
 ## Workspace
 
 ```txt
-apps/web                 TanStack Start app, admin UI, public site, docs, API routes
-content/posts            MakerJackie MDX post source files synced into the CMS
-packages/core            content types, demo data, Markdown and i18n helpers
-packages/db              Drizzle schema and D1 migrations
+apps/web                 TanStack Start app, public site, user-data admin, docs, APIs
+content/posts            canonical MDX article source
+packages/core            shared types, static site configuration, and helpers
+packages/db              dynamic-data Drizzle schema and D1 migrations
 packages/ui              shared UI primitives
-skills                   AI initialization and OpenAPI maintenance Skill
-apps/web/content/docs    public Fumadocs source, mirrored at docs/site
-docs/specs               project specifications and release planning records
+skills/01mvp-blog        code-first initialization and maintenance Skill
+apps/web/content/docs    public product documentation source
+docs/specs               architecture and operational specifications
 ```
 
-## Documentation
-
-The public documentation source is `apps/web/content/docs`. It is rendered at `/docs` and `/zh/docs`.
-
-Start with these guides:
-
-- [AI Setup](./apps/web/content/docs/ai-setup.md)
-- [Deployment](./apps/web/content/docs/deployment.md)
-- [Comments](./apps/web/content/docs/comments.md)
-- [Advanced configuration](./apps/web/content/docs/advanced-configuration.md)
-- [API](./apps/web/content/docs/api.md)
-
-The root `docs/specs` folder is for project specifications, deployment records, acceptance notes, and release planning records. It is intentionally separate from the public Fumadocs source.
-
-## Automation
-
-The canonical blog Skill lives at `skills/01mvp-blog/SKILL.md`.
-
-Check that the Skill is discoverable from the GitHub repository:
-
-```sh
-npx skills@latest add 01MVP/blog-starter --list
-```
-
-Install it for Codex in this project:
-
-```sh
-npx skills@latest add 01MVP/blog-starter --skill 01mvp-blog --agent codex --yes
-```
-
-Replace `codex` with another lowercase agent id when installing for a different agent.
-
-Use the `01mvp-blog` Skill for site creation and OpenAPI-based maintenance. Cloudflare provisioning still needs Cloudflare-capable agent skills or tooling. Generated sites expose `/openapi.json`; create scoped API tokens in the admin settings before wiring external automation.
-
-If you do not want to install the Skill, copy the prompt in [AI Setup](./apps/web/content/docs/ai-setup.md) into your AI agent. The Skill is still recommended because setup commands, Cloudflare provisioning, and verification checks can be updated over time.
+For article conventions, see [Content publishing](./.agents/content-publishing.md). Public documentation starts at [AI Setup](./apps/web/content/docs/ai-setup.md).
 
 ## License
 

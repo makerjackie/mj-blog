@@ -1,0 +1,174 @@
+---
+title: "用 AI 搭建你的永久精神家园"
+slug: "2026-06-09-ai-permanent-personal-site"
+excerpt: "我做了一个开源博客模板，想让更多人用 AI 和 Cloudflare 搭一个低成本、可维护、真正属于自己的个人网站。"
+status: "published"
+publishedAt: "2026-06-09T01:00:00.000Z"
+updatedAt: "2026-06-30T12:43:02.621Z"
+authorName: "Jackie"
+featured: false
+pinned: false
+commentsEnabled: true
+coverImage: "https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/01-opening.jpg"
+seoTitle: "用 AI 搭建你的永久精神家园"
+seoDescription: "我做了一个开源博客模板，想让更多人用 AI 和 Cloudflare 搭一个低成本、可维护、真正属于自己的个人网站。"
+tags:
+  - "01MVP"
+  - "AI"
+  - "Cloudflare"
+  - "个人网站"
+  - "独立开发"
+---
+
+哈喽，我是 Jackie。
+
+今天想分享一下我新的开源项目：用 AI 搭建你永久的个人网站。或者换一个更有感情的说法，搭建你的永久精神家园。
+
+这是我很久之前就想做的事情。
+
+因为我越来越觉得，现在互联网茧房实在太严重了。推荐流、热榜和平台规则不断包围内容，个人站点几乎是抵抗推荐算法茧房的最后一套防线。
+
+![个人站点是抵抗推荐算法茧房的最后一套防线](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/01-opening.jpg)
+
+以前你想搭一个博客，或者搭一个自己的个人站点，其实非常麻烦。
+
+你需要有自己的服务器，需要有自己的域名，需要懂一点编程和部署。很多人最后会用 WordPress，但定制化又没有那么舒服，而且你还得不断续费服务器，维护插件，处理一堆跟写作本身没那么相关的事情。
+
+现在我们有了一个新的方案。
+
+## 01. 为什么是个人站点
+
+对创作者来说，个人站点最重要的意义，不是多一个展示页面。
+
+它更像是一个内容母站。
+
+公众号、小红书、知乎、B 站、X，这些平台都很重要。我们当然要去分发，要去适配不同平台的内容格式。但如果所有内容只留在平台里，你会一直被平台的规则牵着走。
+
+有了自己的个人站点之后，你的内容才真正属于你。
+
+![有了个人站点，内容才真正属于你](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/05-content-ownership.jpg)
+
+你不会再被平台控制。你想发什么就发什么，长期来看也更不容易因为平台变化而丢失内容。你可以在这里完全展示真实的自己，放文章、项目、教程、作品集，也可以把它慢慢做成自己的知识库。
+
+我自己现在越来越在意这件事：**内容不要只发布出去，也要沉淀回来。**
+
+## 02. Cloudflare 把建站成本降下来了
+
+这套博客模板的第一个特点，是几乎永久免费。
+
+这要感谢我们的赛博菩萨 Cloudflare。
+
+![新方案是 Cloudflare 原生托管，几乎永久免费](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/02-cloudflare-free.jpg)
+
+网站完全托管在 Cloudflare 上，你自己不需要运维服务器。Cloudflare 还提供了很多基础能力，比如数据库、后端、对象存储等等。对一个个人站点来说，它的免费额度已经非常高了，基本可以认为是长期够用的。
+
+当然，如果你想在国内更稳定地访问，最好还是买一个自己的域名。Cloudflare 会自带一个访问地址，但国内访问未必稳定。有了自己的域名之后，整个体验会完整很多。
+
+第二个变化，是 AI 可以把后面的事情接过去。
+
+完成基础配置之后，AI 可以帮你做开发、部署、后续维护。你不需要自己从零研究每一个技术细节，也不需要长期守着服务器。
+
+![基础配置之后，AI 接手开发、部署和运维](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/03-ai-automation.jpg)
+
+第三个变化，是你可以真正个性化你的网站。
+
+以前用模板，经常会变成“我换了个颜色，但还是那套模板”。现在你可以从简单的颜色切换，到完全改造成符合你个人风格的站点。你不需要依赖固定模板，AI 可以按你的想法继续生成和改造。
+
+![你不需要依赖固定模板，可以切换不同个人风格](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/04-site-customization.jpg)
+
+![基础博客页面和评论区](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/06-blog-page.jpg)
+
+## 03. 它不是一个简单的静态页面
+
+我不想做一个只能展示文章的静态页面。
+
+这个项目更像是一套 Cloudflare 原生的个人内容系统，它有可视化写作后台、图床、评论系统、AI 自由改造等功能。
+
+你可以在后台修改文章，添加封面图。编辑器支持 Markdown 语法，也可以直接粘贴图片，图片会上传到 R2 存储桶，再插入到正文里。
+
+![后台编辑器支持 Markdown 和图片上传](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/07-editor.jpg)
+
+文章页本身也不是空壳。它有目录，有评论，有 RSS 订阅，也可以让读者选择是否订阅你的博客更新。
+
+后台里可以看到阅读量、访问量、评论信息。你还可以把对象存储当成一个简单网盘，用来做图床，或者把一些想分享给别人的文件上传上去，然后把链接发给对方。
+
+这里需要注意一下，对象存储功能使用时需要绑定自己的信用卡。当然它本身还是免费的，只是 Cloudflare 有这么一个限制。
+
+评论系统也做了基础的防护。
+
+你可以设置屏蔽关键词，也可以配置 AI 审核规则。比如垃圾广告、钓鱼、辱骂、色情、明显 SEO 外链这些，都可以先拦下来。普通用户需要登录，才能在你的文章下面评论。
+
+![评论后台支持关键词屏蔽和 AI 审核规则](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/08-comments-ai-review.jpg)
+
+除此之外，还有站点设置、用户管理、邮箱订阅、AI provider、GitHub 登录、Google 登录、Cloudflare Turnstile 人机验证、数据导出、API Token 等等。
+
+邮件功能不是完全免费的。Cloudflare 需要一个 5 美元的订阅账号，才能开启对应的邮件能力。AI provider 则可以用来做评论审核、文章标题和图片等内容自动化操作。
+
+![站点设置里可以配置主题、订阅和邮件功能](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/09-site-settings.jpg)
+
+我希望这个模板刚开始就能覆盖个人站点最常用的一些需求。不是把每个功能都做得很复杂，而是让你一开始就有一个能用、能写、能改、能持续迭代的基础。
+
+## 04. 怎么搭建自己的站点
+
+你有两个搭建方式。
+
+第一种，是安装我做的 blog skills，让 AI 按流程帮你配置。
+
+第二种，是直接复制站点里的文档，把搭建说明交给 AI，让 AI 自动化处理后面的步骤。
+
+准备工作其实不多：
+
+- 一个 Cloudflare 账号。
+- 一个 AI 编程工具，比如 Codex。
+- 一个 GitHub 账号，用来保存你的博客代码。
+- 一个自定义域名，推荐准备，但不是绝对必须。
+
+如果你用的是 Codex，可以在插件里搜索 Cloudflare，安装并授权。授权之后，AI 就可以帮你创建 Cloudflare 资源、部署 Worker、绑定域名、跑通后台。
+
+![在 Codex 里安装 Cloudflare 插件并授权](https://assets.01mvp.com/images/makerjackie/2026-06-09-ai-permanent-personal-site/10-cloudflare-plugin.jpg)
+
+如果你用的不是 Codex，也可以到 GitHub 上搜索 Cloudflare skill，根据项目说明安装对应内容。
+
+整个思路很简单：人负责想清楚自己要什么，AI 负责把重复、琐碎、容易出错的配置步骤做掉。
+
+这也是我现在做 01MVP 时越来越常用的方式。不是先把所有技术栈学到很深，而是先让一个东西跑起来，然后边用边改。
+
+## 05. 一次写作，多平台分发
+
+最后一个也是我最想说的。
+
+有了个人站点之后，你可以一次写作，多平台分发。
+
+比如你先在博客里写完整文章，再通过插件或者 skill，把它适配成公众号、小红书、知乎、X 等平台需要的格式。
+
+这件事对内容创作者很重要。
+
+因为网站是你的主仓库，其他平台是你的分发渠道。主仓库越稳，你越不容易被平台节奏带着跑。
+
+你可以在个人站点里保留完整版本，在公众号发适合深度阅读的版本，在小红书发图文长截图，在 X 上发短观点，在 B 站发视频。不同平台可以有不同表达，但最完整的内容始终回到你自己手里。
+
+对我来说，这就是“永久精神家园”的意义。
+
+不是说一个网站真的永远不会变，而是你终于有了一个自己能掌控、能迁移、能持续维护的地方。它不会只因为某个平台的推荐规则改变，就突然失去价值。
+
+## 06. 开源和下一步
+
+这个项目已经开源在 GitHub 上，使用 MIT License，也欢迎你来贡献代码。
+
+项目现在可能还会有一些 bug，我后面还会持续维护。我也基于这套博客模板，创建了自己的博客。这里面有我的个人介绍、写过的文章，还有我用 AI 开发过的一些项目。
+
+感兴趣的话，可以从这几个入口开始看：
+
+- Demo：[blog.01mvp.com](https://blog.01mvp.com)
+- GitHub：[01mvp/blog-starter](https://github.com/01mvp/blog-starter)
+- 我的博客：[makerjackie.com](https://makerjackie.com)
+
+如果这个项目对你有帮助，也欢迎你去 GitHub 点个 Star，或者直接拿它搭一个自己的站点。
+
+我现在越来越相信一件事：
+
+**创作者需要自己的房子。**
+
+平台是广场，适合传播；个人站点是家，适合沉淀。
+
+先把家搭起来，后面再慢慢装修。

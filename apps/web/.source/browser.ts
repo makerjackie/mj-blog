@@ -15,5 +15,12 @@ const browserCollections = {
     },
     "eager": false
   })),
+  posts: create.doc("posts", import.meta.glob(["./**/*.mdx"], {
+    "base": "./../../../content/posts",
+    "query": {
+      "collection": "posts"
+    },
+    "eager": false
+  })),
 };
 export default browserCollections;

@@ -22,3 +22,11 @@ export const docs = await create.docs("docs", "content/docs", import.meta.glob([
   },
   "eager": true
 }));
+
+export const posts = await create.doc("posts", "../../content/posts", import.meta.glob(["./**/*.mdx"], {
+  "base": "./../../../content/posts",
+  "query": {
+    "collection": "posts"
+  },
+  "eager": true
+}));

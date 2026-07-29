@@ -1,46 +1,46 @@
 # Content Publishing
 
-Use this guide when creating, editing, importing, or publishing MakerJackie blog content.
+Use this guide when creating, editing, or publishing MakerJackie articles.
 
 ## Source Of Truth
 
-- Durable long-form posts live in `content/posts/*.mdx`.
-- The CMS/D1 database is the production runtime layer for rendering, comments, RSS, search, exports, backups, and emergency edits.
-- Do not treat the CMS editor as the durable source for article content. If a formal article needs a lasting edit, update the matching MDX file first, then sync it to the CMS.
-- CMS admin edits are acceptable for small typo fixes, image management, comments, site settings, user/admin work, and urgent hotfixes. Backfill meaningful CMS-only content changes to `content/posts/*.mdx` afterwards.
+- `content/posts/*.mdx` is the only article source.
+- The build compiles that collection directly for public article pages, lists, tags, series, feeds, sitemap, and read-only article metadata.
+- Do not add article tables, article write APIs, an article editor, a database sync step, or a second article source.
+- D1 is only for dynamic user data: comments, Better Auth identities and sessions, email preferences/subscriptions, notification delivery logs, broadcasts, and analytics.
+- Site-wide editorial settings are code in `packages/core/src/demo-data.ts`.
 
 ## Publishing Flow
 
-Run from the repository root:
+1. Create or edit a file in `content/posts/`.
+2. Keep its `slug` stable after publication so D1 comments remain attached.
+3. Run focused validation:
 
 ```sh
-cd /Users/jackiexiao/code/makerjackie/mj-blog
-pnpm publish:mdx content/posts/my-post.mdx --draft
-pnpm publish:mdx content/posts/my-post.mdx --publish
+pnpm --filter @repo/web docs:source
+pnpm lint
+pnpm build:web
 ```
 
-- The script upserts by `slug`: existing CMS posts are updated, missing CMS posts are created.
-- The local API token is expected at `.tmp/makerjackie-blog-api-token.txt`, or pass `CMS_API_TOKEN` in the environment.
-- Keep `.tmp` untracked; never commit API tokens, OAuth secrets, Cloudflare tokens, or generated credential material.
+4. Commit and deploy the code. A production deployment is the publishing action; no CMS sync is involved.
 
-## Locale Rule
+## Article Contract
 
-- The default `pnpm publish:mdx` path writes `--lang=en`, which means the CMS primary post fields used by `/blog/:slug`.
-- This is still the correct default for Chinese MakerJackie posts because the public route reads primary fields.
-- Use `--lang=zh` only when intentionally updating the Chinese i18n translation slot, not for normal Chinese-language publishing.
+Every post must provide frontmatter accepted by `apps/web/source.config.ts`, including:
 
-## MDX Compatibility
+- `title`, `slug`, `excerpt`, `status`, and `publishedAt`
+- optional `updatedAt`, `tags`, `series`, `coverImage`, SEO metadata, and display flags
+- `commentsEnabled`, which defaults to `true`
 
-- The blog CMS stores Markdown/MDX-like content, but it is not a full React MDX runtime.
-- Safe Markdown and supported raw image tags are fine.
-- Complex React components, interactive docs, or reusable tutorial assets belong in the 01MVP docs/Fumadocs side, not inside MakerJackie blog posts.
+Use one file per reader-facing language version. Link translations explicitly when useful.
+
+## Compatibility
+
+- Posts are real MDX and may use supported MDX components.
+- Prefer durable Markdown for ordinary article content.
+- Images should be repository-owned files or stable external URLs with verified usage rights.
+- Do not restore R2 upload/import/export machinery solely for article media; add a repository-native asset path when the need is concrete.
 
 ## Drift Checks
 
-For sync audits:
-
-- Compare `content/posts/*.mdx` frontmatter slugs with production posts from `https://makerjackie.com/api/posts?status=all&lang=en` using the local CMS API token.
-- Flag local MDX posts missing from CMS.
-- Flag CMS posts without a matching MDX source file when they are durable MakerJackie articles.
-- Flag CMS posts whose `contentMarkdown`, title, status, tags, or publish date diverge from the MDX frontmatter/body.
-- Report drift first. Do not auto-publish, overwrite CMS content, or delete CMS posts unless the user explicitly asks for that action.
+The repository is authoritative. Check for duplicate slugs, invalid frontmatter, broken compilation, and D1 comments whose `post_slug` no longer exists in the content collection. Do not compare against or restore the retired D1 article tables.

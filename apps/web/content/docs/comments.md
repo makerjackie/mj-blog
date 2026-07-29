@@ -52,6 +52,7 @@ You can update the keyword list anytime in your admin panel — no developer hel
 All comment management happens in your **admin dashboard**:
 
 - Go to the **Comments page** (`/admin/comments`) to: approve, mark as spam, or delete comments
-- Go to the **Settings page** (`/admin/settings`) to: toggle comments on/off, switch moderation mode, manage blocked keywords
+- Change moderation defaults in `packages/core/src/demo-data.ts`, then deploy the code
+- Open `/admin/comments` to review, approve, mark spam, or delete comments
 
 > Everything is done through the web-based admin panel — no coding or redeployment required.

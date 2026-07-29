@@ -12,30 +12,13 @@ test.describe("Comments", () => {
     test.setTimeout(120_000);
 
     const runId = `${Date.now()}-${test.info().parallelIndex}`;
-    const postTitle = `E2E comment flow ${runId}`;
-    const postSlug = `e2e-comment-flow-${runId}`;
+    const postTitle = "10 Minutes to Codex";
+    const postSlug = "2026-05-25-10-minutes-to-codex-en";
     const readerName = `E2E Reader ${runId}`;
     const readerEmail = `reader-${runId}@example.test`;
     const commentBody = `E2E visible comment ${runId}`;
     const clientIp = `2001:db8::${runId.replaceAll("-", "")}`;
 
-    await logInAsLocalAdmin(page);
-    await ensureCommentSettings(page);
-
-    const createPostResponse = await page.context().request.post("/api/posts", {
-      data: {
-        title: postTitle,
-        slug: postSlug,
-        excerpt: "Post used by the Playwright comment flow.",
-        contentMarkdown: `# ${postTitle}\n\nThis post is created by the comment e2e flow.`,
-        status: "published",
-        commentsEnabled: true,
-      },
-      headers: sameOriginHeaders(),
-    });
-    expect(createPostResponse.status()).toBe(201);
-
-    await page.context().clearCookies();
     await page.route("**/api/comments", async (route) => {
       await route.continue({
         headers: {
@@ -116,18 +99,5 @@ async function logInAsLocalAdmin(page: Page) {
   await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
   await page.getByRole("button", { name: /Open admin/ }).click();
   await expect(page).toHaveURL(/\/admin\/?$/);
-  await expect(page.getByRole("heading", { name: "Publishing overview" })).toBeVisible();
-}
-
-async function ensureCommentSettings(page: Page) {
-  const response = await page.context().request.put("/api/site", {
-    data: {
-      commentsEnabled: true,
-      commentsRequireApproval: true,
-      emailVerificationEnabled: false,
-    },
-    headers: sameOriginHeaders(),
-  });
-
-  expect(response.status()).toBe(200);
+  await expect(page.getByRole("heading", { name: "Admin overview" })).toBeVisible();
 }

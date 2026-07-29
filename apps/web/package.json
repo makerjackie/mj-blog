@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "deploy": "node ../../scripts/check-r2-buckets.mjs && vp build && wrangler deploy --config dist/server/wrangler.json",
+    "deploy": "vp build && wrangler deploy --config dist/server/wrangler.json",
     "preview": "vp preview",
     "cf-typegen": "wrangler types",
     "docs:source": "fumadocs-mdx source.config.ts .source",
@@ -13,7 +13,6 @@
   "dependencies": {
     "@fontsource-variable/inter": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
-    "@mdxeditor/editor": "catalog:",
     "@repo/auth": "workspace:*",
     "@repo/core": "workspace:*",
     "@repo/db": "workspace:*",

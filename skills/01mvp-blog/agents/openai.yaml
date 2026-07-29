@@ -1,0 +1,4 @@
+interface:
+  display_name: "01MVP Blog"
+  short_description: "Build and maintain a code-first Cloudflare blog"
+  default_prompt: "Use $01mvp-blog to create or maintain my code-first MDX blog on Cloudflare."

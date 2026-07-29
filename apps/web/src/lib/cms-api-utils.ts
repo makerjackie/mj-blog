@@ -2,17 +2,6 @@ import { resolveLocale, siteSettings, type SupportedLocale } from "@repo/core";
 
 import { getSetCookieValues } from "#/lib/auth-helpers";
 
-export const apiTokenScopes = [
-  "posts:read",
-  "posts:write",
-  "posts:publish",
-  "assets:write",
-  "comments:moderate",
-  "site:read",
-  "site:write",
-  "export:read",
-] as const;
-
 export function jsonResponse(body: unknown, init?: ResponseInit) {
   const headers = new Headers({ "cache-control": "no-store" });
 
@@ -68,18 +57,6 @@ export async function readJsonBody<TBody extends object>(
   }
 
   return isPlainJsonObject(parsed) ? (parsed as Partial<TBody>) : ({} as Partial<TBody>);
-}
-
-export function importPreview(kind: "markdown" | "html" | "zip", filename: string | undefined) {
-  const now = new Date().toISOString();
-  return {
-    id: `import_${crypto.randomUUID()}`,
-    kind,
-    filename: filename ?? null,
-    status: "accepted",
-    createdAt: now,
-    createdPostStatus: "draft",
-  };
 }
 
 function resolveAcceptLanguageLocale(header: string): SupportedLocale | null {

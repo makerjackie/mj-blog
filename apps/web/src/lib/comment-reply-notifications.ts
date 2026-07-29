@@ -6,9 +6,10 @@ import * as cmsSchema from "@repo/db/schema/cms";
 import { env } from "cloudflare:workers";
 import { and, eq } from "drizzle-orm";
 
-import { getD1SiteSettings } from "./cms-d1-assets";
 import { getCmsDb } from "./cms-db";
 import { getEmailDeliveryStatus, sendCmsEmail } from "./cms-email";
+import { getContentPostBySlug } from "./content-posts";
+import { getSiteSettings } from "./site-config";
 
 type CommentReplyRecipient = {
   id: string;
@@ -39,9 +40,9 @@ export async function notifyCommentReplyCreated(reply: Comment) {
     return { skipped: true, reason: "self_reply" as const };
   }
 
-  const [settings, delivery, post, recipient] = await Promise.all([
-    getD1SiteSettings(),
-    Promise.resolve(getEmailDeliveryStatus()),
+  const settings = getSiteSettings();
+  const delivery = getEmailDeliveryStatus();
+  const [post, recipient] = await Promise.all([
     getPostForComment(reply),
     getReplyRecipient(parent.authorUserId),
   ]);
@@ -138,7 +139,7 @@ async function getParentComment(reply: Comment) {
       .where(
         and(
           eq(cmsSchema.comments.id, reply.parentId),
-          eq(cmsSchema.comments.postId, reply.postId),
+          eq(cmsSchema.comments.postSlug, reply.postSlug),
           eq(cmsSchema.comments.status, "approved"),
         ),
       )
@@ -147,16 +148,7 @@ async function getParentComment(reply: Comment) {
 }
 
 async function getPostForComment(reply: Comment) {
-  return (
-    await getCmsDb()
-      .select({
-        slug: cmsSchema.posts.slug,
-        title: cmsSchema.posts.title,
-      })
-      .from(cmsSchema.posts)
-      .where(eq(cmsSchema.posts.id, reply.postId))
-      .limit(1)
-  )[0];
+  return getContentPostBySlug(reply.postSlug);
 }
 
 async function getReplyRecipient(userId: string): Promise<CommentReplyRecipient | undefined> {

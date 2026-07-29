@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getD1SiteSettings } from "#/lib/cms-d1";
+import { getSiteSettings } from "#/lib/site-config";
 
 export const Route = createFileRoute("/robots.txt")({
   server: {
     handlers: {
       GET: async () => {
-        const siteSettings = await getD1SiteSettings();
+        const siteSettings = getSiteSettings();
         const body = siteSettings.indexingEnabled
           ? `User-agent: *
 Allow: /

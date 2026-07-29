@@ -4,11 +4,12 @@ import { createAuthDb } from "@repo/db";
 import { user as authUserTable } from "@repo/db/schema";
 import * as cmsSchema from "@repo/db/schema/cms";
 import { env } from "cloudflare:workers";
-import { and, desc, eq, gt, lte, or } from "drizzle-orm";
+import { and, desc, eq, or } from "drizzle-orm";
 
-import { getD1SiteSettings } from "./cms-d1-assets";
 import { getCmsDb } from "./cms-db";
 import { getEmailDeliveryStatus, sendCmsEmail } from "./cms-email";
+import { listContentPosts } from "./content-posts";
+import { getSiteSettings } from "./site-config";
 
 const weeklyBlogUpdateWindowDays = 7;
 const emailSendConcurrency = 5;
@@ -28,10 +29,8 @@ type BroadcastInput = {
 const authDb = createAuthDb(env.CMS_DB as Parameters<typeof createAuthDb>[0]);
 
 export async function sendDueWeeklyBlogUpdates() {
-  const [settings, delivery] = await Promise.all([
-    getD1SiteSettings(),
-    Promise.resolve(getEmailDeliveryStatus()),
-  ]);
+  const settings = getSiteSettings();
+  const delivery = getEmailDeliveryStatus();
 
   if (!settings.emailNotificationsEnabled) {
     return { skipped: true, reason: "disabled" as const };
@@ -140,10 +139,8 @@ export async function sendBroadcastPreview(input: {
   message: string;
   subject: string;
 }) {
-  const [settings, delivery] = await Promise.all([
-    getD1SiteSettings(),
-    Promise.resolve(getEmailDeliveryStatus()),
-  ]);
+  const settings = getSiteSettings();
+  const delivery = getEmailDeliveryStatus();
 
   if (!settings.manualEmailBroadcastsEnabled || !delivery.configured) {
     return { sent: false, reason: "disabled" as const };
@@ -162,10 +159,8 @@ export async function sendBroadcastPreview(input: {
 }
 
 export async function sendManualBroadcast(input: BroadcastInput) {
-  const [settings, delivery] = await Promise.all([
-    getD1SiteSettings(),
-    Promise.resolve(getEmailDeliveryStatus()),
-  ]);
+  const settings = getSiteSettings();
+  const delivery = getEmailDeliveryStatus();
 
   if (!settings.manualEmailBroadcastsEnabled) {
     return { error: "Manual broadcasts are disabled" } as const;
@@ -367,27 +362,18 @@ async function getLatestWeeklyBlogUpdateRun() {
 }
 
 async function listPostsForWeeklyBlogUpdate(periodStart: string, periodEnd: string) {
-  const rows = await getCmsDb()
-    .select()
-    .from(cmsSchema.posts)
-    .where(
-      and(
-        gt(cmsSchema.posts.publishedAt, periodStart),
-        lte(cmsSchema.posts.publishedAt, periodEnd),
-        or(eq(cmsSchema.posts.status, "published"), eq(cmsSchema.posts.status, "scheduled")),
-      ),
-    )
-    .orderBy(desc(cmsSchema.posts.publishedAt));
-  const settings = await getD1SiteSettings();
+  const settings = getSiteSettings();
 
-  return rows.map((post) => ({
-    id: post.id,
-    title: post.title,
-    slug: post.slug,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt ?? post.createdAt,
-    url: `${settings.url.replace(/\/$/, "")}/blog/${post.slug}`,
-  }));
+  return listContentPosts()
+    .filter((post) => post.publishedAt > periodStart && post.publishedAt <= periodEnd)
+    .map((post) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      publishedAt: post.publishedAt,
+      url: `${settings.url.replace(/\/$/, "")}/blog/${post.slug}`,
+    }));
 }
 
 function buildWeeklyBlogUpdateEmail(input: {

@@ -145,10 +145,6 @@ function rejectCrossOriginWrite(request: Request) {
     return null;
   }
 
-  if (hasApiTokenAuth(request)) {
-    return null;
-  }
-
   const origin = request.headers.get("origin");
 
   try {
@@ -164,12 +160,6 @@ function rejectCrossOriginWrite(request: Request) {
   }
 
   return Response.json({ error: "Cross-origin write requests are not allowed" }, { status: 403 });
-}
-
-function hasApiTokenAuth(request: Request) {
-  const authorization = request.headers.get("authorization") ?? "";
-
-  return /^Bearer\s+.+/i.test(authorization) || Boolean(request.headers.get("x-api-token")?.trim());
 }
 
 function isTrustedFetchSite(value: string | null) {

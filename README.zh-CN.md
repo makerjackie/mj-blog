@@ -4,68 +4,37 @@
 
 [English README](./README.md)
 
-01mvp-blog-starter 是一个基于 Cloudflare 的个人发布系统，并内置 Git 管理的文档系统。
+这是一个部署在 Cloudflare 上的代码优先个人博客：文章和产品文档都保存在 Git，D1 只存动态用户数据。
 
-默认提供两套内容系统：
+## 内容模型
 
-- `/blog` 由发布后台驱动，适合公开文章、后台写作、评论、RSS、OpenAPI 发布、导入、导出和备份。
-- `/docs` 由 Fumadocs 与 GitHub Markdown/MDX 驱动，适合产品文档、开发者文档、API 指南和模板说明。
+- `content/posts/*.mdx` 是博客文章的唯一源头。
+- `apps/web/content/docs/*.md` 是产品文档源头。
+- 构建时，两套内容都会直接编译进 TanStack Start 应用。
+- D1 只存评论、用户、会话、订阅偏好、通知记录、广播记录和分析事件。
+- 管理后台只管理评论和用户，不提供文章编辑器。
 
-MakerJackie 当前部署中，长期博客文章以 `content/posts/*.mdx` 为源文件，再同步到 CMS。CMS/D1 是线上运行层，负责渲染、评论、RSS、搜索、导出、备份和紧急小修。
-
-## MakerJackie 发布流程
-
-正式文章以本地 MDX 为长期源文件：
+发布文章就是修改 MDX、提交代码并部署：
 
 ```sh
-cd /Users/jackiexiao/code/makerjackie/mj-blog
-pnpm publish:mdx content/posts/my-post.mdx --draft
-pnpm publish:mdx content/posts/my-post.mdx --publish
+pnpm --filter @repo/web docs:source
+pnpm lint
+pnpm build:web
+pnpm deploy:web
 ```
 
-发布脚本会按 `slug` upsert：CMS 中已有文章会被更新，没有则创建。API Token 默认从 `.tmp/makerjackie-blog-api-token.txt` 读取，也可以通过环境变量 `CMS_API_TOKEN` 传入。
-
-CMS 后台主要用于评论、站点设置、图片管理、临时错别字修复和紧急修改。正式内容变更应先回到对应 MDX 文件修改，再同步到 CMS，避免 MDX 和 CMS 双向漂移。详细 agent 工作流见 [Content publishing](./.agents/content-publishing.md)。
+文章发布后应保持 `slug` 稳定，因为评论通过它关联文章。
 
 ## 技术栈
 
 - TanStack Start + TanStack Router
 - React 19 + React Compiler
 - Tailwind CSS + shadcn/ui
-- Fumadocs 管理 Git 文档
-- Paraglide.js 编译英文和中文 UI 文案
-- Cloudflare Workers，通过 `@cloudflare/vite-plugin` 集成
-- Cloudflare D1 存储文章、评论、设置、用户、会话和 API Token
-- Cloudflare R2 存储媒体、导入包、导出包和备份
-- Cloudflare KV 存储缓存元数据和短期记录
-
-## 一键部署到 Cloudflare
-
-点击上方 Deploy to Cloudflare 按钮，可以从公开 GitHub 仓库创建并部署自己的副本。
-
-这个按钮面向 Workers 应用。当前仓库是 pnpm monorepo，所以根目录脚本是部署入口：
-
-```sh
-pnpm deploy:web
-```
-
-第一次生产部署前，先创建或选择目标 D1 数据库、R2 存储桶和 KV namespace，然后替换 `apps/web/wrangler.jsonc` 里的 placeholder。只要 placeholder ID 或 placeholder URL 还在，部署脚本会提前失败。
-
-生产环境必需的 secret：
-
-- `BETTER_AUTH_SECRET`：用 `pnpm auth:secret` 生成
-- `GITHUB_CLIENT_ID` 和 `GITHUB_CLIENT_SECRET`：只有启用 GitHub 登录时才需要
-- `GOOGLE_CLIENT_ID` 和 `GOOGLE_CLIENT_SECRET`：只有启用 Google 登录时才需要
-
-## 部署约定
-
-生产环境统一从可信的本地环境，通过 Cloudflare 工具显式部署。代码 push 到 GitHub 后不会自动发布站点。
-
-```sh
-pnpm deploy:web
-```
-
-Cloudflare 凭据只保存在本地部署环境，不要把生产部署 Token 添加到 GitHub Actions。
+- Fumadocs MDX 文章与文档集合
+- Paraglide.js 中英文 UI 文案
+- Cloudflare Workers
+- Cloudflare D1 动态用户数据
+- Cloudflare KV 短期认证和限流记录
 
 ## 本地开发
 
@@ -74,9 +43,9 @@ pnpm install
 pnpm dev:web
 ```
 
-本地 Web 应用默认运行在 `http://localhost:3000`。
+应用默认运行在 `http://localhost:3000`。
 
-写入本地 D1 管理员账号：
+写入本地管理员账号：
 
 ```sh
 pnpm db:seed:local-admin
@@ -89,70 +58,30 @@ email: a@a.test
 password: 1
 ```
 
-## 构建
+## 部署
 
-```sh
-pnpm build:web
-```
-
-构建会编译 Paraglide 输出、构建 TanStack Start，并生成 Cloudflare Worker bundle。
-
-## 生产部署
+第一次部署前，在 `apps/web/wrangler.jsonc` 配好 D1 与 KV，并设置 `BETTER_AUTH_SECRET`。GitHub 和 Google OAuth 是可选项。
 
 ```sh
 pnpm deploy:web
 ```
 
-这个命令会检查必需的 R2 存储桶、构建 Web 应用、应用远程 D1 migrations，用生成的 Cloudflare 配置部署 Worker，并在配置 `CMS_PUBLIC_SITE_URL` 和 `CMS_API_TOKEN` 后同步 Git 管理的笔记。
+部署脚本会构建代码中的文章、应用动态数据的 D1 migration，并部署 Worker。只 push GitHub 不会自动发布生产环境。
 
 ## 工作区
 
 ```txt
-apps/web                 TanStack Start 应用、管理后台、公开站点、文档和 API 路由
-content/posts            MakerJackie MDX 文章源文件，同步到 CMS 运行层
-packages/core            内容类型、演示数据、Markdown 与 i18n helper
-packages/db              Drizzle schema 与 D1 migrations
+apps/web                 TanStack Start 应用、公开站点、用户数据后台、文档和 API
+content/posts            唯一的 MDX 文章源
+packages/core            共享类型、静态站点配置和 helper
+packages/db              动态数据 Drizzle schema 与 D1 migrations
 packages/ui              共享 UI primitives
-skills                   自动化初始化与 OpenAPI 维护 Skill
-apps/web/content/docs    公开 Fumadocs 文档源，docs/site 指向这里
-docs/specs               项目规格、部署记录和发布规划记录
+skills/01mvp-blog        代码优先的初始化与维护 Skill
+apps/web/content/docs    公开产品文档源
+docs/specs               架构与运维规格
 ```
 
-## 文档
-
-公开文档源文件放在 `apps/web/content/docs`。它会渲染到 `/docs` 和 `/zh/docs`。
-
-配置新站点时优先看这些文档：
-
-- [AI 初始化建站](./apps/web/content/docs/ai-setup.zh.md)
-- [部署](./apps/web/content/docs/deployment.zh.md)
-- [评论](./apps/web/content/docs/comments.zh.md)
-- [进阶配置](./apps/web/content/docs/advanced-configuration.zh.md)
-- [API](./apps/web/content/docs/api.zh.md)
-
-根目录下的 `docs/specs` 用于项目规格、部署记录、验收记录和发布规划记录，不作为公开 Fumadocs 内容整包发布。
-
-## 自动化
-
-博客 Skill 的源文件在 `skills/01mvp-blog/SKILL.md`。
-
-检查 GitHub 仓库里的 Skill 是否可被发现：
-
-```sh
-npx skills@latest add 01MVP/blog-starter --list
-```
-
-把它安装到本项目的 Codex 环境：
-
-```sh
-npx skills@latest add 01MVP/blog-starter --skill 01mvp-blog --agent codex --yes
-```
-
-安装到其他 agent 时，把 `codex` 换成对应的小写 agent id。
-
-创建站点和维护已有博客时使用 `01mvp-blog` Skill。Cloudflare 资源创建和部署仍然需要具备 Cloudflare 能力的 agent skill 或工具。生成后的站点会暴露 `/openapi.json`，接入外部自动化前先在后台设置页创建受限 API Token。
-
-如果不想安装 Skill，也可以复制 [AI 初始化建站](./apps/web/content/docs/ai-setup.zh.md) 里的 Prompt 给 AI。推荐优先使用 Skill，因为后续初始化命令、Cloudflare 资源创建和验收清单可以随 Skill 更新。
+文章规范见 [Content publishing](./.agents/content-publishing.md)，公开文档从 [AI 初始化](./apps/web/content/docs/ai-setup.zh.md) 开始。
 
 ## License
 

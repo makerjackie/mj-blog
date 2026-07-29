@@ -1,0 +1,107 @@
+---
+title: "80 元 20 个 Plus？手把手教你搭建超低价 GPT 账号池"
+slug: "2026-05-06-cheap-gpt-plus-pool-guide"
+excerpt: "最近发现了一个超低价获取 ChatGPT Plus 的方案：4 块钱一个号。本文分享如何通过账号池管理软件，实现极低成本使用 gpt5.5。"
+status: "published"
+publishedAt: "2026-05-06T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:36.608Z"
+authorName: "Jackie"
+featured: false
+pinned: false
+commentsEnabled: true
+coverImage: "/images/cockpit.jpeg"
+seoTitle: "80 元 20 个 Plus？手把手教你搭建超低价 GPT 账号池"
+seoDescription: "最近发现了一个超低价获取 ChatGPT Plus 的方案：4 块钱一个号。本文分享如何通过账号池管理软件，实现极低成本使用 gpt5.5。"
+tags:
+  - "01MVP"
+  - "AI"
+  - "GPT"
+  - "教程"
+---
+
+> 2026-05-07 补充： 注意⚠️⚠️⚠️！！！ 不建议散户入手，因为这些号都很快，容易被封的，可能一两天就没了
+> 2026-05-07 补充： 注意⚠️⚠️⚠️！！！ 不建议散户入手，因为这些号都很快，容易被封的，可能一两天就没了
+
+最近看到一个非常离谱的价格：**4 块钱就能买到一个 ChatGPT Plus 账号。**
+
+你可以花 80 块钱买 20 个 Plus 账号，建立一个属于自己的“账号池”，以此来代替昂贵的 Pro 会员。
+
+今天就分享一下这套“超低价账号池”的玩法和具体操作流程。
+
+视频教程： https://youtu.be/6JPdkymNeJo
+
+## 01. 核心逻辑
+
+这套玩法的核心在于利用一些 API 中转站提供的廉价账号，配合专门的账号切换管理软件（Cockpit），实现多个账号之间的无缝切换。
+
+当一个账号的额度用完时，直接一键切换到下一个，从而实现“无限续杯”的效果。
+
+## 02. 准备工作
+
+在开始之前，你需要准备好以下工具和链接：
+
+- **卡密购买小店**：[点击购买](https://pay.ldxp.cn/shop/3S5GUAQ4)（80 元 20 个）
+- **凭证管理后台**：[gpt.kedaya.xyz](https://gpt.kedaya.xyz/)（用于导入和登录账号）
+- **格式转换工具**：[codex.kedaya.xyz](https://codex.kedaya.xyz/)（提取 Token 并转换格式）
+- **管理软件**：**Cockpit Tools**（账号池切换神器）
+
+## 03. 实操步骤
+
+### 第一步：购买并导入账号
+
+1. 进入[购买小店](https://pay.ldxp.cn/shop/3S5GUAQ4)购买你需要的账号数量。
+2. 登录[凭证管理后台](https://gpt.kedaya.xyz/)，点击“导入账号”。
+3. 将购买到的邮箱和密码复制进去，点击导入。
+4. 在列表中勾选账号，选择“登录选中”。登录成功后，你会看到账号状态变为“成功”。
+
+### 第二步：提取 Token 并转换格式
+
+1. 在后台选择“导出选中”，下载账号信息。
+2. 解压下载的文件，用文本编辑器打开。
+3. 进入[格式转换工具](https://codex.kedaya.xyz/)，将刚才提取的内容粘贴进去，点击转换，获取符合 Cockpit 格式的 Token。
+
+### 第三步：安装 Cockpit Tools
+
+这是最关键的一步，你需要一个好用的切换软件。
+
+**安装方式 A：使用 Homebrew (推荐)**
+
+```bash
+brew tap jlcodes99/cockpit-tools https://github.com/jlcodes99/cockpit-tools
+brew install --cask cockpit-tools
+```
+
+**安装方式 B：手动下载**
+
+去 [GitHub Release](https://github.com/jlcodes99/cockpit-tools/releases) 下载对应的安装包（Mac 用户选择 `.dmg` 或 `.app`）。
+
+**重要：绕过 macOS 安全限制**
+
+安装完成后，如果无法打开，请在终端运行以下指令：
+
+```bash
+sudo xattr -rd com.apple.quarantine "/Applications/Cockpit Tools.app"
+```
+
+### 第四步：导入账号池
+
+![Cockpit Tools 界面预览](/images/cockpit.jpeg)
+
+1. 打开 Cockpit Tools，点击左侧的 **+** 号。
+2. 选择 **TOKEN** 导入方式。
+3. 粘贴刚才转换好的 Token，点击导入。
+4. 导入成功后，你就可以在列表中看到所有的 Plus 账号了。
+
+需要使用时，点击对应的账号“切换”，软件会自动重启浏览器或对应插件，你就可以直接使用该账号的 Plus 权限了。
+
+## 04. 风险提示（非常重要）
+
+虽然这套方案极其便宜，但也存在以下风险，请务必知晓：
+
+1. **封号风险**：这些账号通常是共享或批量生成的，存在被 OpenAI 封禁的可能。
+2. **时效性**：这种低价渠道可能随时失效，建议随买随用，不要一次性囤太多。
+3. **数据隐私**：既然是低价号，建议不要在上面对话任何涉及个人隐私或公司机密的内容。
+
+**总结一句话：这适合用来作为低成本的算力补充，但不适合作为长期稳定的生产力工具。**
+
+你自己判断，按需尝试。

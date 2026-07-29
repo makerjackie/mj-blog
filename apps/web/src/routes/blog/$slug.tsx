@@ -1,19 +1,18 @@
-import { useAuth } from "@repo/auth/tanstack/hooks";
 import {
   formatDate,
   localizeComment,
   localizePost,
   localizeSiteSettings,
-  slugify,
   type Comment,
 } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { MessageSquareIcon, PencilLineIcon, RssIcon } from "lucide-react";
+import { MessageSquareIcon, RssIcon } from "lucide-react";
 import { useState } from "react";
 
 import { CommentForm } from "#/components/comment-form";
+import { PostContent } from "#/components/post-content";
 import { SiteShell } from "#/components/site-shell";
 import { $getBlogPostPage, type BlogPostPageData } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
@@ -108,9 +107,15 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function BlogPostPage() {
-  const { comments, post, relatedPosts, siteSettings, turnstileSiteKey }: BlogPostPageData =
-    Route.useLoaderData();
-  const { user } = useAuth();
+  const {
+    comments,
+    contentPath,
+    post,
+    relatedPosts,
+    siteSettings,
+    tocItems,
+    turnstileSiteKey,
+  }: BlogPostPageData = Route.useLoaderData();
   const [replyTarget, setReplyTarget] = useState<Comment | null>(null);
   const [submittedComments, setSubmittedComments] = useState<Comment[]>([]);
   const locale = getCurrentLocale();
@@ -128,8 +133,6 @@ function BlogPostPage() {
   const commentsDescription = localizedSiteSettings.commentsRequireApproval
     ? m.comments_description()
     : null;
-  const articleBody = buildArticleBody(localizedPost.contentHtml);
-  const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
 
   return (
@@ -137,18 +140,6 @@ function BlogPostPage() {
       <article>
         <header className="border-b border-border bg-background">
           <div className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-            {user?.role === "admin" ? (
-              <Link
-                to="/admin/posts/$postId"
-                params={{ postId: localizedPost.id }}
-                className="absolute top-5 right-4 z-10 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground underline-offset-4 hover:text-link hover:underline sm:right-6 lg:right-8"
-                aria-label={editLabel}
-              >
-                <PencilLineIcon className="size-4" />
-                {editLabel}
-              </Link>
-            ) : null}
-
             <div
               className={cn(
                 "grid gap-6",
@@ -209,9 +200,9 @@ function BlogPostPage() {
               <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 {m.contents()}
               </p>
-              {articleBody.tocItems.length ? (
+              {tocItems.length ? (
                 <ol className="mt-4 grid gap-3">
-                  {articleBody.tocItems.map((item) => (
+                  {tocItems.map((item) => (
                     <li key={item.id}>
                       <a
                         href={`#${item.id}`}
@@ -247,7 +238,7 @@ function BlogPostPage() {
           </aside>
 
           <div className="min-w-0">
-            {articleBody.tocItems.length ? (
+            {tocItems.length ? (
               <nav
                 aria-label={m.contents()}
                 className="mb-10 border-b border-border/70 pb-6 lg:hidden"
@@ -256,7 +247,7 @@ function BlogPostPage() {
                   {m.contents()}
                 </p>
                 <ol className="mt-4 grid gap-3">
-                  {articleBody.tocItems.map((item) => (
+                  {tocItems.map((item) => (
                     <li key={item.id}>
                       <a
                         href={`#${item.id}`}
@@ -272,10 +263,9 @@ function BlogPostPage() {
               </nav>
             ) : null}
 
-            <div
-              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&>h1:first-child]:hidden"
-              dangerouslySetInnerHTML={{ __html: articleBody.html }}
-            />
+            <div className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&>h1:first-child]:hidden">
+              <PostContent path={contentPath} />
+            </div>
 
             {commentsEnabled || localizedComments.length ? (
               <section id="comments" className="mt-16 border-t border-border/70 pt-10">
@@ -429,59 +419,4 @@ function absoluteUrl(value: string, siteUrl: string) {
   }
 
   return new URL(value, siteUrl).toString();
-}
-
-type TocItem = {
-  id: string;
-  level: 2 | 3;
-  text: string;
-};
-
-function buildArticleBody(contentHtml: string): { html: string; tocItems: TocItem[] } {
-  const usedIds = new Map<string, number>();
-  const tocItems: TocItem[] = [];
-  const html = contentHtml.replace(
-    /<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi,
-    (match, levelValue: string, attrs: string, children: string) => {
-      const text = decodeHtml(stripTags(children)).trim();
-
-      if (!text) {
-        return match;
-      }
-
-      const id = uniqueHeadingId(text, usedIds);
-      const level = Number(levelValue) === 3 ? 3 : 2;
-      tocItems.push({ id, level, text });
-
-      return `<h${level}${removeIdAttribute(attrs)} id="${id}">${children}</h${level}>`;
-    },
-  );
-
-  return { html, tocItems };
-}
-
-function uniqueHeadingId(text: string, usedIds: Map<string, number>) {
-  const baseId = slugify(text) || "section";
-  const count = usedIds.get(baseId) ?? 0;
-  usedIds.set(baseId, count + 1);
-
-  return count ? `${baseId}-${count + 1}` : baseId;
-}
-
-function removeIdAttribute(attrs: string) {
-  return attrs.replace(/\s+id=(?:"[^"]*"|'[^']*'|[^\s>]*)/i, "");
-}
-
-function stripTags(value: string) {
-  return value.replace(/<[^>]*>/g, "");
-}
-
-function decodeHtml(value: string) {
-  return value
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
 }

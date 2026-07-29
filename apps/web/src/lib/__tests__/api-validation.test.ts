@@ -2,9 +2,7 @@ import { describe, it, expect } from "vitest";
 
 import {
   AccountEmailPreferencesPatchSchema,
-  BatchPostSchema,
   CreateCommentSchema,
-  PostPatchSchema,
   validateBody,
 } from "../api-validation";
 
@@ -122,69 +120,6 @@ describe("CreateCommentSchema", () => {
     if (result.success) {
       expect(result.data.parentId).toBe("comment-1");
     }
-  });
-});
-
-describe("PostPatchSchema", () => {
-  it("accepts a known partial post update", () => {
-    const result = PostPatchSchema.safeParse({
-      status: "published",
-      tags: ["release", "notes"],
-      locale: "en",
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("rejects unknown fields", () => {
-    const result = PostPatchSchema.safeParse({ statuz: "published" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects an empty update", () => {
-    const result = PostPatchSchema.safeParse({});
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects invalid statuses", () => {
-    const result = PostPatchSchema.safeParse({ status: "live" });
-    expect(result.success).toBe(false);
-  });
-});
-
-describe("BatchPostSchema", () => {
-  it("accepts a valid batch action", () => {
-    const result = BatchPostSchema.safeParse({
-      action: "publish",
-      ids: ["post_1", "post_2"],
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("trims post ids in a batch action", () => {
-    const result = BatchPostSchema.safeParse({
-      action: "publish",
-      ids: [" post_1 ", "post_2"],
-    });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.ids).toEqual(["post_1", "post_2"]);
-    }
-  });
-
-  it("rejects more than 50 ids", () => {
-    const result = BatchPostSchema.safeParse({
-      action: "archive",
-      ids: Array.from({ length: 51 }, (_, index) => `post_${index}`),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects duplicate ids after trimming", () => {
-    const result = BatchPostSchema.safeParse({
-      action: "archive",
-      ids: ["post_1", " post_1 "],
-    });
-    expect(result.success).toBe(false);
   });
 });
 

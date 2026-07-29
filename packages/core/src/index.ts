@@ -24,9 +24,6 @@ export {
   toIsoString,
 } from "./utils";
 export type {
-  ApiToken,
-  ApiTokenScope,
-  Asset,
   Comment,
   CommentAiModeration,
   CommentAiModerationDecision,
@@ -38,7 +35,6 @@ export type {
   EmailPreference,
   LayoutPreset,
   Post,
-  PostExternalSource,
   Series,
   SiteSettings,
   SupportedLocale,
@@ -78,13 +74,6 @@ export function localizeSeries(series: Series, locale: SupportedLocale): Series 
 export function localizePost(post: Post, locale: SupportedLocale): Post {
   return {
     ...post,
-    title: localizeText(post.title, post.i18n?.title, locale),
-    excerpt: localizeText(post.excerpt, post.i18n?.excerpt, locale),
-    contentMarkdown: localizeText(post.contentMarkdown, post.i18n?.contentMarkdown, locale),
-    contentHtml: localizeText(post.contentHtml, post.i18n?.contentHtml, locale),
-    contentText: localizeText(post.contentText, post.i18n?.contentText, locale),
-    seoTitle: localizeText(post.seoTitle, post.i18n?.seoTitle, locale),
-    seoDescription: localizeText(post.seoDescription, post.i18n?.seoDescription, locale),
     series: post.series ? localizeSeries(post.series, locale) : null,
     tags: post.tags.map((tag) => localizeTag(tag, locale)),
   };

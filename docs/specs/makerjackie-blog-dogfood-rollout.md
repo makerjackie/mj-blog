@@ -1,5 +1,7 @@
 # MakerJackie Blog Dogfood Rollout
 
+> Historical rollout record from the former database-backed article CMS. The current architecture uses `content/posts/*.mdx` as the only article source and D1 only for dynamic user data. Do not use the CMS, R2, token, import/export, or backup steps below as current operating instructions.
+
 Updated: 2026-06-30
 
 ## Goal

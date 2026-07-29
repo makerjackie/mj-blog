@@ -3,9 +3,9 @@ import { assertPassword, digestText, extractSetCookieHeaders, normalizeEmail } f
 import { env } from "cloudflare:workers";
 
 import { auth } from "#/lib/auth";
-import { getD1SiteSettings } from "#/lib/cms-d1";
 import { sendPasswordResetEmail } from "#/lib/cms-email";
 import { getClientIp } from "#/lib/comment-guard";
+import { getSiteSettings } from "#/lib/site-config";
 
 const passwordResetWindowSeconds = 60 * 60;
 const passwordResetIpLimit = 5;
@@ -189,7 +189,7 @@ async function sendPasswordResetForUser(
     expirationTtl: ttlMinutes * 60,
   });
 
-  const settings = await getD1SiteSettings();
+  const settings = getSiteSettings();
   await sendPasswordResetEmail({
     email: user.email,
     siteName: settings.name,

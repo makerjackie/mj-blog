@@ -2,15 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { sameOriginHeaders } from "./request";
 
-const localAdmin = {
-  email: process.env.BLOGCMS_LOCAL_ADMIN_EMAIL ?? "a@a.test",
-  password: process.env.BLOGCMS_LOCAL_ADMIN_PASSWORD ?? "1",
-};
-
 test.describe("Account preferences", () => {
   test("saves blog update and comment reply email preferences", async ({ page }) => {
-    await prepareEmailPasswordSignup(page);
-
     const runId = `${Date.now()}-${test.info().parallelIndex}`;
     await signUpReaderAccount(page, {
       email: `reader-preferences-${runId}@example.test`,
@@ -80,20 +73,6 @@ async function expectEmailPreferences(
   }
 }
 
-async function prepareEmailPasswordSignup(page: Page) {
-  await logInAsLocalAdmin(page);
-
-  const response = await page.context().request.put("/api/site", {
-    data: {
-      emailVerificationEnabled: false,
-    },
-    headers: sameOriginHeaders(),
-  });
-  expect(response.status()).toBe(200);
-
-  await page.context().clearCookies();
-}
-
 async function signUpReaderAccount(
   page: Page,
   input: {
@@ -107,34 +86,6 @@ async function signUpReaderAccount(
     headers: sameOriginHeaders(),
   });
   expect(signupResponse.status()).toBe(201);
-}
-
-async function logInAsLocalAdmin(page: Page) {
-  await gotoLoginPage(page);
-  await page.getByLabel("Email").fill(localAdmin.email);
-  await page.getByLabel("Password").fill(localAdmin.password);
-  await page.getByRole("button", { name: "Login" }).click();
-  await expect(page).toHaveURL(/\/app\/?$/);
-  await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
-  await page.getByRole("button", { name: /Open admin/ }).click();
-  await expect(page).toHaveURL(/\/admin\/?$/);
-  await expect(page.getByRole("heading", { name: "Publishing overview" })).toBeVisible();
-}
-
-async function gotoLoginPage(page: Page) {
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    await page.goto("/login", { waitUntil: "domcontentloaded" });
-
-    if ((await page.getByLabel("Email").count()) > 0) {
-      await expect(page.getByLabel("Email")).toBeVisible({ timeout: 5_000 });
-      return;
-    }
-
-    await page.waitForTimeout(1_000);
-  }
-
-  await page.goto("/login", { waitUntil: "domcontentloaded" });
-  await expect(page.getByLabel("Email")).toBeVisible({ timeout: 5_000 });
 }
 
 async function gotoAccountPage(page: Page) {

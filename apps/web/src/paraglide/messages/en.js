@@ -689,7 +689,7 @@ export const admin_overview_eyebrow = /** @type {(inputs: Admin_Overview_Eyebrow
 };
 
 export const admin_overview_title = /** @type {(inputs: Admin_Overview_TitleInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Publishing overview`)
+	return /** @type {LocalizedString} */ (`Admin overview`)
 };
 
 export const admin_post_status_archived_description = /** @type {(inputs: Admin_Post_Status_Archived_DescriptionInputs) => LocalizedString} */ () => {

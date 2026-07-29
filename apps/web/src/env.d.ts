@@ -17,40 +17,6 @@ type CmsD1Database = {
   prepare(query: string): CmsD1Statement;
 };
 
-type CmsR2Object = {
-  key: string;
-  body: ReadableStream<Uint8Array> | null;
-  httpMetadata?: {
-    contentType?: string;
-    cacheControl?: string;
-  };
-  size: number;
-  uploaded: Date;
-};
-
-type CmsR2ListResult = {
-  objects: CmsR2Object[];
-  truncated: boolean;
-  cursor?: string;
-};
-
-type CmsR2Bucket = {
-  get(key: string): Promise<CmsR2Object | null>;
-  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<CmsR2ListResult>;
-  put(
-    key: string,
-    value: ReadableStream<Uint8Array> | ArrayBuffer | ArrayBufferView | string | Blob | null,
-    options?: {
-      httpMetadata?: {
-        contentType?: string;
-        cacheControl?: string;
-      };
-      customMetadata?: Record<string, string>;
-    },
-  ): Promise<unknown>;
-  delete(key: string): Promise<void>;
-};
-
 type CmsKVNamespace = {
   get(key: string): Promise<string | null>;
   get<TValue = unknown>(key: string, type: "json"): Promise<TValue | null>;
@@ -71,12 +37,10 @@ type CmsEmailBinding = {
 
 type CloudflareBindings = {
   CMS_DB: CmsD1Database;
-  CMS_STORAGE: CmsR2Bucket;
   CMS_CACHE: CmsKVNamespace;
   CMS_EMAIL?: CmsEmailBinding;
   VITE_BASE_URL: string;
   CMS_PUBLIC_SITE_URL: string;
-  CMS_BACKUP_RETENTION_DAYS: string;
   CMS_EMAIL_SENDING_ENABLED: string;
   CMS_EMAIL_FROM: string;
   CMS_EMAIL_TO: string;
@@ -85,6 +49,9 @@ type CloudflareBindings = {
   RESEND_FROM_EMAIL?: string;
   EMAIL_FROM?: string;
   CMS_TURNSTILE_SECRET_KEY?: string;
+  CMS_AI_BASE_URL?: string;
+  CMS_AI_API_KEY?: string;
+  CMS_AI_MODEL?: string;
   VITE_TURNSTILE_SITE_KEY: string;
   BETTER_AUTH_SECRET?: string;
   GITHUB_CLIENT_ID?: string;

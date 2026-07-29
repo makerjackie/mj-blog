@@ -1,15 +1,14 @@
 import { cachedGet } from "#/lib/cms-cache";
-import { getD1SiteSettings, listD1Posts, listD1Series, listD1Tags } from "#/lib/cms-d1";
+import { listContentPosts, listContentSeries, listContentTags } from "#/lib/content-posts";
+import { getSiteSettings } from "#/lib/site-config";
 import { source } from "#/lib/source";
 
 export async function getSitemapPaths() {
   return cachedGet("sitemap:paths", async () => {
-    const siteSettings = await getD1SiteSettings();
-    const [posts, tags, series] = await Promise.all([
-      listD1Posts().catch(() => []),
-      listD1Tags().catch(() => []),
-      listD1Series().catch(() => []),
-    ]);
+    const siteSettings = getSiteSettings();
+    const posts = listContentPosts();
+    const tags = listContentTags();
+    const series = listContentSeries();
     const docsPaths = source.getPages().map((page) => page.url);
     const pagePaths = ["", "/demo", "/blog", "/docs", "/series", "/tags", "/projects", "/about"];
     const postPaths = posts.map((post) => `/blog/${post.slug}`);

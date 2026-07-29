@@ -1,13 +1,14 @@
 import { localizePost } from "@repo/core";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getD1SiteSettings, listD1Posts } from "#/lib/cms-d1";
+import { listContentPosts } from "#/lib/content-posts";
+import { getSiteSettings } from "#/lib/site-config";
 
 export const Route = createFileRoute("/rss.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const siteSettings = await getD1SiteSettings();
+        const siteSettings = getSiteSettings();
 
         if (!siteSettings.rssEnabled) {
           return new Response("RSS feed is disabled.", {
@@ -32,10 +33,10 @@ export const Route = createFileRoute("/rss.xml")({
   },
 });
 
-async function renderRss(siteSettings: Awaited<ReturnType<typeof getD1SiteSettings>>) {
+async function renderRss(siteSettings: ReturnType<typeof getSiteSettings>) {
   const locale = siteSettings.primaryLanguage;
-  const posts = (await listD1Posts().catch(() => [])).map((post) => localizePost(post, locale));
-  const localizedSiteSettings = await getD1SiteSettings(locale);
+  const posts = listContentPosts().map((post) => localizePost(post, locale));
+  const localizedSiteSettings = getSiteSettings(locale);
 
   return `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">

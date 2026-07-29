@@ -1,0 +1,350 @@
+---
+title: "一句话把网站部署到 Cloudflare：配好 Token，剩下的交给 AI"
+slug: "2026-04-24-cloudflare-deploy-guide"
+excerpt: "配置好 Cloudflare API Token 和 Skills，后面创建项目、配置数据库、绑定域名、GitHub 部署全部交给 AI 一句话搞定。"
+status: "published"
+publishedAt: "2026-04-24T01:00:00.000Z"
+updatedAt: "2026-06-30T12:42:25.842Z"
+authorName: "Jackie"
+featured: true
+pinned: false
+commentsEnabled: true
+seoTitle: "一句话把网站部署到 Cloudflare：配好 Token，剩下的交给 AI"
+seoDescription: "配置好 Cloudflare API Token 和 Skills，后面创建项目、配置数据库、绑定域名、GitHub 部署全部交给 AI 一句话搞定。"
+tags:
+  - "AI"
+  - "Cloudflare"
+  - "Workers"
+  - "自动化部署"
+---
+
+我现在越来越喜欢把小项目直接通过 Cloudflare 部署。
+
+不是因为它完美，而是因为配置一次后，以后做新项目只需要对 AI 说一句话：
+
+```txt
+用 Cloudflare 创建一个待办清单应用，项目名 tododemo。
+包含用户登录和待办事项管理，使用 D1 数据库。
+部署到 tododemo.01mvp.com。
+```
+
+然后 AI 会自动帮你：
+
+- 创建 Worker 项目
+- 配置 D1 数据库
+- 写好前后端代码
+- 推送到 GitHub 私有仓库
+- 配置自动部署
+- 绑定自定义域名
+
+你不用手动操作任何一步。
+
+## 前提条件
+
+- 一个 Cloudflare 账号（免费，额度很慷慨）
+- 一个域名，托管在 Cloudflare（DNS 由 Cloudflare 管理）
+- 一个支持 Cloudflare Skills 的 AI 工具（比如 Claude Code）
+
+## 核心原理
+
+整个流程的关键是两个东西：
+
+**1. Cloudflare API Token**
+这是一把钥匙，让 AI 工具能代替你操作 Cloudflare。
+
+**2. Cloudflare Skills**
+这是 AI 的"操作手册"，告诉 AI 怎么用 Cloudflare 的各种服务。
+
+配置好这两个，AI 就能自动完成：
+
+- 创建 Worker
+- 配置数据库（D1）
+- 配置对象存储（R2）
+- 配置 DNS 和域名绑定
+- 设置 GitHub 自动部署
+
+## 第一步：创建 Cloudflare API Token
+
+### 在哪创建
+
+登录 [Cloudflare 控制台](https://dash.cloudflare.com/)。
+
+如果你要创建个人 Token：
+
+```txt
+右上角头像
+  -> My Profile
+  -> API Tokens
+  -> Create Token
+```
+
+如果你的账号里已经有 Account API Tokens：
+
+```txt
+Manage Account
+  -> API Tokens
+  -> Create Token
+```
+
+个人练手项目，用 user token 就够了。
+
+团队项目、长期 CI/CD，更适合用 account token。
+
+### 选择模板
+
+在模板里选：
+
+```txt
+Edit Cloudflare Workers
+```
+
+这个模板会给你一部分 Worker 相关权限。
+
+但如果你想让 AI 后面还能帮你配域名、建数据库、接对象存储，需要补一些权限。
+
+### 建议加的权限
+
+以 `01mvp.com` 这个域名为例，我会这样配：
+
+```txt
+Account -> Cloudflare Workers Scripts -> Edit
+Zone    -> Zone                    -> Read
+Zone    -> DNS                     -> Edit
+Account -> D1                      -> Edit
+Account -> Workers R2 Storage       -> Edit
+```
+
+如果你在权限列表里看到 Durable Objects 相关权限，也可以给 Edit。
+
+资源范围尽量收窄：
+
+```txt
+Account Resources: 选择你的 Cloudflare account
+Zone Resources:    只选择 01mvp.com
+```
+
+这样就算 Token 泄漏，影响范围也不会无限扩大。
+
+Token 创建完成后只会显示一次。
+
+马上复制下来，别写进代码仓库。
+
+### 获取 Account ID
+
+在 Cloudflare 控制台：
+
+```txt
+Account Home（账户主页）
+单账户：账户名右侧点 ⋮（三点菜单）→ Copy account ID
+多账户：在账户列表行末尾点 ⋮ → Copy account ID
+```
+
+### 保存到环境变量
+
+可以直接用下面的命令一键追加到你的 `.zshrc`，这样可以永久生效：
+
+```bash
+echo 'export CLOUDFLARE_API_TOKEN="你的_token"' >> ~/.zshrc
+echo 'export CLOUDFLARE_ACCOUNT_ID="你的_account_ID"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### 为什么不用 wrangler login
+
+理论上如果你只是在自己电脑上部署，也可以直接：
+
+```bash
+npx wrangler login
+```
+
+但问题在于：
+
+- wrangler login 没有 DNS 的修改权限
+- 如果你要给 AI 工具、CI/CD、脚本化部署用，最佳方案还是 API token
+
+## 第二步：添加 Cloudflare Skills
+
+Skills 是 Cloudflare 官方提供的 AI 操作手册。
+
+如果你用的是 Claude Code，可以直接运行：
+
+```bash
+npx skills add https://github.com/cloudflare/skills --yes --all
+```
+
+这会把 Cloudflare 的所有 Skills 添加到你的 AI 工具里。
+
+以后 AI 就知道怎么：
+
+- 用 C3 创建项目
+- 配置 wrangler.jsonc
+- 创建和绑定 D1 数据库
+- 配置 R2 对象存储
+- 设置自定义域名
+- 配置 GitHub 自动部署
+
+## 第三步：对 AI 说一句话
+
+配置完成后，以后做新项目只需要对 AI 说：
+
+### 示例 1：待办清单应用
+
+```txt
+用 Cloudflare 创建一个待办清单应用，项目名 tododemo。
+
+功能：
+- 用户名密码登录
+- 创建、查看、删除待办事项
+- 使用 D1 数据库存储
+
+部署：
+- 创建 GitHub 私有仓库
+- 配置 Cloudflare 自动部署
+- 绑定到 tododemo.01mvp.com
+```
+
+### 示例 2：图片分享站
+
+```txt
+用 Cloudflare 创建一个图片分享站，项目名 photoshare。
+
+功能：
+- 用户登录
+- 上传图片（< 5MB）
+- 浏览所有人的图片流
+- 使用 D1 存储用户信息，R2 存储图片
+
+部署：
+- 创建 GitHub 私有仓库
+- 配置 Cloudflare 自动部署
+- 绑定到 photoshare.01mvp.com
+```
+
+### 示例 3：简单说明站
+
+```txt
+用 Cloudflare 创建一个产品说明站，项目名 demo。
+
+使用 React + Vite，纯静态页面。
+部署到 demo.01mvp.com。
+```
+
+## AI 会自动完成什么
+
+当你说完这句话，AI 会自动：
+
+1. **创建项目**
+   - 用 C3 创建 Worker 或 Pages 项目
+   - 选择合适的模板
+
+2. **写代码**
+   - 实现你要的功能
+   - 配置数据库 schema
+   - 写好前后端逻辑
+
+3. **配置数据库**
+   - 创建 D1 数据库
+   - 在 wrangler.jsonc 里绑定
+   - 运行 migration
+
+4. **配置存储（如果需要）**
+   - 创建 R2 bucket
+   - 在 wrangler.jsonc 里绑定
+
+5. **本地测试**
+   - 运行 `npm run dev`
+   - 确认功能正常
+
+6. **推送到 GitHub**
+   - 初始化 git
+   - 创建私有仓库
+   - 推送代码
+
+7. **配置自动部署**
+   - 在 Cloudflare 控制台连接 GitHub
+   - 设置自动部署
+
+8. **绑定域名**
+   - 在 wrangler.jsonc 配置 custom_domain
+   - 自动配置 DNS
+
+全程你不需要手动操作任何一步。
+
+## 你需要做什么
+
+你只需要：
+
+1. **第一次配置**（一次性）
+   - 创建 API Token
+   - 添加 Cloudflare Skills
+
+2. **每次做新项目**
+   - 对 AI 说一句话
+   - 等几分钟
+   - 打开浏览器访问你的域名
+
+就这么简单。
+
+## 常见问题
+
+### Q: 我的域名不在 Cloudflare 怎么办？
+
+A: 需要先把域名的 DNS 转到 Cloudflare。在域名注册商那里修改 Nameserver，指向 Cloudflare 提供的 NS 记录。
+
+### Q: 免费额度够用吗？
+
+A: 对于个人项目和小流量应用，Cloudflare 的免费额度非常慷慨：
+
+- Workers: 每天 100,000 次请求
+- D1: 每天 100,000 次读取，50,000 次写入
+- R2: 每月 10GB 存储，100 万次读取
+
+### Q: 如果我想修改代码怎么办？
+
+A: 直接修改本地代码，推送到 GitHub，Cloudflare 会自动重新部署。
+
+或者直接对 AI 说：
+
+```txt
+帮我在 tododemo 项目里加一个"标记完成"功能。
+```
+
+AI 会自动修改代码、测试、推送。
+
+### Q: 数据库数据会丢吗？
+
+A: D1 是持久化存储，数据不会丢。但建议定期备份重要数据。
+
+## 总结
+
+配置好 API Token 和 Skills 后，做新项目的流程变成：
+
+```txt
+对 AI 说一句话 -> 等几分钟 -> 打开浏览器访问
+```
+
+你不用：
+
+- 手动创建项目
+- 手动配置数据库
+- 手动写部署脚本
+- 手动配置域名
+- 手动设置 CI/CD
+
+这些全部交给 AI 自动完成。
+
+你只需要专注在：
+
+- 想清楚要做什么
+- 把需求说清楚
+- 测试功能是否符合预期
+
+这才是 AI 时代做产品的正确姿势。
+
+## 官方文档
+
+- [Create API Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
+- [Cloudflare Skills](https://github.com/cloudflare/skills)
+- [Cloudflare Workers](https://developers.cloudflare.com/workers/)
+- [D1 Database](https://developers.cloudflare.com/d1/)
+- [R2 Storage](https://developers.cloudflare.com/r2/)

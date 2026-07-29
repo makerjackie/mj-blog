@@ -99,13 +99,14 @@ function AdminUsersPage() {
       admin: rows.filter((user) => user.role === "admin").length,
       muted: rows.filter((user) => user.commentStatus === "muted").length,
       reader: rows.filter((user) => user.role === "reader").length,
-      subscribed: rows.filter((user) => user.emailPreference !== "none").length,
+      subscribed: rows.filter((user) => user.emailPreference !== "none" && !user.marketingOptOut)
+        .length,
       total: rows.length,
     }),
     [rows],
   );
-  const postById = useMemo(
-    () => new Map(postRows.map((post) => [post.id, post] as const)),
+  const postBySlug = useMemo(
+    () => new Map(postRows.map((post) => [post.slug, post] as const)),
     [postRows],
   );
   const commentsByUserId = useMemo(() => {
@@ -485,7 +486,7 @@ function AdminUsersPage() {
                   <UserCommentsPanel
                     comments={userComments}
                     locale={locale}
-                    postById={postById}
+                    postBySlug={postBySlug}
                     copy={copy}
                   />
                 ) : null}
@@ -537,12 +538,12 @@ function UserCommentsPanel({
   comments,
   copy,
   locale,
-  postById,
+  postBySlug,
 }: {
   readonly comments: Comment[];
   readonly copy: UsersActionCopy;
   readonly locale: ReturnType<typeof getCurrentLocale>;
-  readonly postById: Map<string, Post>;
+  readonly postBySlug: Map<string, Post>;
 }) {
   return (
     <div className="mt-4 border-t border-border/80 pt-3">
@@ -554,7 +555,7 @@ function UserCommentsPanel({
       {comments.length ? (
         <div className="grid gap-3">
           {comments.map((comment) => {
-            const localizedPost = postById.get(comment.postId);
+            const localizedPost = postBySlug.get(comment.postSlug);
 
             return (
               <article

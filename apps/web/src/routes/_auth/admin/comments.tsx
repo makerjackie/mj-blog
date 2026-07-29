@@ -1,22 +1,9 @@
-import {
-  defaultAiCommentModerationRules,
-  type Comment,
-  type Post,
-  type SiteSettings,
-} from "@repo/core";
+import { type Comment, type Post } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { Label } from "@repo/ui/components/label";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import {
-  BotIcon,
-  CheckIcon,
-  SaveIcon,
-  SearchIcon,
-  Settings2Icon,
-  ShieldAlertIcon,
-  Trash2Icon,
-} from "lucide-react";
-import { useEffect, useMemo, useState, type ComponentProps } from "react";
+import { BotIcon, CheckIcon, SearchIcon, ShieldAlertIcon, Trash2Icon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -24,7 +11,6 @@ import {
   AdminPanel,
   adminInputClassName,
   adminSelectClassName,
-  adminTextareaClassName,
 } from "#/components/admin/admin-ui";
 import { getResponseErrorMessage } from "#/lib/admin-notifications";
 import { getCurrentLocale } from "#/lib/i18n";
@@ -35,36 +21,14 @@ export const Route = createFileRoute("/_auth/admin/comments")({
 });
 
 type ModerationAction = "approve" | "delete" | "spam";
-type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
-type CommentSettings = Pick<
-  SiteSettings,
-  | "commentsEnabled"
-  | "commentsRequireApproval"
-  | "commentAutoBlockEnabled"
-  | "commentBlockedKeywords"
-  | "aiCommentModerationEnabled"
-  | "aiCommentModerationRules"
->;
 
 const commentStatuses: Array<Comment["status"]> = ["pending", "approved", "spam", "deleted"];
-const defaultCommentSettings: CommentSettings = {
-  commentsEnabled: true,
-  commentsRequireApproval: true,
-  commentAutoBlockEnabled: false,
-  commentBlockedKeywords: [],
-  aiCommentModerationEnabled: false,
-  aiCommentModerationRules: defaultAiCommentModerationRules,
-};
 
 function AdminCommentsPage() {
   const locale = getCurrentLocale();
   const copy = getCommentsActionCopy(locale);
   const [rows, setRows] = useState<Comment[]>([]);
   const [postRows, setPostRows] = useState<Post[]>([]);
-  const [commentSettings, setCommentSettings] = useState<CommentSettings>(defaultCommentSettings);
-  const [commentSettingsStatus, setCommentSettingsStatus] = useState<"idle" | "saved" | "error">(
-    "idle",
-  );
   const [statusFilter, setStatusFilter] = useState<Comment["status"] | "all">("pending");
   const [postFilter, setPostFilter] = useState("all");
   const [query, setQuery] = useState("");
@@ -80,11 +44,9 @@ function AdminCommentsPage() {
       fetch(`/api/posts?status=all&lang=${locale}`).then((response) =>
         response.ok ? response.json() : undefined,
       ),
-      fetch("/api/site").then((response) => (response.ok ? response.json() : undefined)),
-    ]).then(([commentPayload, postPayload, sitePayload]) => {
+    ]).then(([commentPayload, postPayload]) => {
       const nextComments = (commentPayload as { data?: Comment[] } | undefined)?.data;
       const nextPosts = (postPayload as { data?: Post[] } | undefined)?.data;
-      const nextSettings = (sitePayload as { data?: SiteSettings } | undefined)?.data;
 
       if (!ignore && nextComments) {
         setRows(nextComments);
@@ -93,10 +55,6 @@ function AdminCommentsPage() {
       if (!ignore && nextPosts) {
         setPostRows(nextPosts);
       }
-
-      if (!ignore && nextSettings) {
-        setCommentSettings(pickCommentSettings(nextSettings));
-      }
     });
 
     return () => {
@@ -104,8 +62,8 @@ function AdminCommentsPage() {
     };
   }, [locale]);
 
-  const postById = useMemo(
-    () => new Map(postRows.map((post) => [post.id, post] as const)),
+  const postBySlug = useMemo(
+    () => new Map(postRows.map((post) => [post.slug, post] as const)),
     [postRows],
   );
   const counts = useMemo(
@@ -151,48 +109,11 @@ function AdminCommentsPage() {
     return true;
   };
 
-  const saveCommentSettings: FormSubmitHandler = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/site", {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        commentsEnabled: formData.get("commentsEnabled") === "on",
-        commentsRequireApproval: formData.get("commentsRequireApproval") === "on",
-        commentAutoBlockEnabled: formData.get("commentAutoBlockEnabled") === "on",
-        commentBlockedKeywords: parseCommentBlockedKeywords(formData.get("commentBlockedKeywords")),
-        aiCommentModerationEnabled: formData.get("aiCommentModerationEnabled") === "on",
-        aiCommentModerationRules:
-          formValueString(formData.get("aiCommentModerationRules")).trim() ||
-          defaultAiCommentModerationRules,
-      }),
-    }).catch(() => null);
-
-    if (!response?.ok) {
-      setCommentSettingsStatus("error");
-      toast.error(m.admin_settings_error(), {
-        description: response
-          ? await getResponseErrorMessage(response, m.admin_settings_error())
-          : copy.networkError,
-      });
-      return;
-    }
-
-    const payload = (await response.json()) as { data: SiteSettings };
-    setCommentSettings(pickCommentSettings(payload.data));
-    window.dispatchEvent(
-      new CustomEvent("blogcms:site-settings-updated", { detail: payload.data }),
-    );
-    setCommentSettingsStatus("saved");
-    toast.success(m.admin_settings_saved());
-  };
-
   const normalizedQuery = query.trim().toLowerCase();
   const filteredRows = rows.filter((comment) => {
-    const localizedPost = postById.get(comment.postId);
+    const localizedPost = postBySlug.get(comment.postSlug);
     const statusMatches = statusFilter === "all" || comment.status === statusFilter;
-    const postMatches = postFilter === "all" || comment.postId === postFilter;
+    const postMatches = postFilter === "all" || comment.postSlug === postFilter;
     const queryMatches =
       !normalizedQuery ||
       [comment.authorName, comment.body, localizedPost?.title ?? ""].some((value) =>
@@ -208,15 +129,6 @@ function AdminCommentsPage() {
   ).length;
   const allVisibleSelected =
     filteredRows.length > 0 && selectedVisibleCount === filteredRows.length;
-  const commentSettingsKey = [
-    commentSettings.commentsEnabled,
-    commentSettings.commentsRequireApproval,
-    commentSettings.commentAutoBlockEnabled,
-    commentSettings.commentBlockedKeywords.join("\n"),
-    commentSettings.aiCommentModerationEnabled,
-    commentSettings.aiCommentModerationRules,
-  ].join("|");
-
   const toggleAllVisible = () => {
     setSelectedCommentIds((current) => {
       if (allVisibleSelected) {
@@ -263,112 +175,6 @@ function AdminCommentsPage() {
           </span>
         }
       />
-
-      <AdminPanel>
-        <form key={commentSettingsKey} onSubmit={saveCommentSettings} className="grid gap-4">
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-            <div className="flex items-start gap-3">
-              <Settings2Icon className="mt-1 size-5 text-link" />
-              <div>
-                <h2 className="text-xl font-semibold">{m.admin_comment_settings()}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {m.admin_comments_description()}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {commentSettingsStatus !== "idle" ? (
-                <p
-                  className={`text-sm ${
-                    commentSettingsStatus === "saved" ? "text-success" : "text-destructive"
-                  }`}
-                >
-                  {commentSettingsStatus === "saved"
-                    ? m.admin_settings_saved()
-                    : m.admin_settings_error()}
-                </p>
-              ) : null}
-              <Button type="submit" size="sm">
-                <SaveIcon className="size-4" />
-                {m.admin_save_settings()}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  name="commentsEnabled"
-                  defaultChecked={commentSettings.commentsEnabled}
-                  className="size-4 rounded border-input"
-                />
-                {m.comments()}
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  name="commentsRequireApproval"
-                  defaultChecked={commentSettings.commentsRequireApproval}
-                  className="size-4 rounded border-input"
-                />
-                {m.admin_comments_require_approval()}
-              </label>
-              <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                <input
-                  type="checkbox"
-                  name="commentAutoBlockEnabled"
-                  defaultChecked={commentSettings.commentAutoBlockEnabled}
-                  className="size-4 rounded border-input"
-                />
-                {m.admin_comments_auto_block()}
-              </label>
-              <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                <input
-                  type="checkbox"
-                  name="aiCommentModerationEnabled"
-                  defaultChecked={commentSettings.aiCommentModerationEnabled}
-                  className="size-4 rounded border-input"
-                />
-                {locale === "zh" ? "使用 AI 辅助审核评论" : "Use AI to help review comments"}
-              </label>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="comment-blocked-keywords">
-                {m.admin_comments_blocked_keywords()}
-              </Label>
-              <textarea
-                id="comment-blocked-keywords"
-                name="commentBlockedKeywords"
-                defaultValue={commentSettings.commentBlockedKeywords.join("\n")}
-                rows={5}
-                className={`${adminTextareaClassName} min-h-28`}
-              />
-              <p className="text-xs text-muted-foreground">
-                {m.admin_comments_blocked_keywords_help()}
-              </p>
-            </div>
-            <div className="grid gap-2 lg:col-span-2">
-              <Label htmlFor="ai-comment-moderation-rules">
-                {locale === "zh" ? "AI 审核规则" : "AI review rules"}
-              </Label>
-              <textarea
-                id="ai-comment-moderation-rules"
-                name="aiCommentModerationRules"
-                defaultValue={commentSettings.aiCommentModerationRules}
-                rows={4}
-                className={`${adminTextareaClassName} min-h-28`}
-              />
-              <p className="text-xs text-muted-foreground">
-                {locale === "zh"
-                  ? "启用 AI 审核且已配置模型后，新评论会按这些规则辅助判断。模型异常时会回到原有审核逻辑。"
-                  : "When AI review and a model are configured, new comments are checked against these rules. If the model fails, the existing moderation flow remains in place."}
-              </p>
-            </div>
-          </div>
-        </form>
-      </AdminPanel>
 
       <AdminPanel>
         <div className="flex flex-wrap gap-2">
@@ -422,7 +228,7 @@ function AdminCommentsPage() {
             >
               <option value="all">{m.admin_comments_all_posts()}</option>
               {postRows.map((post) => (
-                <option key={post.id} value={post.id}>
+                <option key={post.id} value={post.slug}>
                   {post.title}
                 </option>
               ))}
@@ -489,7 +295,7 @@ function AdminCommentsPage() {
             </p>
           )}
           {filteredRows.map((comment) => {
-            const localizedPost = postById.get(comment.postId);
+            const localizedPost = postBySlug.get(comment.postSlug);
             const selected = selectedCommentIds.includes(comment.id);
 
             return (
@@ -604,30 +410,6 @@ function AiModerationSummary({
       </div>
     </div>
   );
-}
-
-function pickCommentSettings(settings: SiteSettings): CommentSettings {
-  return {
-    commentsEnabled: settings.commentsEnabled,
-    commentsRequireApproval: settings.commentsRequireApproval,
-    commentAutoBlockEnabled: settings.commentAutoBlockEnabled,
-    commentBlockedKeywords: settings.commentBlockedKeywords,
-    aiCommentModerationEnabled: settings.aiCommentModerationEnabled,
-    aiCommentModerationRules: settings.aiCommentModerationRules,
-  };
-}
-
-function parseCommentBlockedKeywords(value: FormDataEntryValue | null) {
-  return typeof value === "string"
-    ? value
-        .split(/[\n,，]/)
-        .map((item) => item.trim())
-        .filter(Boolean)
-    : [];
-}
-
-function formValueString(value: FormDataEntryValue | null) {
-  return typeof value === "string" ? value : "";
 }
 
 function getAiModerationSummaryCopy(

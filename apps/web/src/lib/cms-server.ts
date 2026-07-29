@@ -3,6 +3,12 @@ import { createServerFn } from "@tanstack/react-start";
 
 export type BlogPostPageData = {
   post: Post;
+  contentPath: string;
+  tocItems: Array<{
+    id: string;
+    level: 2 | 3;
+    text: string;
+  }>;
   comments: Comment[];
   relatedPosts: Post[];
   siteSettings: SiteSettings;
@@ -62,12 +68,14 @@ export type AboutPageData = {
 export const $getBlogPostPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }): Promise<BlogPostPageData | null> => {
-    const [{ env }, { getD1PostBySlug, getD1SiteSettings, listD1ApprovedComments }] =
-      await Promise.all([import("cloudflare:workers"), import("./cms-d1")]);
-    const [siteSettings, post] = await Promise.all([
-      getD1SiteSettings(),
-      getD1PostBySlug(data.slug),
+    const [{ env }, { listD1ApprovedComments }, content, { getSiteSettings }] = await Promise.all([
+      import("cloudflare:workers"),
+      import("./cms-d1"),
+      import("./content-posts"),
+      import("./site-config"),
     ]);
+    const siteSettings = getSiteSettings();
+    const post = content.getContentPostBySlug(data.slug);
 
     if (!post) {
       return null;
@@ -75,8 +83,17 @@ export const $getBlogPostPage = createServerFn({ method: "GET" })
 
     return {
       post,
-      comments: await listD1ApprovedComments(post.id),
-      relatedPosts: [],
+      contentPath: content.getContentPostPath(post.slug) ?? `${post.slug}.mdx`,
+      tocItems: content.getContentPostToc(post.slug),
+      comments: await listD1ApprovedComments(post.slug),
+      relatedPosts: content
+        .listContentPosts()
+        .filter(
+          (candidate) =>
+            candidate.id !== post.id &&
+            candidate.tags.some((tag) => post.tags.some((postTag) => postTag.slug === tag.slug)),
+        )
+        .slice(0, 3),
       siteSettings,
       turnstileSiteKey: env.VITE_TURNSTILE_SITE_KEY?.trim() || null,
     };
@@ -84,14 +101,15 @@ export const $getBlogPostPage = createServerFn({ method: "GET" })
 
 export const $getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageData> => {
-    const { getD1SiteSettings, listD1Posts, listD1Series, listD1Tags } = await import("./cms-d1");
-    const [siteSettings, posts, featuredPosts, tags, series] = await Promise.all([
-      getD1SiteSettings(),
-      listD1Posts({ limit: 12 }),
-      listD1Posts({ featured: true, limit: 3 }),
-      listD1Tags(),
-      listD1Series(),
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
     ]);
+    const siteSettings = getSiteSettings();
+    const posts = content.listContentPosts({ limit: 12 });
+    const featuredPosts = content.listContentPosts({ featured: true, limit: 3 });
+    const tags = content.listContentTags();
+    const series = content.listContentSeries();
 
     return {
       posts,
@@ -114,8 +132,10 @@ export const $getBlogIndexPage = createServerFn({ method: "GET" })
     }) => data,
   )
   .handler(async ({ data }): Promise<BlogIndexPageData> => {
-    const { countD1Posts, getD1SiteSettings, listD1Posts, listD1Series, listD1Tags } =
-      await import("./cms-d1");
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
+    ]);
     const pageSize = Math.min(Math.max(1, Math.floor(data.pageSize ?? 6)), 24);
     const requestedPage = Math.max(1, Math.floor(data.page ?? 1));
     const filters = {
@@ -123,15 +143,13 @@ export const $getBlogIndexPage = createServerFn({ method: "GET" })
       tagSlug: data.tagSlug,
       seriesSlug: data.seriesSlug,
     };
-    const [siteSettings, tags, series, totalPosts] = await Promise.all([
-      getD1SiteSettings(),
-      listD1Tags(),
-      listD1Series(),
-      countD1Posts(filters),
-    ]);
+    const siteSettings = getSiteSettings();
+    const tags = content.listContentTags();
+    const series = content.listContentSeries();
+    const totalPosts = content.countContentPosts(filters);
     const pageCount = Math.max(1, Math.ceil(totalPosts / pageSize));
     const page = Math.min(requestedPage, pageCount);
-    const posts = await listD1Posts({
+    const posts = content.listContentPosts({
       ...filters,
       limit: pageSize,
       offset: (page - 1) * pageSize,
@@ -151,12 +169,13 @@ export const $getBlogIndexPage = createServerFn({ method: "GET" })
 export const $getTagPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }): Promise<TagPageData | null> => {
-    const { getD1SiteSettings, listD1Posts, listD1Tags } = await import("./cms-d1");
-    const [posts, siteSettings, tags] = await Promise.all([
-      listD1Posts({ tagSlug: data.slug }),
-      getD1SiteSettings(),
-      listD1Tags(),
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
     ]);
+    const posts = content.listContentPosts({ tagSlug: data.slug });
+    const siteSettings = getSiteSettings();
+    const tags = content.listContentTags();
     const tag = tags.find((candidate) => candidate.slug === data.slug);
 
     if (!tag) {
@@ -172,12 +191,13 @@ export const $getTagPage = createServerFn({ method: "GET" })
 
 export const $getTagsPage = createServerFn({ method: "GET" }).handler(
   async (): Promise<TagsPageData> => {
-    const { getD1SiteSettings, listD1Posts, listD1Tags } = await import("./cms-d1");
-    const [posts, siteSettings, tags] = await Promise.all([
-      listD1Posts(),
-      getD1SiteSettings(),
-      listD1Tags(),
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
     ]);
+    const posts = content.listContentPosts();
+    const siteSettings = getSiteSettings();
+    const tags = content.listContentTags();
 
     return {
       siteSettings,
@@ -189,12 +209,13 @@ export const $getTagsPage = createServerFn({ method: "GET" }).handler(
 
 export const $getSeriesPage = createServerFn({ method: "GET" }).handler(
   async (): Promise<SeriesPageData> => {
-    const { getD1SiteSettings, listD1Posts, listD1Series } = await import("./cms-d1");
-    const [posts, siteSettings, series] = await Promise.all([
-      listD1Posts(),
-      getD1SiteSettings(),
-      listD1Series(),
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
     ]);
+    const posts = content.listContentPosts();
+    const siteSettings = getSiteSettings();
+    const series = content.listContentSeries();
 
     return {
       siteSettings,
@@ -207,12 +228,13 @@ export const $getSeriesPage = createServerFn({ method: "GET" }).handler(
 export const $getSeriesDetailPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }): Promise<SeriesDetailPageData | null> => {
-    const { getD1SiteSettings, listD1Posts, listD1Series } = await import("./cms-d1");
-    const [posts, siteSettings, allSeries] = await Promise.all([
-      listD1Posts({ seriesSlug: data.slug }),
-      getD1SiteSettings(),
-      listD1Series(),
+    const [{ getSiteSettings }, content] = await Promise.all([
+      import("./site-config"),
+      import("./content-posts"),
     ]);
+    const posts = content.listContentPosts({ seriesSlug: data.slug });
+    const siteSettings = getSiteSettings();
+    const allSeries = content.listContentSeries();
     const series = allSeries.find((candidate) => candidate.slug === data.slug);
 
     if (!series) {
@@ -228,20 +250,20 @@ export const $getSeriesDetailPage = createServerFn({ method: "GET" })
 
 export const $getSiteSettingsPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<SiteSettingsPageData> => {
-    const { getD1SiteSettings } = await import("./cms-d1");
+    const { getSiteSettings } = await import("./site-config");
 
     return {
-      siteSettings: await getD1SiteSettings(),
+      siteSettings: getSiteSettings(),
     };
   },
 );
 
 export const $getAboutPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<AboutPageData> => {
-    const { getD1SiteSettings } = await import("./cms-d1");
+    const { getSiteSettings } = await import("./site-config");
 
     return {
-      siteSettings: await getD1SiteSettings(),
+      siteSettings: getSiteSettings(),
     };
   },
 );

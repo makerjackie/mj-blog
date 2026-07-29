@@ -5,13 +5,13 @@ import { user as authUserTable, verification } from "@repo/db/schema";
 import { env } from "cloudflare:workers";
 import { eq } from "drizzle-orm";
 
-import { getD1SiteSettings } from "#/lib/cms-d1";
 import {
   getEmailDeliveryStatus,
   sendEmailVerificationEmail,
   type EmailDeliveryStatus,
 } from "#/lib/cms-email";
 import { getClientIp } from "#/lib/comment-guard";
+import { getSiteSettings } from "#/lib/site-config";
 
 const emailVerificationTtlMinutes = 30;
 const emailVerificationWindowSeconds = 60 * 60;
@@ -29,10 +29,8 @@ export type EmailVerificationStatus = {
 };
 
 export async function getEmailVerificationStatus(): Promise<EmailVerificationStatus> {
-  const [settings, delivery] = await Promise.all([
-    getD1SiteSettings(),
-    Promise.resolve(getEmailDeliveryStatus()),
-  ]);
+  const settings = getSiteSettings();
+  const delivery = getEmailDeliveryStatus();
 
   return {
     delivery,
@@ -87,7 +85,7 @@ export async function sendCommentEmailVerification(input: {
   name: string;
   request: Request;
 }) {
-  const settings = await getD1SiteSettings();
+  const settings = getSiteSettings();
   const token = `verify_${crypto.randomUUID().replace(/-/g, "")}${crypto
     .randomUUID()
     .replace(/-/g, "")}`;

@@ -87,11 +87,7 @@ describe("localizePost", () => {
     slug: "hello-world",
     excerpt: "An excerpt.",
     coverImage: "/cover.jpg",
-    contentMarkdown: "# Hello",
-    contentHtml: "<h1>Hello</h1>",
-    contentText: "Hello",
     status: "published",
-    source: "editor",
     featured: false,
     pinned: false,
     commentsEnabled: true,
@@ -110,30 +106,14 @@ describe("localizePost", () => {
     ],
     seoTitle: "Hello World SEO",
     seoDescription: "SEO description",
-    i18n: {
-      title: { zh: "你好世界" },
-      excerpt: { zh: "一段摘录。" },
-      contentMarkdown: { zh: "# 你好" },
-      contentHtml: { zh: "<h1>你好</h1>" },
-      contentText: { zh: "你好" },
-      seoTitle: { zh: "你好世界 SEO" },
-      seoDescription: { zh: "SEO 描述" },
-    },
   };
 
-  it("localizes title, excerpt, content fields to zh", () => {
+  it("preserves content metadata", () => {
     const result = localizePost(post, "zh");
-    expect(result.title).toBe("你好世界");
-    expect(result.excerpt).toBe("一段摘录。");
-    expect(result.contentMarkdown).toBe("# 你好");
-    expect(result.contentHtml).toBe("<h1>你好</h1>");
-    expect(result.contentText).toBe("你好");
-  });
-
-  it("localizes seo fields to zh", () => {
-    const result = localizePost(post, "zh");
-    expect(result.seoTitle).toBe("你好世界 SEO");
-    expect(result.seoDescription).toBe("SEO 描述");
+    expect(result.title).toBe("Hello World");
+    expect(result.excerpt).toBe("An excerpt.");
+    expect(result.seoTitle).toBe("Hello World SEO");
+    expect(result.seoDescription).toBe("SEO description");
   });
 
   it("localizes nested tags", () => {
