@@ -12,8 +12,8 @@ test.describe("Comments", () => {
     test.setTimeout(120_000);
 
     const runId = `${Date.now()}-${test.info().parallelIndex}`;
-    const postTitle = "10 Minutes to Codex";
-    const postSlug = "2026-05-25-10-minutes-to-codex-en";
+    const postTitle = "好课像大片";
+    const postSlug = "2026-05-22-great-course-design";
     const readerName = `E2E Reader ${runId}`;
     const readerEmail = `reader-${runId}@example.test`;
     const commentBody = `E2E visible comment ${runId}`;

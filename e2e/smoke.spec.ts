@@ -7,12 +7,12 @@ test.describe("Smoke Tests", () => {
 
     await page.getByRole("button", { name: "View all posts" }).click();
     await expect(page).toHaveURL(/\/blog/);
-    await expect(page.getByRole("heading", { name: "Durable publishing notes" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Articles" })).toBeVisible();
   });
 
   test("blog list page loads", async ({ page }) => {
     await page.goto("/blog?q=&tag=&page=1");
-    await expect(page.getByRole("heading", { name: "Durable publishing notes" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Articles" })).toBeVisible();
     const title = await page.title();
     expect(title).toBeTruthy();
   });
