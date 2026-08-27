@@ -44,5 +44,7 @@ export const posts = defineCollections({
 export default defineConfig({
   mdxOptions: {
     rehypeCodeOptions: false,
+    // Remote editorial images should remain visible even when metadata lookup is temporarily unavailable.
+    remarkImageOptions: { onError: "ignore" },
   },
 });
