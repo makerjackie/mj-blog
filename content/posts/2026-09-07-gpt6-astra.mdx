@@ -1,0 +1,527 @@
+---
+title: "超干的 GPT-6-Astra 一手实操经验分享"
+slug: "2026-09-07-gpt6-astra"
+excerpt: "GPT-6 Astra 一手项目实测，科学可视化、Computer Use、旧项目重构，以及 Astra 与 Luna 分工和省额度技巧。"
+status: "published"
+publishedAt: "2026-09-07T08:00:00.000Z"
+tags: ["AI", "Codex", "GPT-6", "独立开发"]
+coverImage: "https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/2026-09-07-gpt6-astra-cover.jpg"
+commentsEnabled: true
+authorName: "Maker Jackie"
+---
+
+<blockquote>
+  <p>文章后半部分有实操干货！几个技巧让你“获得”至少两倍以上的 codex 额度</p>
+</blockquote>
+
+<p>周六 GPT-6 Astra 出来之后，我干了一件事。</p>
+
+<p>找 Claude 号商，说我要退款哈哈哈！</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-01.jpg"
+  alt="addition-3.jpg"
+/>
+
+<p>
+  别问我之前为什么这么「舔狗」。前阵子连续被封了三四个 Claude
+  账号，我还在想办法用。因为我那个科学可视化网站，之前试下来，只有 Claude
+  能做出我想要的效果：超美超好看，极度丝滑优雅的动画，让人不可遏制的，燃起对宇宙、科学的好奇。
+</p>
+
+<p />
+
+<p>谢天谢地，现在 GPT-6 来了。</p>
+
+<p>它做出来的科学可视化，真的牛逼，而且非常好看。截图只能呈现一部分，实际动起来的效果也很丝滑。</p>
+
+<p>我终于可以不用再跪舔 Claude 了！！</p>
+
+<p>你看我这两天发的东西，就知道我有多兴奋。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-02.jpg"
+  alt="PixPin_2026-09-07_12-09-23.jpg"
+/>
+
+<p>
+  我在酒店录了个一分钟的视频，让你看一下这美妙的效果！给大人的小星球和科学可视化：
+  https://shapeof.world
+</p>
+
+{/* 视频 1，待作者手动插入 */}
+
+<p />
+
+<p>今天分享我的项目实测和使用技巧，不是严格的模型评测。</p>
+
+<p>后面还会聊 Astra 和 Luna 怎么分工、Pro 额度怎么用，以及 AGENTS.md 和 Skills 怎么精简。</p>
+
+<p />
+
+<h2>先看点直观的，小星球和科学可视化</h2>
+
+<p>先看「给大人的小星球」。用 Astra 做出来的网页，可以是这种画风。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-03.jpg"
+  alt="PixPin_2026-09-07_11-39-07.jpg"
+/>
+
+<p>给大人的小星球</p>
+
+<p>
+  打开给大人的小星球
+  <br />
+  https://tinyplanets.01mvp.com/?lang=zh
+</p>
+
+<p>再看「世界的形状」，这次我用 Astra 做了好几个科学可视化主题。</p>
+
+<p>有数学、物理，也有日常生活中的可视化。复制下面的网址到浏览器，就能亲手玩。</p>
+
+<p>光子这个主题，画面就又是另一种感觉了。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-04.jpg"
+  alt="PixPin_2026-09-07_11-40-02.jpg"
+/>
+
+<p>
+  世界的形状 · 光子，一次一粒
+  <br />
+  https://shapeof.world/explore/photon
+</p>
+
+<p>比如复变函数。平时在纸上看是一串公式，做成可以观察的空间之后，感觉就完全不一样了。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-05.jpg"
+  alt="aeda50bea9a46a0f730195ddea5ce811.jpg"
+/>
+
+<p>
+  世界的形状 · 复变函数
+  <br />
+  https://shapeof.world/explore/complex-mapping
+</p>
+
+<p>
+  还有河流改道。这样的主题，我觉得很适合用交互来解释，光靠一张静态图很难讲清楚变化的过程。
+  <br />
+  https://shapeof.world/explore/river-meander
+</p>
+
+<p>然后是地球自转与公转。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-06.jpg"
+  alt="PixPin_2026-09-07_11-38-48.jpg"
+/>
+
+<p>
+  世界的形状 · 地球自转与公转
+  <br />
+  https://shapeof.world/explore/earth-spin-orbit
+</p>
+
+<p />
+
+<p>也不全是数学物理。比如「金钱的去向」，就是把钱流向不同地方的关系呈现出来。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-07.jpg"
+  alt="PixPin_2026-09-07_11-40-27.jpg"
+/>
+
+<p>
+  世界的形状 · 金钱的去向
+  <br />
+  https://shapeof.world/explore/money-flow-atlas
+</p>
+
+<p>再往视觉效果这边走一点，就是这个公式特效。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-08.jpg"
+  alt="PixPin_2026-09-07_11-41-12.jpg"
+/>
+
+<p>
+  世界的形状 · 公式特效
+  <br />
+  https://shapeof.world/explore/equation-wormhole
+</p>
+
+<p />
+
+<p>Flutter 项目、iOS App 和网站重构，我也试了，效果都很好，篇幅所限就不展开了。</p>
+
+<p />
+
+<h2>Computer Use，我拿它办了件真的麻烦事</h2>
+
+<p>GPT6 Astra 的 computer use 能力听说也得到了很大的提升</p>
+
+<p>不过我其实没有为了测试 Computer Use，专门找一堆软件让它操作。</p>
+
+<p>但刚好有一个真实需求，鸿蒙 App 上架。</p>
+
+<p>苹果这边用 ASC CLI 比较方便。鸿蒙上架却有一堆证书、授权和申请材料，要在网页后台来回处理。</p>
+
+<p>这些事情我就交给 Codex，让它用 Computer Use 帮我操作。</p>
+
+<p>实测体验很好，操作成功率很高。这些来回点、来回填的事情，终于有人帮我干了。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-09.jpg"
+  alt="image.png"
+/>
+
+<p />
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-10.jpg"
+  alt="PixPin_2026-09-07_11-47-16.jpg"
+/>
+
+<p>鸿蒙 App 上架流程中的权限申请页面。</p>
+
+<p>这里说的是后台操作体验，最终审核结果还是要看商店。</p>
+
+<p>想试 Computer Use，就找一个真实的后台流程，把任务、材料和完成标准交代清楚。</p>
+
+<p>Blender 我最近没有需求，还没亲测。</p>
+
+<p>
+  官方有个建筑案例，Astra 用 Blender 做出可编辑场景，检查渲染结果，再导入 Unreal Engine 5
+  做漫游。感兴趣可以看原文。
+</p>
+
+<p />
+
+<p>
+  OpenAI Developers · Astra 建筑可视化案例
+  <br />
+  https://developers.openai.com/blog/architectural-visualization-with-astra
+</p>
+
+<p />
+
+<h2>老项目也试了，删图 App 这次少返工了</h2>
+
+<p>
+  除了这些直观的效果，我还让 Astra 收拾了一下我的 ios APP 删图：相片整理，修了几个 5.6 sol
+  搞不懂的陈年老
+  bug，也大大提升了APP的性能。（估计新版本会在明天审核后上架，我觉得真的丝滑很多！！）
+</p>
+
+<p />
+
+<p>最让我满意的是，返工次数少了。之前用 GPT-5.6，经常这里修好了，那里又冒出一个问题。</p>
+
+<p>如果你也有一个积累了 GPT 5.6 写了几个月的屎山项目，可以试试这段话，有奇效！</p>
+
+<pre>
+  <code>帮我做一下代码重构，删除历史遗留文档/代码，删除不必要的复杂设计和抽象且保证测试通过。</code>
+</pre>
+
+<p>对了，下面这个 App 演示视频，也是它自己生成的。</p>
+
+{/* 视频 2，待作者手动插入 */}
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-11.jpg"
+  alt="72214cd0f76ffcb0944511afc18ae8f6.jpg"
+/>
+
+<p>删图 App 演示视频的制作结果。</p>
+
+<p />
+
+<p>
+  <b>
+    <span>
+      好了，接下来回到最开头的“干货”引子，如何小钱办大活，让你的 ChatGPT
+      多块好省，干更多的活呢？{" "}
+    </span>
+  </b>
+</p>
+
+<p />
+
+<h2>思考深度默认推荐用 Medium ，不用每次都拉满</h2>
+
+<p>回到具体怎么用这块。</p>
+
+<p>
+  我现在大部分情况下用 Medium，比较复杂的思考任务再用 Extra High。这里说的是 Codex 里 Astra
+  的思考档位，因为你看它那个测评指标，在编程任务上，Medium跟Extra
+  High其实差距很小。（这里我就懒得贴图了）
+</p>
+
+<p />
+
+<p>
+  我自己的习惯是，普通修改、需求已经比较清楚的任务，先用
+  Medium。遇到需要认真想架构、拆一个复杂问题的时候，再往上调。
+</p>
+
+<p />
+
+<h2>省额度的最佳方法：Astra 计划，Luna 执行</h2>
+
+<p>不过先说一个让我肉疼的地方，Astra 真的很烧额度。</p>
+
+<p>按当前官方的标准 token credit 费率，同样数量的 token，Astra 的费率是 Sol 的 2.5 倍。</p>
+
+<p>
+  但实际跑下来额度消耗能到原来的 4～5 倍。也有 Plus 用户反馈，一两轮重任务就把额度用得差不多了。
+</p>
+
+<p>所以能力我是真的喜欢，额度也是真的心疼。希望 OpenAI 后面能继续优化。</p>
+
+<p />
+
+<p>Astra 出计划，Luna Max 执行，最后再让 Astra 验收。</p>
+
+<p>注意，是另开对话让 Luna 做，别让 Astra 开 SubAgent 一直盯着它。</p>
+
+<p>我实测后面这种监督方式，更烧 token，还更慢。至少在我的任务里，多开 Agent 没省下来。</p>
+
+<p />
+
+<p>举个简单的例子：</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-12.jpg"
+  alt="PixPin_2026-09-07_11-52-21.jpg"
+/>
+
+<p />
+
+<h2>Codex 的 Astra 额度用完了，可以用网页 Chat Pro！</h2>
+
+<p>很多朋友可能不知道，网页普通 Chat 里的 Pro 模型，和 Work、Codex 的使用额度是分开计算的。</p>
+
+<p>
+  <b>而且一直以来， chatgpt 网页中的 Chat Pro 实际上是最聪明最强大的版本！</b>
+</p>
+
+<p>买了 Pro 却只用 Codex，别把网页 Chat 的额度闲置了，额度是这样的</p>
+
+<table>
+  <colgroup>
+    <col width="133" />
+    <col width="165" />
+    <col width="328" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>
+        <p>套餐</p>
+      </th>
+      <th>
+        <p>GPT-6 Pro</p>
+      </th>
+      <th>
+        <p>GPT-5.6 Sol Pro</p>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <p>Pro $200</p>
+      </td>
+      <td>
+        <p>每周 200 条</p>
+      </td>
+      <td>
+        <p>另有每天 170 条，两模型合计每天最多 200 条</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Pro $100</p>
+      </td>
+      <td>
+        <p>每周 50 条</p>
+      </td>
+      <td>
+        <p>与 GPT-6 Pro 共用这 50 条每周额度</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  {" "}
+  GPT-6 Pro 用满后，会自动回退到 GPT-5.6 Thinking 的 Medium 或者 Instant 模型；
+  <br />
+</p>
+
+<p>具体使用方法如下：</p>
+
+<ol>
+  <li>
+    如果你有 GitHub 仓库的话，先安装 GitHub 插件、确认仓库权限后，把需求交给它，让它用 PR 交付。
+  </li>
+</ol>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-13.jpg"
+  alt="PixPin_2026-09-07_11-32-33.jpg"
+/>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-14.jpg"
+  alt="PixPin_2026-09-07_11-33-49.jpg"
+/>
+
+<ol>
+  <li>如果从零开始做，就让它交付完整代码包（它会给你一个可以下载的链接。）</li>
+</ol>
+
+<p>注意网页运行代码用的是云端Linux环境。所以你要让它操作你本地的电脑，那就无能为力了。</p>
+
+<p />
+
+<h2>模型能力提升了，以前 AGENTS.md 和 Skill 需要改改啦！</h2>
+
+<p>
+  Superpower 的 skill
+  基本可以全扔了，在模型智力比较低的时候，它还挺有用，但是模型智力提升，它复杂冗余的流程就是妥妥的累赘了。
+</p>
+
+<p>
+  除此之外，其实基本上每一代模型的发布，OpenAI和或者claude官方都会出一些新的 prompt
+  指南。所以你要做的事情很简单，仅仅是把官方指南链接丢给AI，让它审计一遍过去的Skill 跟 Agents.md
+</p>
+
+<p />
+
+<p>复制这段 prompt 给你的 codex</p>
+
+<pre>
+  <code>
+    阅读@pvncher的文章 https://x.com/pvncher/status/2095991462416490862
+    <br />
+    审计我项目中的所有技能和 AGENTS.md 文件
+  </code>
+</pre>
+
+<p />
+
+<p>
+  上面 prompt 中的链接是 codex 核心开发者之一 pvncher 的 X 原帖，此外OpenAI · Astra
+  指令遵循建议在这里：https://developers.openai.com/api/docs/guides/latest-model
+</p>
+
+<p />
+
+<h2>Codex 新能力：更好的上下文管理</h2>
+
+<p>还有一个我自己体验不错的东西，实验性上下文管理。</p>
+
+<p>Astra 现在可以跨窗口记笔记，找回同一任务里早先的消息和工具结果。</p>
+
+<p>聊得很长的时候，前面试过什么、为什么没走通，不用完全依赖一份被反复压缩的摘要。</p>
+
+<p>我用下来衔接挺准，也感觉更省额度，但没做严格对照。</p>
+
+<p>
+  目前它还是实验性功能，默认关闭，而且要看客户端和登录方式是否支持。可以把下面这段直接发给本机
+  Codex。
+</p>
+
+<pre>
+  <code>
+    查看我当前版本是否支持下面的设置，如果支持，
+    <br />
+    修改 codex 的 config.toml，启用以下配置
+    <br />
+    <br />
+    [features.context_management]
+    <br />
+    experimental_mode = true
+    <br />
+    <br />
+    改完做一下验证
+  </code>
+</pre>
+
+<p>改好配置后，重开 Codex，再新建任务才生效。</p>
+
+<p>
+  OpenAI · 实验性上下文管理配置说明
+  <br />
+  https://learn.chatgpt.com/docs/config-file/config-reference
+</p>
+
+<p />
+
+<h2>还有个用法，让它做你的人生教练！</h2>
+
+<p>
+  除了写代码和操作电脑，我还看到 Robinson ·
+  鲁梓逊（@python_xxt）发了一个提示词，我觉得这个思路很棒。
+</p>
+
+<p>结合你的经历、能力和现实处境，让 Astra 分析最值得做什么，又该停下什么。</p>
+
+<p>别泛泛地鼓励我，也别什么都说好。把我自己没注意到的瓶颈、风险和机会说具体一点。</p>
+
+<p>下面是他的原帖截图。</p>
+
+<img
+  src="https://assets.01mvp.com/images/makerjackie/2026-09-07-gpt6-astra/image-15.jpg"
+  alt="addition-2.jpg"
+/>
+
+<p>可以复制 prompt :</p>
+
+<pre>
+  <code>
+    请基于你在当前对话、可用记忆和我提供的材料中确实知道的信息，帮我做一次个人发展复盘。先列出你了解的事实和仍然缺少的信息，不要假装看过我的全部历史对话。
+    <br />
+    <br />
+    结合我的经历、能力、职业处境、资源和风险偏好，找出未来 3～5 年最值得关注的 3～5
+    个瓶颈、机会和盲点，按重要程度排序。
+    <br />
+    <br />
+    不要一味安慰或迎合我。每条建议都说清楚依据、现实约束、机会成本，以及我可以做的具体行动。区分事实、推测和需要向我确认的地方。
+    <br />
+    <br />
+    给出未来 30 天、90 天和 1 年的行动重点。如果现在只做一个改变，你建议是什么？为什么？
+    <br />
+    <br />
+    最后提出一条值得验证的长期主线，以及未来出现哪些新信息时，我应该调整方向。宁可少给几条具体建议，也不要堆一大串空话。
+  </code>
+</pre>
+
+<p />
+
+<p>这次 GPT-6 带给我的兴奋，真的是全方位的。</p>
+
+<p>未来，执行可能没那么值钱了（因为 astra 可以帮你搞定大部分）</p>
+
+<p>更值钱的，是发现真实需求的能力、判断力、天马行空的想象力，还有你的审美。</p>
+
+<p />
+
+<p>这真是一个令人兴奋的时代！</p>
+
+<p />
+
+<p>
+  如果你觉得这篇文章对你有帮助，欢迎点赞、在看、转发。如果想第一时间收到推送，也可以给我个星标⭐
+</p>
+
+<p>谢谢你看我的文章，我们，下次再见。</p>
+
+<p />
+
+<p>/ 作者，Maker Jackie</p>
+
+<p>/ 合作请联系邮箱，makerjackie@qq.com</p>
