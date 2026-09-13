@@ -2,7 +2,8 @@ import type { SiteSettings } from "./types";
 
 export const siteSettings: SiteSettings = {
   name: "MakerJackie",
-  description: "AI product notes, indie hacking logs, and practical guides from MakerJackie.",
+  description:
+    "The personal home of MakerJackie: writing, travels, playful experiments, and independent products.",
   url: "https://makerjackie.com",
   authorName: "Jackie",
   authorBio: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
@@ -41,7 +42,7 @@ export const siteSettings: SiteSettings = {
   primaryLanguage: "zh",
   i18n: {
     name: { zh: "MakerJackie" },
-    description: { zh: "记录 AI 产品、独立开发、自媒体和长期思考。" },
+    description: { zh: "MakerJackie 的互联网主页：写作、旅行、有趣的实验，以及正在做的产品。" },
     authorBio: { zh: "独立开发者，前 AI 算法工程师，周周黑客松发起人。" },
   },
 };
