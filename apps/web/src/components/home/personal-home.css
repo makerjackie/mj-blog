@@ -1,0 +1,748 @@
+.personal-home {
+  --personal-blue: #315ca7;
+  --personal-paper: color-mix(in srgb, var(--background) 94%, #cdbb8d 6%);
+  --personal-line: color-mix(in srgb, var(--foreground) 16%, transparent);
+  --personal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  background: var(--personal-paper);
+  color: var(--foreground);
+}
+.personal-wrap {
+  max-width: 1168px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.personal-home a,
+.personal-home button,
+.personal-home summary {
+  -webkit-tap-highlight-color: transparent;
+}
+.personal-home a:focus-visible,
+.personal-home button:focus-visible,
+.personal-home summary:focus-visible {
+  outline: 2px solid var(--personal-blue);
+  outline-offset: 5px;
+}
+.personal-home a {
+  text-decoration: none;
+}
+.personal-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 70px;
+  padding: 84px 0 86px;
+}
+.personal-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+.personal-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--personal-blue);
+  border-radius: 50%;
+}
+.personal-intro h1 {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  margin-top: 25px;
+}
+.personal-name {
+  font-size: 106px;
+  line-height: 1.05;
+  font-weight: 650;
+  letter-spacing: -0.065em;
+}
+.personal-period {
+  color: var(--personal-blue);
+}
+.personal-tagline {
+  margin-top: 23px;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.personal-intro-body {
+  max-width: 460px;
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.95;
+  color: var(--muted-foreground);
+}
+.personal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 23px;
+}
+.personal-intro .personal-actions {
+  margin-top: 27px;
+}
+.personal-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 46px;
+  padding: 10px 20px;
+  gap: 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.3s var(--personal-ease),
+    box-shadow 0.3s;
+}
+.personal-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.personal-text-link svg {
+  transition: transform 0.3s var(--personal-ease);
+}
+.personal-photo {
+  background: var(--background);
+  padding: 10px 10px 0;
+  border: 1px solid var(--personal-line);
+  box-shadow: 0 14px 36px -22px #1e253e60;
+}
+.personal-photo img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+.personal-photo figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 43px;
+  padding: 2px 8px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.personal-photo figcaption span:last-child {
+  color: var(--personal-blue);
+  font-size: 19px;
+}
+.personal-hero-photo {
+  width: 100%;
+  transform: rotate(3deg);
+  transition: transform 0.7s var(--personal-ease);
+}
+.personal-hero-photo img {
+  aspect-ratio: 1;
+}
+.personal-section {
+  padding: 58px 0;
+  border-top: 1px solid var(--personal-line);
+  scroll-margin-top: 80px;
+}
+.personal-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 29px;
+}
+.personal-section h2 {
+  margin-top: 13px;
+  font-size: 29px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.045em;
+}
+.personal-projects {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.personal-project {
+  min-width: 0;
+  display: block;
+}
+.personal-project-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  aspect-ratio: 1.32;
+  border-radius: 9px;
+}
+.personal-project-apps .personal-project-visual {
+  background: #e3e9ee;
+}
+.personal-project-knowledge .personal-project-visual {
+  background: #ede6d7;
+}
+.personal-project-world .personal-project-visual {
+  background: #0a0a0a;
+}
+.personal-project-number {
+  position: absolute;
+  top: 15px;
+  left: 16px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #405166;
+}
+.personal-project-world .personal-project-number {
+  color: #c6b9a9;
+}
+.personal-project-arrow {
+  position: absolute;
+  right: 13px;
+  bottom: 13px;
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #ffffffd9;
+  color: #202632;
+  transition: transform 0.4s var(--personal-ease);
+}
+.personal-app-icons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 76%;
+  transform: rotate(-7deg);
+  transition: transform 0.7s var(--personal-ease);
+}
+.personal-app-icons img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 23%;
+  box-shadow: 0 7px 12px -6px #33415588;
+}
+.personal-book {
+  align-self: flex-end;
+  width: 65%;
+  height: 88%;
+  padding: 24px 20px 16px;
+  color: #f8f4e9;
+  background: #273d32;
+  transform: rotate(-8deg) translateY(12px);
+  box-shadow:
+    5px 6px 0 #b6b49d,
+    12px 15px 26px #433a2b40;
+  transition: transform 0.7s var(--personal-ease);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.personal-book > span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.personal-book strong {
+  font-size: 32px;
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+}
+.personal-book strong span {
+  color: #e9c879;
+}
+.personal-book small {
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  padding-top: 15px;
+  border-top: 1px solid #ffffff60;
+}
+.personal-world-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--personal-ease);
+}
+.personal-project-copy {
+  padding: 20px 1px 0;
+}
+.personal-project-copy h3 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.personal-project-copy p {
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.personal-project-copy small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.personal-life {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 85px;
+  align-items: center;
+  padding: 80px 32px;
+}
+.personal-music-photo {
+  transform: rotate(-3deg);
+  max-width: 330px;
+}
+.personal-music-photo img {
+  aspect-ratio: 4/5;
+  object-position: 46% 61%;
+}
+.personal-life-copy h2 {
+  margin-top: 18px;
+  font-size: 38px;
+  line-height: 1.35;
+}
+.personal-life-copy > p:not(.personal-kicker) {
+  max-width: 380px;
+  font-size: 14px;
+  line-height: 1.95;
+  margin-top: 19px;
+  color: var(--muted-foreground);
+}
+.personal-featured-note {
+  display: block;
+  border-left: 2px solid var(--personal-blue);
+  padding: 4px 0 4px 17px;
+  margin-top: 25px;
+}
+.personal-featured-note > span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.personal-featured-note strong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  line-height: 1.6;
+  margin-top: 6px;
+  font-weight: 500;
+}
+.personal-bio {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.personal-bio summary {
+  min-height: 44px;
+  padding: 12px 0;
+  cursor: pointer;
+  width: fit-content;
+}
+.personal-bio p {
+  line-height: 1.9;
+  margin-top: 8px;
+}
+.personal-post {
+  display: grid;
+  grid-template-columns: 65px 1fr 20px;
+  align-items: start;
+  gap: 22px;
+  border-top: 1px solid var(--personal-line);
+  padding: 23px 0;
+}
+.personal-post time {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  padding-top: 4px;
+}
+.personal-post h3 {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.5;
+}
+.personal-post p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 9px;
+  line-height: 1.8;
+}
+.personal-post > svg {
+  margin-top: 4px;
+  transition: transform 0.3s var(--personal-ease);
+}
+.personal-collaborate-intro {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  white-space: pre-line;
+}
+.personal-services {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--personal-line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.personal-services article {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+}
+.personal-services article + article {
+  border-left: 1px solid var(--personal-line);
+}
+.personal-service-index {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+}
+.personal-services h3 {
+  font-size: 19px;
+  margin-top: 17px;
+  font-weight: 500;
+}
+.personal-services p {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.8;
+  margin: 12px 0 25px;
+}
+.personal-price {
+  margin-top: auto;
+  font-size: 29px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+.personal-price-text {
+  font-size: 17px;
+  letter-spacing: 0;
+  padding-bottom: 5px;
+}
+.personal-contact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  padding: 29px 0 0;
+}
+.personal-contact p {
+  font-size: 12px;
+}
+.personal-contact strong {
+  font-size: 17px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.personal-contact [role="status"] {
+  display: block;
+  min-height: 20px;
+  margin-top: 7px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.personal-signoff {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--personal-line);
+  padding: 30px 0;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.personal-signoff span {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-style: italic;
+  color: var(--personal-blue);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .personal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px -10px var(--foreground);
+  }
+  .personal-hero-photo:hover {
+    transform: rotate(0deg) translateY(-3px);
+  }
+  .personal-project:hover .personal-app-icons {
+    transform: rotate(-2deg) scale(1.025);
+  }
+  .personal-project:hover .personal-book {
+    transform: rotate(-3deg) translateY(8px);
+  }
+  .personal-project:hover .personal-world-photo {
+    transform: scale(1.055);
+  }
+  .personal-project:hover .personal-project-arrow,
+  .personal-post:hover > svg,
+  .personal-text-link:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .personal-intro,
+  .personal-hero-photo {
+    animation: personal-arrive 0.8s var(--personal-ease) both;
+  }
+  .personal-hero-photo {
+    animation-delay: 0.08s;
+  }
+  @keyframes personal-arrive {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .personal-home *,
+  .personal-home *::before,
+  .personal-home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media (max-width: 900px) {
+  .personal-wrap {
+    padding: 0 28px;
+  }
+  .personal-hero {
+    gap: 35px;
+    padding: 60px 0;
+  }
+  .personal-name {
+    font-size: 82px;
+  }
+  .personal-intro h1 {
+    font-size: 29px;
+  }
+  .personal-tagline {
+    font-size: 21px;
+  }
+  .personal-life {
+    padding-inline: 0;
+    gap: 45px;
+  }
+  .personal-life-copy h2 {
+    font-size: 31px;
+  }
+  .personal-projects {
+    gap: 16px;
+  }
+  .personal-app-icons {
+    gap: 10px;
+  }
+  .personal-book {
+    padding: 17px 14px 13px;
+  }
+  .personal-book strong {
+    font-size: 25px;
+  }
+  .personal-services article {
+    padding: 20px;
+  }
+}
+@media (max-width: 639px) {
+  .personal-wrap {
+    padding: 0 23px;
+  }
+  .personal-hero {
+    grid-template-columns: 1fr;
+    padding: 38px 0 48px;
+    gap: 36px;
+  }
+  .personal-intro h1 {
+    font-size: 28px;
+    margin-top: 20px;
+  }
+  .personal-name {
+    font-size: 86px;
+  }
+  .personal-tagline {
+    margin-top: 16px;
+    font-size: 22px;
+  }
+  .personal-intro-body {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .personal-intro .personal-actions {
+    margin-top: 23px;
+    gap: 20px;
+  }
+  .personal-hero-photo {
+    max-width: 285px;
+    justify-self: center;
+  }
+  .personal-kicker {
+    font-size: 10px;
+  }
+  .personal-section {
+    padding: 36px 0;
+  }
+  .personal-section h2 {
+    font-size: 25px;
+  }
+  .personal-section-heading {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  .personal-projects {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .personal-project-visual {
+    aspect-ratio: 1.6;
+  }
+  .personal-project-copy {
+    padding-top: 15px;
+  }
+  .personal-project-copy h3 {
+    font-size: 21px;
+  }
+  .personal-app-icons {
+    width: 67%;
+    gap: 15px;
+  }
+  .personal-book {
+    width: 56%;
+    padding: 20px;
+  }
+  .personal-book strong {
+    font-size: 31px;
+  }
+  .personal-life {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 26px;
+    padding-block: 44px;
+    align-items: stretch;
+  }
+  .personal-life-copy h2 {
+    font-size: 32px;
+  }
+  .personal-music-photo {
+    max-width: 275px;
+    align-self: center;
+  }
+  .personal-post {
+    grid-template-columns: 1fr 20px;
+    gap: 8px 14px;
+    padding-block: 20px;
+  }
+  .personal-post time {
+    grid-column: 1/-1;
+  }
+  .personal-post h3 {
+    font-size: 17px;
+  }
+  .personal-services {
+    grid-template-columns: 1fr;
+  }
+  .personal-services article {
+    padding: 23px;
+  }
+  .personal-services article + article {
+    border-left: 0;
+    border-top: 1px solid var(--personal-line);
+  }
+  .personal-services p {
+    margin-bottom: 16px;
+  }
+  .personal-contact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+
+/* Keep the real portrait in the first mobile viewport. */
+@media (max-width: 639px) {
+  .personal-hero {
+    grid-template-columns: minmax(0, 1fr) 135px;
+    gap: 18px;
+    padding-top: 32px;
+  }
+  .personal-intro {
+    display: contents;
+  }
+  .personal-intro > .personal-kicker {
+    grid-column: 1 / -1;
+  }
+  .personal-intro h1 {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 23px;
+    margin-top: 0;
+  }
+  .personal-name {
+    font-size: 60px;
+  }
+  .personal-hero-photo {
+    grid-column: 2;
+    grid-row: 2;
+    width: 135px;
+    padding: 5px 5px 0;
+  }
+  .personal-hero-photo figcaption {
+    min-height: 28px;
+    padding: 0 3px;
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+  .personal-hero-photo figcaption span:last-child {
+    font-size: 13px;
+  }
+  .personal-intro .personal-tagline,
+  .personal-intro .personal-intro-body,
+  .personal-intro .personal-actions {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+  .personal-intro .personal-tagline {
+    margin-top: 9px;
+  }
+  .personal-intro .personal-actions {
+    margin-top: 4px;
+  }
+}
+@media (max-width: 360px) {
+  .personal-hero {
+    grid-template-columns: minmax(0, 1fr) 110px;
+    gap: 14px;
+  }
+  .personal-hero-photo {
+    width: 110px;
+  }
+  .personal-name {
+    font-size: 50px;
+  }
+  .personal-intro h1 {
+    font-size: 21px;
+  }
+}
