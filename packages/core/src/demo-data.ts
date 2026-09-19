@@ -4,7 +4,7 @@ export const siteSettings: SiteSettings = {
   name: "MakerJackie",
   description:
     "The personal home of MakerJackie: writing, travels, playful experiments, and independent products.",
-  url: "https://makerjackie.com",
+  url: "https://old.makerjackie.com",
   authorName: "Jackie",
   authorBio: "独立开发者，前 AI 算法工程师，周周黑客松发起人。",
   avatarUrl: "/jackie-avatar.jpg",

@@ -1,8 +1,8 @@
 # Deployment
 
-MakerJackie production target:
+MakerJackie legacy archive target:
 
-- Site: `https://makerjackie.com`
+- Site: `https://old.makerjackie.com`
 - Worker: `makerjackie-blog`
 - D1: `makerjackie-blog-cms`
 - Wrangler config: `apps/web/wrangler.jsonc`

@@ -12,11 +12,7 @@
   },
   "routes": [
     {
-      "pattern": "makerjackie.com",
-      "custom_domain": true,
-    },
-    {
-      "pattern": "www.makerjackie.com",
+      "pattern": "old.makerjackie.com",
       "custom_domain": true,
     },
   ],
@@ -27,8 +23,8 @@
     },
   ],
   "vars": {
-    "VITE_BASE_URL": "https://makerjackie.com",
-    "CMS_PUBLIC_SITE_URL": "https://makerjackie.com",
+    "VITE_BASE_URL": "https://old.makerjackie.com",
+    "CMS_PUBLIC_SITE_URL": "https://old.makerjackie.com",
     "CMS_EMAIL_SENDING_ENABLED": "true",
     "CMS_EMAIL_FROM": "noreply@makerjackie.com",
     "CMS_EMAIL_TO": "707610215@qq.com",
